@@ -45,7 +45,7 @@ export function StorySection({ about }: { readonly about: AboutContent }) {
               </span>
             </Reveal>
 
-            <Reveal variant="fade" className="max-w-[28.75rem]">
+            <Reveal variant="settle" className="max-w-[28.75rem]">
               <MediaFrame
                 asset={pathToMediaAsset(about.portraitPath, about.portraitAlt, MEDIA.bagueOrRosePerle)}
                 placeholder="Portrait du fondateur / de l’équipe"

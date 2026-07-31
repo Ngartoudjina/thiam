@@ -142,7 +142,7 @@ export function GalleryGrid({ tiles, mobileTiles }: GalleryGridProps) {
                   onClick={(event) => open(openIndex, event.currentTarget, asset)}
                   aria-label={`Agrandir : ${asset.alt}`}
                   aria-haspopup="dialog"
-                  className="group relative block h-full w-full cursor-zoom-in overflow-hidden bg-ink-soft"
+                  className="group tile-drift relative block h-full w-full cursor-zoom-in overflow-hidden bg-ink-soft"
                 >
                   <MediaFrame
                     asset={asset}

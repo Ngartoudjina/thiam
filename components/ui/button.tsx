@@ -22,7 +22,7 @@ const buttonVariants = cva(
       variant: {
         /** CTA principal : dégradé or, texte cacao. */
         gold: [
-          'bg-gold-gradient text-cacao font-medium tracking-(--tracking-button)',
+          'sheen bg-gold-gradient text-cacao font-medium tracking-(--tracking-button)',
           'hover:bg-gold-gradient-hover hover:[&_svg]:translate-x-1',
         ],
         /** Contour clair sur fond sombre. */

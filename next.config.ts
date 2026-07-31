@@ -51,10 +51,46 @@ const nextConfig: NextConfig = {
     // Ne charge que les icônes réellement importées : évite d'embarquer
     // l'intégralité de lucide-react dans le bundle client.
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+
+    /**
+     * Cache de navigation du routeur.
+     *
+     * Next réutilise le rendu déjà reçu pendant ces durées : revenir en
+     * arrière, ou repasser par une page visitée, devient instantané au lieu de
+     * redemander la charge au serveur. Les pages du site étant statiques et
+     * invalidées par étiquette à chaque modification du tableau de bord, trois
+     * minutes ne présentent aucun risque de contenu périmé.
+     */
+    staleTimes: {
+      static: 180,
+      dynamic: 30,
+    },
   },
 
   async headers() {
-    return [{ source: '/:path*', headers: [...securityHeaders] }];
+    return [
+      { source: '/:path*', headers: [...securityHeaders] },
+
+      /**
+       * Photographies et logotype livrés avec le site.
+       *
+       * Leur contenu ne change jamais sous une même adresse — un remplacement
+       * passe par le tableau de bord et produit un nouveau chemin. On peut donc
+       * les déclarer immuables : le navigateur ne les redemande plus jamais.
+       */
+      {
+        source: '/images/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/brand/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ];
   },
 };
 

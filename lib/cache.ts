@@ -16,5 +16,12 @@ export const CACHE_TAGS = {
 
 export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
 
-/** Durée de vie maximale d'une entrée, filet de sécurité si une étiquette est oubliée. */
-export const CONTENT_REVALIDATE_SECONDS = 300;
+/**
+ * Durée de vie maximale d'une entrée.
+ *
+ * Ce n'est qu'un filet de sécurité : la fraîcheur est assurée par
+ * l'invalidation par étiquette, déclenchée à chaque écriture du tableau de
+ * bord. Une heure évite de réinterroger Supabase pour rien sur un contenu qui
+ * change quelques fois par mois.
+ */
+export const CONTENT_REVALIDATE_SECONDS = 3600;

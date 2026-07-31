@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-export type RevealVariant = 'up' | 'up-sm' | 'fade' | 'left';
+export type RevealVariant = 'up' | 'up-sm' | 'fade' | 'left' | 'settle';
 
 /** Balises autorisées : garde la sémantique sans ouvrir la porte à `any`. */
 type RevealTag =

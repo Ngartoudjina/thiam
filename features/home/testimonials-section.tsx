@@ -36,7 +36,7 @@ export function TestimonialsSection({ featured, cards }: TestimonialsSectionProp
       />
 
       <div className="mb-12 grid gap-10 lg:mb-15 lg:grid-cols-[27.5rem_1fr] lg:items-stretch lg:gap-15">
-        <Reveal variant="fade">
+        <Reveal variant="settle">
           <MediaFrame
             asset={MEDIA.bouclesFleurPerle}
             placeholder="Portrait cliente en boutique"

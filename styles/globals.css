@@ -578,6 +578,126 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Mouvements pilotés par le défilement                                        */
+/*                                                                              */
+/*  `animation-timeline: view()` lie la progression d'une animation à la place  */
+/*  de l'élément dans le cadre, sans écouteur ni JavaScript : tout se joue sur  */
+/*  le compositeur. Encadré par `@supports` — là où la propriété manque, la     */
+/*  mise en page reste simplement immobile, jamais cassée.                      */
+/* -------------------------------------------------------------------------- */
+
+@layer components {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      /*
+       * « Les grandes tuiles dérivent verticalement de 40 px au scroll
+       * (parallaxe différentielle par colonne). »
+       * La dérive s'applique à l'image, jamais à la tuile : le pavage de la
+       * mosaïque reste strictement en place.
+       */
+      .tile-drift img {
+        animation: tile-drift linear both;
+        animation-timeline: view();
+        animation-range: entry 0% exit 100%;
+      }
+
+      @keyframes tile-drift {
+        from {
+          translate: 0 -20px;
+        }
+        to {
+          translate: 0 20px;
+        }
+      }
+
+      /* Le filet vertical de la chronologie se remplit à mesure du défilement. */
+      .scroll-progress-line {
+        animation: draw-down linear both;
+        animation-timeline: view();
+        animation-range: entry 40% cover 70%;
+        transform-origin: top;
+      }
+
+      @keyframes draw-down {
+        from {
+          scale: 1 0;
+        }
+        to {
+          scale: 1 1;
+        }
+      }
+    }
+  }
+
+  /*
+   * « Les images arrivent à 1,06 et reviennent à 1,00 » — l'objectif qui se
+   * stabilise. Portée par la révélation, donc jouée une seule fois.
+   */
+  .js [data-reveal='settle'] {
+    opacity: 0;
+  }
+
+  .js [data-reveal='settle'] img {
+    scale: 1.06;
+  }
+
+  .js [data-reveal='settle'][data-revealed] {
+    opacity: 1;
+    transition: opacity var(--duration-reveal) var(--ease-editorial);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal='settle'][data-revealed] img {
+    scale: 1;
+    transition: scale 900ms var(--ease-editorial);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  /*
+   * Reflet des boutons or : une lueur traverse le dégradé au survol.
+   * Un seul passage, déclenché par l'intention de l'utilisateur — jamais en
+   * boucle, conformément à la règle de la maquette.
+   */
+  .sheen {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .sheen::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    translate: -110% 0;
+    background: linear-gradient(
+      100deg,
+      transparent 20%,
+      rgb(255 255 255 / 0.28) 50%,
+      transparent 80%
+    );
+    pointer-events: none;
+  }
+
+  .sheen:hover::after,
+  .sheen:focus-visible::after {
+    animation: sheen-sweep 900ms var(--ease-editorial) both;
+  }
+
+  @keyframes sheen-sweep {
+    to {
+      translate: 110% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sheen::after {
+      display: none;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Mouvement réduit — « tout devient un simple fondu »                          */
 /* -------------------------------------------------------------------------- */
 

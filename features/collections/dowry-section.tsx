@@ -13,7 +13,7 @@ export function DowrySection() {
   return (
     <section aria-labelledby="dot-titre" className="bg-ivory gutter py-14 lg:py-27.5">
       <div className="grid items-stretch lg:grid-cols-2">
-        <Reveal variant="fade" className="h-[16rem] lg:h-[35rem]">
+        <Reveal variant="settle" className="h-[16rem] lg:h-[35rem]">
           <MediaFrame
             asset={MEDIA.presentationParures}
             alt="Coffret de mariage : parure complète présentée dans son écrin"
