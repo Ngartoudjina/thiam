@@ -1,0 +1,597 @@
+@import 'tailwindcss';
+
+/**
+ * Mode sombre piloté par une classe sur `<html>`, posée par le tableau de bord.
+ * Le site vitrine n'emploie aucune variante `dark:` : il reste identique quel
+ * que soit l'état de la classe.
+ */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -------------------------------------------------------------------------- */
+/*  Design tokens — relevés à l'identique sur la maquette « THIAM 24 Carats »   */
+/*  Canvas de référence : desktop 1440 px · mobile 390 px                       */
+/* -------------------------------------------------------------------------- */
+
+@theme {
+  /* ---- Points de rupture (6 paliers : du petit mobile au grand desktop) ---- */
+  --breakpoint-xs: 23.4375rem; /* 375px — mobile standard                    */
+  --breakpoint-sm: 30rem; /* 480px — grand mobile                       */
+  --breakpoint-md: 48rem; /* 768px — tablette                           */
+  --breakpoint-lg: 64rem; /* 1024px — tablette paysage / petit laptop   */
+  --breakpoint-xl: 80rem; /* 1280px — laptop                            */
+  --breakpoint-2xl: 90rem; /* 1440px — desktop (canvas de la maquette)   */
+  --breakpoint-3xl: 108rem; /* 1728px — grand desktop                     */
+
+  /* ---- Noirs ---- */
+  --color-obsidian: #0b0b0c;
+  --color-ink: #16120f;
+  --color-ink-soft: #141110;
+  --color-slate: #1c1917;
+  --color-espresso: #17130f;
+  --color-cacao: #17100a;
+  --color-graphite: #2a241f;
+  --color-umber: #3c352f;
+  --color-taupe: #4a433d;
+
+  /* ---- Ivoires ---- */
+  --color-ivory: #f7f4ef;
+  --color-porcelain: #fffdfa;
+  --color-sand: #ede7df;
+
+  /* ---- Ors (issus du logo) ---- */
+  --color-gold: #c08a62;
+  --color-gold-deep: #a96f4b;
+  --color-gold-dim: #a9805f;
+  --color-gold-warm: #c99a76;
+  --color-gold-light: #e3b79a;
+  --color-gold-pale: #e8bfa3;
+  --color-gold-mist: #f2d6bf;
+  --color-gold-ink: #8e5c3d; /* or lisible sur fond ivoire — ratio AA 4.97:1 */
+
+  /* ---- Gris de texte (sur ivoire) ---- */
+  --color-stone: #5c544d;
+  --color-clay: #6b635c; /* plancher AA sur ivoire — 5.24:1 */
+  --color-fog: #c3b9af; /* décoratif uniquement (séparateurs) */
+
+  /* ---- Statut ---- */
+  --color-open: #8fbf87;
+  --color-open-soft: #b9d9b2;
+
+  /* ---- Encres sur fond sombre (opacités ≥ .55 = AA) ---- */
+  --color-on-dark: #f7f4ef;
+  --color-on-dark-muted: rgb(247 244 239 / 0.72);
+  --color-on-dark-soft: rgb(247 244 239 / 0.6);
+  --color-on-dark-faint: rgb(247 244 239 / 0.55);
+
+  /* ---- Filets ---- */
+  --color-rule-dark: rgb(247 244 239 / 0.1);
+  --color-rule-dark-soft: rgb(247 244 239 / 0.08);
+  --color-rule-dark-strong: rgb(247 244 239 / 0.22);
+  --color-rule-light: rgb(22 18 15 / 0.12);
+  --color-rule-light-soft: rgb(22 18 15 / 0.09);
+  --color-rule-light-strong: rgb(22 18 15 / 0.18);
+
+  /* ---- Typographies ---- */
+  --font-serif: var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans: var(--font-jost), 'Jost', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* ---- Échelle typographique fluide (mobile 390 px → desktop 1440 px) ----- */
+  --text-hero: clamp(3.375rem, 2.168rem + 4.952vw, 6.625rem); /* 54 → 106 */
+  --text-page: clamp(3.25rem, 2.229rem + 4.19vw, 6rem); /*  52 →  96 */
+  --text-contact: clamp(3rem, 2.118rem + 3.619vw, 5.375rem); /*  48 →  86 */
+  --text-section: clamp(2.75rem, 1.961rem + 3.238vw, 4.875rem); /*  44 →  78 */
+  --text-stat: clamp(2.75rem, 2.239rem + 2.095vw, 4.125rem); /*  44 →  66 */
+  --text-feature: clamp(2.25rem, 1.739rem + 2.095vw, 3.625rem); /*  36 →  58 */
+  --text-card: clamp(2.25rem, 1.925rem + 1.333vw, 3.125rem); /*  36 →  50 */
+  --text-form: clamp(2.125rem, 1.846rem + 1.143vw, 2.875rem); /*  34 →  46 */
+  --text-quote-lg: clamp(1.875rem, 1.55rem + 1.333vw, 2.75rem); /*  30 →  44 */
+  --text-row: clamp(1.625rem, 1.346rem + 1.143vw, 2.375rem); /*  26 →  38 */
+  --text-tile: clamp(1.625rem, 1.439rem + 0.762vw, 2.125rem); /*  26 →  34 */
+  --text-quote: clamp(1.5rem, 1.338rem + 0.667vw, 1.9375rem); /*  24 →  31 */
+  --text-milestone: clamp(1.5rem, 1.361rem + 0.571vw, 1.875rem); /*  24 →  30 */
+  --text-question: clamp(1.375rem, 1.213rem + 0.667vw, 1.8125rem); /*  22 →  29 */
+  --text-product: clamp(1.3125rem, 1.173rem + 0.571vw, 1.6875rem); /*  21 →  27 */
+
+  --text-lead: clamp(0.9375rem, 0.879rem + 0.238vw, 1.09375rem); /* 15 → 17.5 */
+  --text-body: clamp(0.90625rem, 0.86rem + 0.19vw, 1.03125rem); /* 14.5 → 16.5 */
+  --text-body-sm: clamp(0.875rem, 0.84rem + 0.143vw, 0.96875rem); /* 14 → 15.5 */
+
+  --text-micro: 0.65625rem; /* 10.5 */
+  --text-label: 0.6875rem; /* 11   */
+  --text-label-lg: 0.71875rem; /* 11.5 */
+  --text-caption: 0.75rem; /* 12   */
+  --text-caption-lg: 0.78125rem; /* 12.5 */
+  --text-meta: 0.8125rem; /* 13   */
+  --text-meta-lg: 0.84375rem; /* 13.5 */
+  --text-input: 1rem; /* 16 — évite le zoom auto iOS */
+
+  /* ---- Interlettrage ---- */
+  --tracking-display: -0.02em;
+  --tracking-display-tight: -0.025em;
+  --tracking-label: 0.16em;
+  --tracking-button: 0.18em;
+  --tracking-nav: 0.2em;
+  --tracking-badge: 0.22em;
+  --tracking-wordmark: 0.3em;
+  --tracking-address: 0.32em;
+  --tracking-eyebrow: 0.4em;
+  --tracking-wordmark-sub: 0.44em;
+
+  /* -------------------------------------------------------------------------
+   *  Tableau de bord — palette neutre, sobre, accordée à l'or de la maison.
+   *  Volontairement distincte de la vitrine : outil de travail, pas d'écrin.
+   * ---------------------------------------------------------------------- */
+  --color-panel: #ffffff;
+  --color-panel-muted: #f7f7f8;
+  --color-panel-sunken: #f2f2f4;
+  --color-panel-border: #e6e6e9;
+  --color-panel-ink: #0b0b0c;
+  --color-panel-soft: #61616b;
+  --color-panel-faint: #8b8b93;
+
+  --color-panel-dark: #0b0b0d;
+  --color-panel-dark-muted: #131316;
+  --color-panel-dark-sunken: #18181c;
+  --color-panel-dark-border: #26262b;
+  --color-panel-dark-ink: #fafafa;
+  --color-panel-dark-soft: #a1a1ab;
+  --color-panel-dark-faint: #71717d;
+
+  --color-accent: #a9805f;
+  --color-accent-strong: #8e5c3d;
+  --color-accent-soft: #f3e9e1;
+  --color-danger: #c0392b;
+  --color-danger-soft: #fdeceb;
+  --color-success: #2f7d5a;
+  --color-success-soft: #e7f4ee;
+
+  /* ---- Ombres ---- */
+  --shadow-panel: 0 1px 2px rgb(11 11 12 / 0.04), 0 8px 24px -16px rgb(11 11 12 / 0.16);
+  --shadow-panel-lg: 0 2px 4px rgb(11 11 12 / 0.06), 0 24px 48px -24px rgb(11 11 12 / 0.24);
+  --shadow-card: 0 24px 50px -34px rgb(28 18 10 / 0.35);
+  --shadow-card-hover: 0 34px 60px -30px rgb(28 18 10 / 0.42);
+  --shadow-float: 0 40px 70px -24px rgb(0 0 0 / 0.8);
+  --shadow-dot: 0 0 10px currentColor;
+
+  /* ---- Mouvement — spécification « Direction du mouvement » de la maquette - */
+  --ease-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-reveal: 700ms; /* apparition de bloc   */
+  --duration-state: 240ms; /* survol / état        */
+  --duration-zoom: 1100ms; /* zoom d'image         */
+  --duration-page: 480ms; /* transition de page   */
+
+  /* « Ouverture par hauteur réelle en 320 ms », fermeture deux fois plus vive. */
+  --animate-accordion-down: accordion-down 320ms var(--ease-editorial);
+  --animate-accordion-up: accordion-up 200ms var(--ease-editorial);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Base                                                                        */
+/* -------------------------------------------------------------------------- */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: currentColor;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+  }
+
+  /* Lenis pilote le défilement : on neutralise le smooth natif quand il est actif. */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  html.lenis {
+    scroll-behavior: auto;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  body {
+    background-color: var(--color-ivory);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-synthesis-weight: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-serif);
+    font-weight: 300;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Focus visible : anneau or, jamais supprimé (WCAG 2.2 — 2.4.11 / 2.4.13). */
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 1px;
+  }
+
+  ::selection {
+    background-color: var(--color-gold-pale);
+    color: var(--color-cacao);
+  }
+
+  /* Cibles tactiles : 44 px minimum sur les zones interactives compactes. */
+  @media (pointer: coarse) {
+    a[data-touch-target],
+    button[data-touch-target] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Utilitaires métier                                                          */
+/* -------------------------------------------------------------------------- */
+
+/** Gouttière horizontale : 20 px en mobile → 60 px sur le canvas 1440. */
+@utility gutter {
+  padding-inline: clamp(1.25rem, 0.712rem + 2.21vw, 3.75rem);
+}
+
+/** Rythme vertical d'une section : 52 px en mobile → 150 px en desktop. */
+@utility section-y {
+  padding-block: clamp(3.25rem, 1.94rem + 5.38vw, 9.375rem);
+}
+
+@utility section-pt {
+  padding-top: clamp(3.25rem, 1.94rem + 5.38vw, 9.375rem);
+}
+
+@utility section-pb {
+  padding-bottom: clamp(2.875rem, 1.72rem + 4.74vw, 8.75rem);
+}
+
+/** Titre or en dégradé — reproduit `background-clip:text` de la maquette. */
+@utility text-gold-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-gold-mist),
+    var(--color-gold) 60%,
+    var(--color-gold-deep)
+  );
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/** Aplat or des boutons principaux. */
+@utility bg-gold-gradient {
+  background-image: linear-gradient(
+    100deg,
+    var(--color-gold-pale),
+    var(--color-gold) 56%,
+    var(--color-gold-deep)
+  );
+}
+
+@utility bg-gold-gradient-hover {
+  background-image: linear-gradient(100deg, #f0cdb4, #ce9871 56%, #b87d57);
+}
+
+/** Voile de verre dépoli utilisé sur les cartons posés sur photo. */
+@utility glass-dark {
+  background-color: rgb(20 16 13 / 0.42);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Composants récurrents                                                       */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*  Entrée du hero — en CSS, pas en JavaScript                                  */
+/*                                                                              */
+/*  Le premier écran ne doit dépendre d'aucune hydratation : animé depuis       */
+/*  React, il restait invisible jusqu'à l'exécution du bundle et le premier     */
+/*  rendu utile arrivait une seconde trop tard. Ces animations démarrent dès    */
+/*  l'application de la feuille de style, sur le compositeur, et respectent la  */
+/*  même grammaire que le reste du site : 700 ms, cubic-bezier(.16,1,.3,1),     */
+/*  décalage de 80 ms, amplitude de 20 px.                                      */
+/* -------------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------------- */
+/*  Révélations au défilement — CSS piloté par un observateur unique            */
+/*                                                                              */
+/*  L'état masqué n'est appliqué que si JavaScript est disponible (`html.js`) : */
+/*  sans lui, le contenu reste simplement visible, jamais escamoté.             */
+/* -------------------------------------------------------------------------- */
+
+@layer components {
+  .js [data-reveal] {
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  .js [data-reveal='up'] {
+    transform: translate3d(0, 24px, 0);
+  }
+
+  .js [data-reveal='up-sm'] {
+    transform: translate3d(0, 16px, 0);
+  }
+
+  .js [data-reveal='left'] {
+    transform: translate3d(-24px, 0, 0);
+  }
+
+  /* Ligne de titre : masquée par son conteneur, elle monte sans fondu. */
+  .js [data-reveal='line'] {
+    opacity: 1;
+    transform: translate3d(0, 110%, 0);
+  }
+
+  /* Filet du sur-titre : il se trace en largeur. */
+  .js [data-reveal='draw'] {
+    opacity: 1;
+    transform: scaleX(0);
+  }
+
+  .js [data-reveal][data-revealed] {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--duration-reveal) var(--ease-editorial),
+      transform var(--duration-reveal) var(--ease-editorial);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: auto;
+  }
+
+  /* Retards explicites, en paliers — `attr()` typé n'est pas encore répandu. */
+  .js [data-reveal][data-reveal-delay='1'] {
+    --reveal-delay: 120ms;
+  }
+  .js [data-reveal][data-reveal-delay='2'] {
+    --reveal-delay: 200ms;
+  }
+
+  /*
+   * Cascade d'un groupe : chaque enfant part 80 ms après le précédent.
+   * Neuf rangs couvrent toutes les listes du site ; au-delà, le décalage
+   * cesse de croître — la spécification plafonne l'attente perçue.
+   */
+  .js [data-reveal-group] > *:nth-child(1) {
+    --reveal-delay: 0ms;
+  }
+  .js [data-reveal-group] > *:nth-child(2) {
+    --reveal-delay: 80ms;
+  }
+  .js [data-reveal-group] > *:nth-child(3) {
+    --reveal-delay: 160ms;
+  }
+  .js [data-reveal-group] > *:nth-child(4) {
+    --reveal-delay: 240ms;
+  }
+  .js [data-reveal-group] > *:nth-child(5) {
+    --reveal-delay: 320ms;
+  }
+  .js [data-reveal-group] > *:nth-child(6) {
+    --reveal-delay: 400ms;
+  }
+  .js [data-reveal-group] > *:nth-child(n + 7) {
+    --reveal-delay: 480ms;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .js [data-reveal] {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer components {
+  .hero-rise {
+    animation: hero-rise var(--duration-reveal) var(--ease-editorial) both;
+    animation-delay: calc(var(--hero-step, 0) * 80ms + 120ms);
+  }
+
+  .hero-unmask {
+    animation: hero-unmask calc(var(--duration-reveal) * 1.4) var(--ease-editorial) both;
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 20px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes hero-unmask {
+    from {
+      clip-path: inset(0 0 100% 0);
+    }
+    to {
+      clip-path: inset(0 0 0 0);
+    }
+  }
+
+  /* Le titre monte ligne par ligne, masqué par son conteneur. */
+  .hero-line {
+    display: block;
+    animation: hero-line var(--duration-reveal) var(--ease-editorial) both;
+    animation-delay: calc(var(--hero-step, 0) * 80ms + 120ms);
+  }
+
+  @keyframes hero-line {
+    from {
+      transform: translate3d(0, 110%, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  /* Le filet du sur-titre se trace en largeur. */
+  .hero-draw {
+    animation: hero-draw var(--duration-reveal) var(--ease-editorial) both;
+    animation-delay: 120ms;
+  }
+
+  @keyframes hero-draw {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-rise,
+    .hero-line,
+    .hero-draw,
+    .hero-unmask {
+      animation: hero-fade 240ms ease-out both;
+      animation-delay: 0ms;
+    }
+
+    @keyframes hero-fade {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+  }
+}
+
+@layer components {
+  /**
+   * Escalier de la section « Savoir-faire » : chaque ligne s'indente
+   * de 34 px de plus que la précédente sur le canvas desktop.
+   * Piloté par `data-step` pour éviter tout style en ligne.
+   */
+  .craft-row {
+    --craft-indent: 0px;
+    padding-left: var(--craft-indent);
+  }
+
+  /**
+   * « Le filet de la ligne survolée passe à l'or et le numéro se décale de
+   * 6 px. Les autres lignes descendent à 40 % d'opacité. »
+   * Le survol du groupe est résolu en CSS pur, sans état React.
+   */
+  @media (width >= 64rem) {
+    .craft-list:hover > li,
+    .craft-list:focus-within > li {
+      opacity: 0.4;
+    }
+
+    .craft-list > li:hover,
+    .craft-list > li:focus-within {
+      opacity: 1;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .craft-row[data-step='2'] {
+      --craft-indent: 34px;
+    }
+    .craft-row[data-step='3'] {
+      --craft-indent: 68px;
+    }
+    .craft-row[data-step='4'] {
+      --craft-indent: 102px;
+    }
+    .craft-row[data-step='5'] {
+      --craft-indent: 136px;
+    }
+    .craft-row[data-step='6'] {
+      --craft-indent: 170px;
+    }
+    .craft-row[data-step='7'] {
+      --craft-indent: 204px;
+    }
+  }
+
+  /** Masque de révélation vertical (« la photo se révèle de bas en haut »). */
+  .reveal-mask {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  /** Barre de défilement discrète, accordée à la palette. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Mouvement réduit — « tout devient un simple fondu »                          */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
