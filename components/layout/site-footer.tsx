@@ -38,7 +38,13 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
   );
 
   return (
-    <footer className="border-t border-rule-dark bg-obsidian gutter pt-[clamp(3.25rem,2rem+5vw,5.625rem)] pb-11">
+    /*
+     * Réserve en pied de page la hauteur de la barre d'action mobile
+     * (14 px de marge + 56 px de bouton + retrait bas de l'appareil).
+     * Sans elle, cette barre fixe recouvrait la dernière ligne du pied :
+     * mentions légales, copyright et accès à l'espace maison.
+     */
+    <footer className="border-t border-rule-dark bg-obsidian gutter pt-[clamp(3.25rem,2rem+5vw,5.625rem)] pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-11">
       <div className="grid gap-12 pb-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-15 lg:pb-[70px]">
         <div>
           <BrandLockup theme="dark" className="mb-6" />

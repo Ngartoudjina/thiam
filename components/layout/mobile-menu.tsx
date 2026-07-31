@@ -10,6 +10,7 @@ import { BrandLockup } from '@/components/layout/brand-lockup';
 import { PhoneIcon, WhatsAppIcon } from '@/components/common/icons';
 import { StatusBadge } from '@/components/common/status-badge';
 import { useSmoothScroll } from '@/components/providers/smooth-scroll-provider';
+import { ADMIN_ROUTES } from '@/constants/admin-navigation';
 import { PRIMARY_NAV } from '@/constants/navigation';
 import { WHATSAPP_INTENTS } from '@/constants/site';
 import { DURATION, EASE_EDITORIAL, STAGGER } from '@/lib/motion';
@@ -148,6 +149,17 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                   variants={entryVariants}
                   className="relative px-6 pb-[max(1.625rem,env(safe-area-inset-bottom))]"
                 >
+                  {/* Accès à l'espace maison : sur mobile, le pied de page est
+                      long à atteindre — le menu est le chemin le plus court. */}
+                  <Link
+                    href={ADMIN_ROUTES.dashboard}
+                    rel="nofollow"
+                    onClick={() => setOpen(false)}
+                    className="mb-4 block text-caption font-light text-[rgb(247_244_239/0.4)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+                  >
+                    Espace maison
+                  </Link>
+
                   <StatusBadge variant="plain" className="mb-5" />
                   <div className="flex gap-3">
                     <a
