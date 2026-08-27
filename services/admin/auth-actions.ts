@@ -7,6 +7,44 @@ import { SUPABASE } from '@/lib/supabase/env';
 import { createServerSupabase } from '@/lib/supabase/server';
 import { failure, runAction, success, type ActionResult } from '@/services/admin/action-result';
 
+
+/**
+ * Distingue une panne de service d'un identifiant erroné.
+ *
+ * Les deux renvoyaient le même message : un projet Supabase en pause ou
+ * supprimé se lisait donc « mot de passe incorrect », et l'on cherchait le
+ * défaut du mauvais côté. Le message reste générique sur les identifiants —
+ * pour ne pas permettre d'énumérer les comptes — mais une indisponibilité du
+ * serveur doit se nommer.
+ */
+function isBackendUnreachable(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+
+  const { name, message, status } = error as {
+    name?: string;
+    message?: string;
+    status?: number;
+  };
+
+  if (name === 'AuthRetryableFetchError' || name === 'TimeoutError' || name === 'AbortError') {
+    return true;
+  }
+
+  // Une erreur réseau ne porte pas de statut HTTP exploitable.
+  if (status === 0 || status === undefined) {
+    const text = (message ?? '').toLowerCase();
+    return (
+      text.includes('fetch failed') ||
+      text.includes('failed to fetch') ||
+      text.includes('network') ||
+      text.includes('enotfound') ||
+      text.includes('timeout')
+    );
+  }
+
+  return false;
+}
+
 const credentialsSchema = z.object({
   email: z.email('Cette adresse e-mail ne semble pas valide.'),
   password: z.string().min(8, 'Le mot de passe compte au moins huit caractères.'),
@@ -43,6 +81,12 @@ export async function signInAction(
       email: parsed.data.email,
       password: parsed.data.password,
     });
+
+    if (error && isBackendUnreachable(error)) {
+      return failure(
+        'Le service d’authentification est injoignable. Vérifiez que le projet Supabase est actif, puis réessayez.',
+      );
+    }
 
     if (error || !data.user) {
       return failure('Adresse e-mail ou mot de passe incorrect.');
