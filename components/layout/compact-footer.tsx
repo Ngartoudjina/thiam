@@ -39,13 +39,13 @@ export function CompactFooter({
         <Link
           href={ADMIN_ROUTES.dashboard}
           rel="nofollow"
-          className="text-caption-lg font-light text-[rgb(247_244_239/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+          className="text-caption-lg font-light text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
         >
           Espace maison
         </Link>
         <a
           href={links.phoneHref}
-          className="font-serif text-[1.375rem] font-light text-ivory transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+          className="font-serif text-[1.375rem] font-light text-ink transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
         >
           {contact.phoneDisplay}
         </a>

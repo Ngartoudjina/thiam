@@ -26,9 +26,15 @@ const buttonVariants = cva(
           'hover:bg-gold-gradient-hover hover:[&_svg]:translate-x-1',
         ],
         /** Contour clair sur fond sombre. */
+        /** Contour posé sur photographie : il conserve son encre claire. */
         outlineLight: [
           'border border-[rgb(247_244_239/0.26)] text-ivory tracking-(--tracking-button)',
           'hover:border-gold-pale hover:text-gold-pale hover:[&_svg]:translate-x-1',
+        ],
+        /** Contour posé sur l'aplat beige. */
+        outlineBeige: [
+          'border border-[rgb(22_18_15/0.24)] text-ink tracking-(--tracking-button)',
+          'hover:border-gold-ink hover:text-gold-ink hover:[&_svg]:translate-x-1',
         ],
         /** Contour sombre sur fond ivoire. */
         outlineDark: [
@@ -41,9 +47,10 @@ const buttonVariants = cva(
           'hover:border-ink hover:bg-ink hover:text-ivory',
         ],
         /** Aplat encre sur fond clair. */
+        /** Aplat or profond : le noir plein sortait de la palette de la maison. */
         ink: [
-          'bg-ink text-ivory font-medium tracking-(--tracking-button)',
-          'hover:bg-gold-dim hover:[&_svg]:translate-x-1',
+          'bg-gold-deep text-ivory font-medium tracking-(--tracking-button)',
+          'hover:bg-gold-ink hover:[&_svg]:translate-x-1',
         ],
         /** Aplat ivoire sur fond sombre — envoi de formulaire. */
         ivory: [

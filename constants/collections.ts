@@ -13,23 +13,23 @@ import type { Collection, CollectionFilter, Piece } from '@/types';
 /** Les six univers de la section « Six univers, une même exigence ». */
 export const COLLECTIONS: readonly Collection[] = [
   {
-    slug: 'diamant',
+    slug: 'mariage',
     index: '01',
+    name: 'Mariage',
+    tagline: 'Gravure offerte',
+    description:
+      'Alliances, parures de dot et coffrets de cérémonie. Essayage sur rendez-vous, en privé.',
+    image: MEDIA.alliances,
+  },
+  {
+    slug: 'diamant',
+    index: '02',
     name: 'Diamant',
     tagline: '42 pièces en vitrine',
     description:
       'Solitaires, pavages et pierres certifiées. Chaque diamant est présenté avec son poids, sa pureté et son origine.',
     image: MEDIA.solitaireDiamant,
     objectPosition: 'object-[50%_42%]',
-  },
-  {
-    slug: 'mariage',
-    index: '02',
-    name: 'Mariage',
-    tagline: 'Gravure offerte',
-    description:
-      'Alliances, parures de dot et coffrets de cérémonie. Essayage sur rendez-vous, en privé.',
-    image: MEDIA.alliances,
   },
   {
     slug: 'or',

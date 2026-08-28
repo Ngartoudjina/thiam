@@ -45,13 +45,13 @@ export function CraftSection() {
             as="li"
             key={pillar.index}
             variant="left"
-            className="grid grid-cols-[2.5rem_1fr] border-b border-[rgb(247_244_239/0.09)] py-5.5"
+            className="grid grid-cols-[2.5rem_1fr] border-b border-[rgb(22_18_15/0.09)] py-5.5"
           >
             <span className="pt-2 font-serif text-meta tracking-(--tracking-badge) text-gold">
               {pillar.index}
             </span>
             <div>
-              <h3 className="mb-1.5 font-serif text-[1.625rem] font-normal text-ivory">
+              <h3 className="mb-1.5 font-serif text-[1.625rem] font-normal text-ink">
                 {pillar.mobileTitle ?? pillar.title}
               </h3>
               <p className="text-body-sm leading-[1.65] font-light text-on-dark-faint">
@@ -71,16 +71,16 @@ export function CraftSection() {
             variant="left"
             step={index + 1}
             className={cn(
-              'craft-row group grid grid-cols-[4rem_18.125rem_1fr] items-start border-t border-[rgb(247_244_239/0.11)] py-8.5',
+              'craft-row group grid grid-cols-[4rem_18.125rem_1fr] items-start border-t border-[rgb(22_18_15/0.11)] py-8.5',
               'transition-[opacity,border-color] duration-(--duration-state) ease-out',
               'focus-within:border-t-[rgb(192_138_98/0.55)] hover:border-t-[rgb(192_138_98/0.55)]',
-              index === CRAFT_PILLARS.length - 1 && 'border-b border-b-[rgb(247_244_239/0.11)]',
+              index === CRAFT_PILLARS.length - 1 && 'border-b border-b-[rgb(22_18_15/0.11)]',
             )}
           >
             <span className="pt-3 font-serif text-[0.9375rem] tracking-[0.24em] text-gold transition-transform duration-(--duration-state) ease-out group-hover:translate-x-1.5">
               {pillar.index}
             </span>
-            <h3 className="font-serif text-row leading-[1.05] font-light text-ivory">
+            <h3 className="font-serif text-row leading-[1.05] font-light text-ink">
               {pillar.title}
             </h3>
             <p className="max-w-[32.5rem] pt-2.5 text-body-sm leading-[1.7] font-light text-on-dark-faint">

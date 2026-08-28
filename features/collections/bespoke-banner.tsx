@@ -25,7 +25,7 @@ export function BespokeBanner() {
               Nous le fabriquons.
             </em>,
           ]}
-          className="mb-4 font-serif text-[clamp(2.375rem,1.83rem+2.24vw,3.875rem)] leading-[1.04] font-light text-ivory lg:mb-5"
+          className="mb-4 font-serif text-[clamp(2.375rem,1.83rem+2.24vw,3.875rem)] leading-[1.04] font-light text-ink lg:mb-5"
         />
 
         <Reveal variant="up-sm" as="p">

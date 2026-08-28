@@ -26,7 +26,7 @@ export default function GlobalError({
         Incident technique
       </p>
 
-      <h1 className="mb-6 font-serif text-section leading-[1.02] font-light text-ivory">
+      <h1 className="mb-6 font-serif text-section leading-[1.02] font-light text-ink">
         Quelque chose
         <br />
         <em className="font-light text-gold">s’est interrompu</em>

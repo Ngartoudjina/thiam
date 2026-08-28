@@ -23,7 +23,7 @@ export function ProofSection({ stats, testimonial }: ProofSectionProps) {
       <RevealGroup
         as="ul"
         stagger={0.12}
-        className="grid grid-cols-2 gap-px border-t border-rule-dark bg-[rgb(247_244_239/0.08)] lg:grid-cols-4 lg:gap-0 lg:bg-transparent"
+        className="grid grid-cols-2 gap-px border-t border-rule-dark bg-[rgb(22_18_15/0.08)] lg:grid-cols-4 lg:gap-0 lg:bg-transparent"
       >
         {stats.map((stat, index) => (
           <RevealItem
@@ -33,7 +33,7 @@ export function ProofSection({ stats, testimonial }: ProofSectionProps) {
               'bg-obsidian px-5 py-6.5 lg:relative lg:px-10 lg:pt-14 lg:pb-0',
               index === 0 && 'lg:pr-10 lg:pl-0',
               index === stats.length - 1 && 'lg:pr-0 lg:pl-10',
-              index < stats.length - 1 && 'lg:border-r lg:border-[rgb(247_244_239/0.08)]',
+              index < stats.length - 1 && 'lg:border-r lg:border-[rgb(22_18_15/0.08)]',
             )}
           >
             <p className="text-gold-gradient font-serif text-stat leading-none font-light">
@@ -72,11 +72,11 @@ export function ProofSection({ stats, testimonial }: ProofSectionProps) {
       <Reveal
         as="figure"
         variant="up-sm"
-        className="mt-12 flex flex-col gap-6 border border-[rgb(247_244_239/0.09)] bg-[linear-gradient(100deg,rgba(247,244,239,0.055),rgba(247,244,239,0.015))] p-7 backdrop-blur-[10px] lg:mt-16 lg:flex-row lg:items-center lg:gap-11 lg:px-11 lg:py-8.5"
+        className="mt-12 flex flex-col gap-6 border border-[rgb(22_18_15/0.09)] bg-[linear-gradient(100deg,rgba(22,18,15,0.055),rgba(22,18,15,0.015))] p-7 lg:mt-16 lg:flex-row lg:items-center lg:gap-11 lg:px-11 lg:py-8.5"
       >
         <StarRating rating={testimonial.rating} className="shrink-0" />
 
-        <blockquote className="flex-1 font-serif text-quote leading-[1.45] font-light text-ivory italic">
+        <blockquote className="flex-1 font-serif text-quote leading-[1.45] font-light text-ink italic">
           « {testimonial.quote} »
         </blockquote>
 

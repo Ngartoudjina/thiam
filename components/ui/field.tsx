@@ -4,8 +4,8 @@ import type { InputHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
 const CONTROL_CLASSES = [
-  'w-full border-0 border-b bg-transparent pt-2.5 pb-2.5 font-sans text-input font-light text-ivory',
-  'placeholder:text-[rgb(247_244_239/0.28)] focus:outline-none focus-visible:outline-none',
+  'w-full border-0 border-b bg-transparent pt-2.5 pb-2.5 font-sans text-input font-light text-ink',
+  'placeholder:text-[rgb(22_18_15/0.32)] focus:outline-none focus-visible:outline-none',
   'transition-colors duration-(--duration-state) ease-out',
 ].join(' ');
 
@@ -29,7 +29,7 @@ function FieldShell({ id, label, error, className, children }: FieldShellProps) 
         htmlFor={id}
         className={cn(
           'text-micro tracking-[0.24em] uppercase transition-colors duration-(--duration-state) ease-out',
-          error ? 'text-gold-light' : 'text-[rgb(247_244_239/0.55)] group-focus-within:text-gold',
+          error ? 'text-gold-light' : 'text-[rgb(22_18_15/0.55)] group-focus-within:text-gold',
         )}
       >
         {label}
@@ -70,7 +70,7 @@ export function TextField({
         className={cn(
           CONTROL_CLASSES,
           'focus:border-b-gold',
-          error ? 'border-b-gold-light' : 'border-b-[rgb(247_244_239/0.2)]',
+          error ? 'border-b-gold-light' : 'border-b-[rgb(22_18_15/0.2)]',
           className,
         )}
         {...props}
@@ -103,7 +103,7 @@ export function TextAreaField({
         className={cn(
           CONTROL_CLASSES,
           'resize-none focus:border-b-gold',
-          error ? 'border-b-gold-light' : 'border-b-[rgb(247_244_239/0.2)]',
+          error ? 'border-b-gold-light' : 'border-b-[rgb(22_18_15/0.2)]',
           className,
         )}
         {...props}
@@ -138,7 +138,7 @@ export function TopicChoice({
 }: TopicChoiceProps) {
   return (
     <fieldset className={cn('flex flex-col gap-3', className)}>
-      <legend className="mb-3 text-micro tracking-[0.24em] text-[rgb(247_244_239/0.55)] uppercase">
+      <legend className="mb-3 text-micro tracking-[0.24em] text-[rgb(22_18_15/0.55)] uppercase">
         {legend}
       </legend>
 
@@ -165,7 +165,7 @@ export function TopicChoice({
                   'peer-focus-visible:outline-2 peer-focus-visible:outline-offset-3 peer-focus-visible:outline-gold',
                   isSelected
                     ? 'bg-gold-light text-cacao'
-                    : 'border border-[rgb(247_244_239/0.2)] text-on-dark-muted hover:border-gold-dim hover:text-gold-light',
+                    : 'border border-[rgb(22_18_15/0.2)] text-on-dark-muted hover:border-gold-dim hover:text-gold-light',
                 )}
               >
                 {option.label}

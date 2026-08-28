@@ -163,7 +163,7 @@ export default async function ContactPage() {
             </p>
             <h2
               id="formulaire-titre"
-              className="mb-9 font-serif text-form leading-[1.06] font-light text-ivory lg:mb-10"
+              className="mb-9 font-serif text-form leading-[1.06] font-light text-ink lg:mb-10"
             >
               Écrivez-nous,
               <br />

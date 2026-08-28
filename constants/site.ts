@@ -12,7 +12,9 @@ export const SITE = {
   shortName: 'THIAM 24 Carats',
   wordmark: 'THIAM',
   wordmarkSuffix: '24 CARATS',
-  tagline: "L'éclat qui se transmet",
+  /** Slogan de la maison, tel que retenu par la direction. */
+  tagline: 'Une référence de qualité',
+  taglineSecond: 'Or, argent et diamant',
   description:
     'Bijoutier joaillier à Cotonou. Or 18, 21 et 24 carats, diamants, alliances et créations sur mesure. Pesée devant vous, certificat nominatif, atelier sur place.',
   locale: 'fr_BJ',
@@ -30,7 +32,7 @@ export const CONTACT = {
   /** Message pré-rempli : réduit la friction du premier contact. */
   whatsappWithMessage: (message: string): string =>
     `https://wa.me/${RAW_PHONE}?text=${encodeURIComponent(message)}`,
-  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'contact@thiam24carats.bj',
+  email: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? 'thiam24carats@gmail.com',
 } as const;
 
 export const LOCATION = {
@@ -54,7 +56,14 @@ export const MAPS = {
   searchHref: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     LOCATION.mapsQuery,
   )}`,
-  embedSrc: process.env.NEXT_PUBLIC_MAPS_EMBED_SRC ?? '',
+  /**
+   * Carte intégrée. À défaut d'une adresse d'intégration fournie par la
+   * maison, on centre sur la recherche du nom commercial : aucune clé d'API
+   * n'est requise, et le plan s'affiche réellement au lieu d'un cadre vide.
+   */
+  embedSrc:
+    process.env.NEXT_PUBLIC_MAPS_EMBED_SRC ||
+    `https://www.google.com/maps?q=${encodeURIComponent(LOCATION.mapsQuery)}&output=embed`,
 } as const;
 
 /**
@@ -105,6 +114,7 @@ export const WHATSAPP_INTENTS = {
   appointment: 'Bonjour, je souhaite prendre rendez-vous à la bijouterie THIAM 24 Carats.',
   question: 'Bonjour, j’ai une question sur vos bijoux.',
   bespoke: 'Bonjour, je souhaite faire réaliser une pièce sur mesure.',
+  buyback: 'Bonjour, je souhaite faire estimer de l’or en vue d’un rachat.',
   fitting: 'Bonjour, je souhaite réserver un essayage pour un coffret de dot.',
   service: (service: string): string =>
     `Bonjour, je souhaite des informations sur votre service « ${service} ».`,

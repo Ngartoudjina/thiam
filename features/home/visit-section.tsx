@@ -37,7 +37,7 @@ export function VisitSection({ contact, hours }: VisitSectionProps) {
             pour garantir le contraste du titre quelle que soit la photo. */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,#0B0B0C_4%,rgba(11,11,12,0.45)_55%,rgba(11,11,12,0.6)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(0deg,#EDE3D4_2%,rgba(11,11,12,0.5)_45%,rgba(11,11,12,0.62)_100%)]"
         />
         <div
           aria-hidden="true"
@@ -86,7 +86,7 @@ export function VisitSection({ contact, hours }: VisitSectionProps) {
               <h3 className="mb-5 text-micro tracking-(--tracking-address) text-gold-dim uppercase">
                 Adresse
               </h3>
-              <p className="mb-3.5 font-serif text-[1.5625rem] leading-[1.45] font-light text-ivory">
+              <p className="mb-3.5 font-serif text-[1.5625rem] leading-[1.45] font-light text-ink">
                 {SITE.name}
                 <br />
                 {links.cityCountry}
@@ -113,7 +113,7 @@ export function VisitSection({ contact, hours }: VisitSectionProps) {
             <p className="mb-5.5 text-micro tracking-(--tracking-address) text-gold-dim uppercase">
               Demande de rendez-vous
             </p>
-            <h3 className="mb-10 font-serif text-form leading-[1.1] font-light text-ivory lg:mb-11.5">
+            <h3 className="mb-10 font-serif text-form leading-[1.1] font-light text-ink lg:mb-11.5">
               Dites-nous ce que
               <br />
               vous cherchez

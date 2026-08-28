@@ -50,10 +50,10 @@ export function NewsletterForm() {
             aria-invalid={errors.email ? 'true' : undefined}
             aria-describedby={errors.email ? 'newsletter-email-error' : 'newsletter-hint'}
             className={cn(
-              'w-full border-b bg-transparent pb-2.5 text-body-sm font-light text-ivory',
-              'placeholder:text-[rgb(247_244_239/0.3)] focus:outline-none',
+              'w-full border-b bg-transparent pb-2.5 text-body-sm font-light text-ink',
+              'placeholder:text-[rgb(22_18_15/0.3)] focus:outline-none',
               'transition-colors duration-(--duration-state) ease-out focus:border-gold',
-              errors.email ? 'border-gold-light' : 'border-[rgb(247_244_239/0.2)]',
+              errors.email ? 'border-gold-light' : 'border-[rgb(22_18_15/0.2)]',
             )}
             {...register('email')}
           />
@@ -62,7 +62,7 @@ export function NewsletterForm() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex size-11 shrink-0 items-center justify-center border border-[rgb(247_244_239/0.2)] text-ivory transition-colors duration-(--duration-state) ease-out hover:border-gold hover:text-gold-light disabled:opacity-55"
+          className="flex size-11 shrink-0 items-center justify-center border border-[rgb(22_18_15/0.2)] text-ink transition-colors duration-(--duration-state) ease-out hover:border-gold hover:text-gold-light disabled:opacity-55"
         >
           <span className="sr-only">S’inscrire à la lettre</span>
           <ArrowRightIcon size={16} />

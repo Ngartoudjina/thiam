@@ -19,7 +19,7 @@ export default function NotFound() {
           Erreur 404
         </Eyebrow>
 
-        <h1 className="mb-6 font-serif text-section leading-[1.02] font-light tracking-(--tracking-display) text-ivory">
+        <h1 className="mb-6 font-serif text-section leading-[1.02] font-light tracking-(--tracking-display) text-ink">
           Cette vitrine
           <br />
           <em className="font-light text-gold">est vide</em>

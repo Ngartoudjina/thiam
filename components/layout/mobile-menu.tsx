@@ -74,7 +74,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
           aria-label="Ouvrir le menu"
           className={cn(
             'flex size-11 flex-col items-center justify-center gap-[5px] lg:hidden',
-            theme === 'dark' ? 'text-ivory' : 'text-ink',
+            theme === 'dark' ? 'text-ink' : 'text-ink',
           )}
         >
           <span aria-hidden="true" className="block h-px w-5 bg-current" />
@@ -116,7 +116,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                       type="button"
                       data-touch-target
                       aria-label="Fermer le menu"
-                      className="flex size-11 items-center justify-center text-ivory"
+                      className="flex size-11 items-center justify-center text-ink"
                     >
                       <X size={22} strokeWidth={1.2} aria-hidden="true" />
                     </button>
@@ -137,7 +137,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                         <span className="font-serif text-caption tracking-(--tracking-nav) text-gold">
                           {String(index + 1).padStart(2, '0')}
                         </span>
-                        <span className="font-serif text-[2.5rem] leading-none font-light text-ivory">
+                        <span className="font-serif text-[2.5rem] leading-none font-light text-ink">
                           {link.label}
                         </span>
                       </Link>
@@ -155,7 +155,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                     href={ADMIN_ROUTES.dashboard}
                     rel="nofollow"
                     onClick={() => setOpen(false)}
-                    className="mb-4 block text-caption font-light text-[rgb(247_244_239/0.4)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+                    className="mb-4 block text-caption font-light text-[rgb(22_18_15/0.4)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
                   >
                     Espace maison
                   </Link>
@@ -174,7 +174,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                     <a
                       href={links.phoneHref}
                       aria-label={`Appeler le ${contact.phoneDisplay}`}
-                      className="flex min-h-14 w-15 items-center justify-center border border-[rgb(247_244_239/0.28)] text-ivory"
+                      className="flex min-h-14 w-15 items-center justify-center border border-[rgb(22_18_15/0.28)] text-ink"
                     >
                       <PhoneIcon size={19} />
                     </a>

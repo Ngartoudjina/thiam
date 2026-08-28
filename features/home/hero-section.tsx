@@ -47,7 +47,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
   return (
     <section
       aria-labelledby="hero-titre"
-      className="relative isolate overflow-hidden bg-obsidian text-ivory"
+      className="relative isolate overflow-hidden bg-obsidian text-ink"
     >
       <div
         aria-hidden="true"
@@ -62,7 +62,8 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
       {/*  Mobile & tablette                                                */}
       {/* ---------------------------------------------------------------- */}
       {/* La photo commence sous la barre de navigation, comme en maquette. */}
-      <div className="pt-15 lg:hidden">
+      {/* Le texte de ce bloc repose sur la photographie : encre claire. */}
+      <div className="pt-15 text-ivory lg:hidden">
         <div className="relative h-[min(70vh,35rem)] min-h-[26rem] overflow-hidden">
           <div className="hero-unmask absolute inset-0">
             <Parallax distance={44} className="absolute inset-0">
@@ -96,7 +97,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
               </span>
             </h1>
 
-            <p className="hero-rise text-lead leading-[1.65] font-light text-on-dark-muted [--hero-step:3]">
+            <p className="hero-rise text-lead leading-[1.65] font-light text-[rgb(247_244_239/0.82)] [--hero-step:3]">
               {hero.descriptionMobile || hero.description}
             </p>
           </div>
@@ -109,16 +110,16 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
               {hero.primaryCta.label}
             </a>
           </Button>
-          <Button asChild variant="outlineLight" size="lg" block className="min-h-14">
+          <Button asChild variant="outlineBeige" size="lg" block className="min-h-14">
             <Link href={hero.secondaryCta.href}>{hero.secondaryCta.label}</Link>
           </Button>
         </div>
 
-        <ul className="hero-rise flex scrollbar-none gap-2.5 overflow-x-auto px-5 pt-1.5 pb-7.5 [--hero-step:5]">
+        <ul className="hero-rise flex scrollbar-none gap-2.5 overflow-x-auto px-5 pt-1.5 pb-7.5 text-ink [--hero-step:5]">
           {TRUST_SIGNALS.map((signal) => (
             <li
               key={signal.icon}
-              className="flex shrink-0 items-center gap-2.5 border border-[rgb(247_244_239/0.14)] px-4 py-3.5"
+              className="flex shrink-0 items-center gap-2.5 border border-[rgb(22_18_15/0.16)] px-4 py-3.5"
             >
               <TrustIcon name={signal.icon} size={15} className="text-gold" />
               <span className="text-micro tracking-[0.12em] whitespace-nowrap text-on-dark-soft uppercase">
@@ -165,7 +166,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
                 {hero.primaryCta.label}
               </a>
             </Button>
-            <Button asChild variant="outlineLight" size="lg">
+            <Button asChild variant="outlineBeige" size="lg">
               <Link href={hero.secondaryCta.href}>
                 {hero.secondaryCta.label}
                 <ArrowRightIcon size={16} />
@@ -194,7 +195,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
 
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#0B0B0C_0%,rgba(11,11,12,0.55)_22%,rgba(11,11,12,0)_58%)]"
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#EDE3D4_0%,rgba(237,227,212,0.72)_18%,rgba(237,227,212,0)_52%)]"
           />
 
           <div className="hero-rise absolute bottom-33 -left-26 h-[19.375rem] w-[14.875rem] border border-[rgb(232_191_163/0.24)] shadow-(--shadow-float) [--hero-step:7]">

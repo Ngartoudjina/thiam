@@ -14,7 +14,9 @@ interface CollectionsSectionProps {
 }
 
 export function CollectionsSection({ collections }: CollectionsSectionProps) {
-  const [diamant, mariage, ...secondary] = collections;
+  // Le premier univers occupe la grande carte, le deuxième la carte haute :
+  // changer l'ordre dans le tableau de bord suffit à changer la mise en avant.
+  const [feature, second, ...secondary] = collections;
   // Deux univers seulement sont mis en avant sur la version mobile.
   const mobileTiles = collections.filter((collection) =>
     ['or', 'sur-mesure'].includes(collection.slug),
@@ -37,8 +39,8 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
 
       {/* Mobile : deux cartes pleines, puis deux tuiles jumelles. */}
       <RevealGroup className="flex flex-col gap-4 lg:hidden">
-        {diamant ? <CollectionCard collection={diamant} format="mobile" /> : null}
-        {mariage ? <CollectionCard collection={mariage} format="mobile" /> : null}
+        {feature ? <CollectionCard collection={feature} format="mobile" /> : null}
+        {second ? <CollectionCard collection={second} format="mobile" /> : null}
 
         <div className="grid grid-cols-2 gap-4">
           {mobileTiles.map((collection) => (
@@ -57,17 +59,17 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
       {/* Desktop : grille 2fr / 1fr puis rangée de quatre tuiles. */}
       <div className="hidden lg:block">
         <RevealGroup className="mb-6.5 grid grid-cols-[2fr_1fr] gap-6.5">
-          {diamant ? (
+          {feature ? (
             <CollectionCard
-              collection={diamant}
+              collection={feature}
               format="feature"
               showDescription
               linkLabel="Découvrir la collection"
             />
           ) : null}
-          {mariage ? (
+          {second ? (
             <CollectionCard
-              collection={mariage}
+              collection={second}
               format="card"
               showDescription
               linkLabel="Découvrir"

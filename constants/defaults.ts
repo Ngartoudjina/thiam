@@ -21,11 +21,11 @@ import type {
 
 export const DEFAULT_HERO: HeroContent = {
   eyebrow: `${LOCATION.city} · ${LOCATION.country}`,
-  titleLine1: 'L’éclat',
-  titleLine2: 'qui se transmet',
+  titleLine1: 'Une référence',
+  titleLine2: 'de qualité',
   description:
-    'Or 18 et 24 carats, diamants sélectionnés, alliances gravées à la main. Depuis notre maison de Cotonou, nous façonnons les bijoux qui accompagnent une vie entière.',
-  descriptionMobile: 'Or 18 et 24 carats, diamants certifiés, alliances gravées à la main.',
+    'Or, argent et diamant. Alliances gravées à la main et parures de dot, façonnées dans notre atelier de Cotonou — et rachat d’or au cours du jour.',
+  descriptionMobile: 'Or, argent et diamant. Alliances, parures de dot et rachat d’or.',
   primaryCta: { label: 'Prendre rendez-vous', href: CONTACT.whatsappHref },
   secondaryCta: { label: 'Découvrir les collections', href: ROUTES.collections },
   imagePath: '',

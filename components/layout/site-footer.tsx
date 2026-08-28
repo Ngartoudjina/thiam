@@ -11,7 +11,7 @@ import type { Collection } from '@/types';
 import { cn } from '@/lib/utils';
 
 const SOCIAL_LINK_CLASSES = cn(
-  'flex size-11 items-center justify-center border border-[rgb(247_244_239/0.18)] text-on-dark-soft',
+  'flex size-11 items-center justify-center border border-[rgb(22_18_15/0.18)] text-on-dark-soft',
   'transition-colors duration-(--duration-state) ease-out hover:border-gold hover:text-gold-light',
 );
 
@@ -118,7 +118,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
           </p>
           <a
             href={links.phoneHref}
-            className="mb-2 block font-serif text-2xl font-light text-ivory transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+            className="mb-2 block font-serif text-2xl font-light text-ink transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
           >
             {contact.phoneDisplay}
           </a>
@@ -133,11 +133,11 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="border-t border-[rgb(247_244_239/0.09)] py-10">
+      <div className="border-t border-[rgb(22_18_15/0.09)] py-10">
         <NewsletterForm />
       </div>
 
-      <div className="flex flex-col gap-5 border-t border-[rgb(247_244_239/0.09)] pt-8 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-5 border-t border-[rgb(22_18_15/0.09)] pt-8 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-caption-lg font-light text-on-dark-faint">
           © {SITE.copyrightYear} {SITE.name} — {links.cityCountry}. Tous droits réservés.
         </p>
@@ -158,7 +158,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
             <Link
               href={ADMIN_ROUTES.dashboard}
               rel="nofollow"
-              className="text-caption-lg font-light text-[rgb(247_244_239/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+              className="text-caption-lg font-light text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
             >
               Espace maison
             </Link>

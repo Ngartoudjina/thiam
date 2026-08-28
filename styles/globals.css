@@ -23,7 +23,7 @@
   --breakpoint-3xl: 108rem; /* 1728px — grand desktop                     */
 
   /* ---- Noirs ---- */
-  --color-obsidian: #0b0b0c;
+  --color-obsidian: #ede3d4;
   --color-ink: #16120f;
   --color-ink-soft: #141110;
   --color-slate: #1c1917;
@@ -34,16 +34,16 @@
   --color-taupe: #4a433d;
 
   /* ---- Ivoires ---- */
-  --color-ivory: #f7f4ef;
-  --color-porcelain: #fffdfa;
-  --color-sand: #ede7df;
+  --color-ivory: #fffcf7;
+  --color-porcelain: #ffffff;
+  --color-sand: #e4d8c6;
 
   /* ---- Ors (issus du logo) ---- */
   --color-gold: #c08a62;
   --color-gold-deep: #a96f4b;
   --color-gold-dim: #a9805f;
-  --color-gold-warm: #c99a76;
-  --color-gold-light: #e3b79a;
+  --color-gold-warm: #8e5c3d;
+  --color-gold-light: #a9713f;
   --color-gold-pale: #e8bfa3;
   --color-gold-mist: #f2d6bf;
   --color-gold-ink: #8e5c3d; /* or lisible sur fond ivoire — ratio AA 4.97:1 */
@@ -58,15 +58,15 @@
   --color-open-soft: #b9d9b2;
 
   /* ---- Encres sur fond sombre (opacités ≥ .55 = AA) ---- */
-  --color-on-dark: #f7f4ef;
-  --color-on-dark-muted: rgb(247 244 239 / 0.72);
-  --color-on-dark-soft: rgb(247 244 239 / 0.6);
-  --color-on-dark-faint: rgb(247 244 239 / 0.55);
+  --color-on-dark: #16120f;
+  --color-on-dark-muted: rgb(22 18 15 / 0.78);
+  --color-on-dark-soft: rgb(22 18 15 / 0.66);
+  --color-on-dark-faint: rgb(22 18 15 / 0.6);
 
   /* ---- Filets ---- */
-  --color-rule-dark: rgb(247 244 239 / 0.1);
-  --color-rule-dark-soft: rgb(247 244 239 / 0.08);
-  --color-rule-dark-strong: rgb(247 244 239 / 0.22);
+  --color-rule-dark: rgb(22 18 15 / 0.14);
+  --color-rule-dark-soft: rgb(22 18 15 / 0.1);
+  --color-rule-dark-strong: rgb(22 18 15 / 0.24);
   --color-rule-light: rgb(22 18 15 / 0.12);
   --color-rule-light-soft: rgb(22 18 15 / 0.09);
   --color-rule-light-strong: rgb(22 18 15 / 0.18);

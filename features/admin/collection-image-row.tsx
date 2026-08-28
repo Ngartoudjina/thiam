@@ -82,7 +82,12 @@ export function CollectionImageRow({
           className="max-w-64"
           hint="Dès l’envoi terminé, elle remplace l’actuelle en gardant sa place et son rang."
         />
-        <AdminButton variant="secondary" size="sm" className="self-start" onClick={() => setMode('idle')}>
+        <AdminButton
+          variant="secondary"
+          size="sm"
+          className="self-start"
+          onClick={() => setMode('idle')}
+        >
           Annuler
         </AdminButton>
       </div>

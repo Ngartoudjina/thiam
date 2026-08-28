@@ -25,7 +25,19 @@ export function SiteHeader() {
   const { isScrolled } = useScrollState();
 
   const isOverHero = pathname === ROUTES.home;
-  const theme: Theme = isOverHero ? 'dark' : 'light';
+  /*
+   * L'encre claire n'est justifiée que sur la photographie du hero. Dès que
+   * la barre prend son fond beige au défilement, elle repasse en encre sombre
+   * — sinon le logotype blanc disparaissait dans le beige.
+   */
+  /*
+   * Encre sombre en toutes circonstances.
+   *
+   * La direction blanc / beige / or a supprimé les aplats nocturnes : le haut
+   * du hero est désormais beige, et non plus une photographie. Un logotype
+   * clair y disparaissait purement et simplement.
+   */
+  const theme: Theme = 'light';
 
   const isActive = (href: string): boolean =>
     href === ROUTES.home ? pathname === href : pathname.startsWith(href) && href !== '/#';
@@ -39,8 +51,8 @@ export function SiteHeader() {
         // la maquette pose la barre sur un aplat nocturne, au-dessus de la photo.
         isOverHero
           ? isScrolled
-            ? 'border-rule-dark bg-obsidian/85 backdrop-blur-xl'
-            : 'border-[rgb(247_244_239/0.09)] bg-obsidian lg:bg-transparent'
+            ? 'border-rule-dark bg-obsidian/90 backdrop-blur-xl'
+            : 'border-transparent bg-obsidian lg:bg-transparent'
           : isScrolled
             ? 'border-rule-light bg-ivory/90 backdrop-blur-xl'
             : 'border-rule-light bg-ivory',
@@ -67,13 +79,7 @@ export function SiteHeader() {
                 className={cn(
                   'group relative py-1 text-caption tracking-(--tracking-nav) uppercase',
                   'transition-colors duration-(--duration-state) ease-out',
-                  theme === 'dark'
-                    ? active
-                      ? 'text-ivory'
-                      : 'text-on-dark-muted hover:text-gold-light'
-                    : active
-                      ? 'text-ink'
-                      : 'text-stone hover:text-gold-ink',
+                  active ? 'text-ink' : 'text-stone hover:text-gold-ink',
                 )}
               >
                 {link.label}
@@ -81,7 +87,7 @@ export function SiteHeader() {
                   aria-hidden="true"
                   className={cn(
                     'absolute -bottom-1 left-0 h-px w-full origin-left transition-transform duration-(--duration-state) ease-out',
-                    theme === 'dark' ? 'bg-gold-light' : 'bg-gold-dim',
+                    'bg-gold-dim',
                     active ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100',
                   )}
                 />
@@ -95,9 +101,7 @@ export function SiteHeader() {
             href={links.phoneHref}
             className={cn(
               'hidden text-meta font-light tracking-[0.06em] transition-colors duration-(--duration-state) ease-out xl:block',
-              theme === 'dark'
-                ? 'text-on-dark-muted hover:text-gold-light'
-                : 'text-stone hover:text-gold-ink',
+              'text-stone hover:text-gold-ink',
             )}
           >
             {contact.phoneDisplay}
@@ -107,10 +111,7 @@ export function SiteHeader() {
             href={links.phoneHref}
             data-touch-target
             aria-label={`Appeler le ${contact.phoneDisplay}`}
-            className={cn(
-              'flex size-11 items-center justify-center lg:hidden',
-              theme === 'dark' ? 'text-ivory' : 'text-ink',
-            )}
+            className={cn('flex size-11 items-center justify-center text-ink lg:hidden')}
           >
             <PhoneIcon size={19} />
           </a>
@@ -122,9 +123,7 @@ export function SiteHeader() {
             className={cn(
               'hidden items-center gap-2.5 px-[22px] py-3.5 text-label font-medium tracking-(--tracking-button) uppercase lg:flex',
               'transition-[background,color] duration-(--duration-state) ease-out',
-              theme === 'dark'
-                ? 'bg-gold-gradient text-cacao hover:bg-gold-gradient-hover'
-                : 'bg-ink text-ivory hover:bg-gold-dim',
+              'bg-gold-gradient text-cacao hover:bg-gold-gradient-hover',
             )}
           >
             <WhatsAppIcon size={14} />

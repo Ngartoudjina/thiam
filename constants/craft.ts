@@ -105,3 +105,38 @@ export const HOUSE_QUOTE = {
 export const SHOP_QUOTE = {
   quote: 'Entrez, même sans rien acheter. On vous montrera volontiers l’atelier.',
 } as const;
+
+/**
+ * Rachat d'or — activité centrale de la maison, mise en avant sur l'accueil.
+ * Le protocole est volontairement tenu en trois gestes : ce que le client
+ * doit savoir avant de se déplacer, rien de plus.
+ */
+export const BUYBACK = {
+  eyebrow: 'Rachat d’or',
+  titleLine1: 'Nous rachetons',
+  titleLine2: 'votre or',
+  description:
+    'Bijoux cassés, pièces héritées, or dentaire : nous reprenons votre or au cours du jour, pesé et testé devant vous. Paiement immédiat, sans engagement si l’estimation ne vous convient pas.',
+  question: 'Comment faire ?',
+  steps: [
+    {
+      index: '01',
+      title: 'Munissez-vous de votre pièce d’identité',
+      description:
+        'À préparer avant votre arrivée : le rachat d’or est encadré, une pièce d’identité en cours de validité est obligatoire.',
+    },
+    {
+      index: '02',
+      title: 'Passez à la boutique',
+      description:
+        'Sans rendez-vous, du lundi au samedi. Apportez vos pièces telles quelles, même abîmées ou dépareillées.',
+    },
+    {
+      index: '03',
+      title: 'Pesée et vérification devant vous',
+      description:
+        'Balance certifiée et test du titre menés sous vos yeux. Le prix suit le cours du jour affiché en boutique.',
+    },
+  ],
+  cta: 'Estimer mon or sur WhatsApp',
+} as const;

@@ -15,22 +15,23 @@ export const SECTIONS = {
   gallery: 'galerie',
   story: 'histoire',
   services: 'services',
+  buyback: 'rachat-or',
   testimonials: 'temoignages',
   faq: 'questions',
   visit: 'nous-trouver',
 } as const;
 
 export const PRIMARY_NAV: readonly NavigationLink[] = [
-  { label: 'Collections', href: ROUTES.collections },
-  { label: 'Savoir-faire', href: `/#${SECTIONS.craft}`, isSectionAnchor: true },
+  { label: 'Vitrine', href: ROUTES.collections },
   { label: 'Services', href: `/#${SECTIONS.services}`, isSectionAnchor: true },
+  { label: 'Savoir-faire', href: `/#${SECTIONS.craft}`, isSectionAnchor: true },
   { label: 'Histoire', href: `/#${SECTIONS.story}`, isSectionAnchor: true },
   { label: 'Contact', href: ROUTES.contact },
 ] as const;
 
 export const FOOTER_NAV: readonly FooterLinkGroup[] = [
   {
-    title: 'Collections',
+    title: 'Vitrine',
     links: [
       { label: 'Diamant', href: `${ROUTES.collections}?univers=diamant` },
       { label: 'Mariage & alliances', href: `${ROUTES.collections}?univers=mariage` },

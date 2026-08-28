@@ -38,31 +38,27 @@ export function ServicesSection({ services }: { readonly services: readonly Serv
         className="relative mb-12 lg:mb-22"
       />
 
-      <RevealGroup
-        as="ul"
-        stagger={0.06}
-        className="relative border-t border-[rgb(247_244_239/0.12)]"
-      >
+      <RevealGroup as="ul" stagger={0.06} className="relative border-t border-[rgb(22_18_15/0.12)]">
         {services.map((service) => (
           <RevealItem as="li" key={service.title} variant="up-sm">
             <a
               href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.service(service.title))}
               target="_blank"
               rel="noopener noreferrer"
-              className="group grid grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[rgb(247_244_239/0.09)] px-0 py-6 transition-colors duration-(--duration-state) ease-out hover:bg-[rgb(232_191_163/0.055)] lg:grid-cols-[3.5rem_18.75rem_1fr_12.5rem_2.5rem] lg:gap-0 lg:px-6.5 lg:py-8"
+              className="group grid grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[rgb(22_18_15/0.09)] px-0 py-6 transition-colors duration-(--duration-state) ease-out hover:bg-[rgb(232_191_163/0.055)] lg:grid-cols-[3.5rem_18.75rem_1fr_12.5rem_2.5rem] lg:gap-0 lg:px-6.5 lg:py-8"
             >
               <ServicePictogram
                 name={service.icon}
                 className="text-gold transition-transform duration-(--duration-state) ease-out group-hover:rotate-8"
               />
 
-              <h3 className="font-serif text-question font-normal text-ivory">{service.title}</h3>
+              <h3 className="font-serif text-question font-normal text-ink">{service.title}</h3>
 
               <p className="col-span-2 text-body-sm font-light text-on-dark-faint lg:col-span-1 lg:pr-[3.125rem]">
                 {service.description}
               </p>
 
-              <span className="col-start-3 row-start-1 text-caption tracking-[0.14em] text-gold-light uppercase transition-colors duration-(--duration-state) ease-out group-hover:text-ivory lg:col-start-auto lg:row-start-auto lg:pr-6 lg:text-right">
+              <span className="col-start-3 row-start-1 text-caption tracking-[0.14em] text-gold-light uppercase transition-colors duration-(--duration-state) ease-out group-hover:text-ink lg:col-start-auto lg:row-start-auto lg:pr-6 lg:text-right">
                 {service.price}
               </span>
 

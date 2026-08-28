@@ -1,6 +1,7 @@
 import { JsonLd } from '@/components/common/json-ld';
 import { SiteFooter } from '@/components/layout/site-footer';
 import { CollectionsSection } from '@/features/home/collections-section';
+import { BuybackSection } from '@/features/home/buyback-section';
 import { CraftSection } from '@/features/home/craft-section';
 import { FaqSection } from '@/features/home/faq-section';
 import { GallerySection } from '@/features/home/gallery-section';
@@ -31,6 +32,7 @@ export default async function HomePage() {
       <HeroSection hero={settings.hero} />
       <ProofSection stats={settings.stats.items} testimonial={testimonials.hero} />
       <CollectionsSection collections={collections} />
+      <BuybackSection contact={settings.contact} />
       <CraftSection />
       <QuoteBandSection />
       <GallerySection gallery={gallery} />

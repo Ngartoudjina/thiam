@@ -47,7 +47,11 @@ export function StorySection({ about }: { readonly about: AboutContent }) {
 
             <Reveal variant="settle" className="max-w-[28.75rem]">
               <MediaFrame
-                asset={pathToMediaAsset(about.portraitPath, about.portraitAlt, MEDIA.bagueOrRosePerle)}
+                asset={pathToMediaAsset(
+                  about.portraitPath,
+                  about.portraitAlt,
+                  MEDIA.bagueOrRosePerle,
+                )}
                 placeholder="Portrait du fondateur / de l’équipe"
                 sizes="(min-width: 1024px) 460px, 100vw"
                 className="h-[16rem] w-full lg:h-[26.875rem]"
