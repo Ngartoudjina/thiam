@@ -7,15 +7,17 @@ import { Button } from '@/components/ui/button';
 import { MEDIA } from '@/constants/media';
 import { DOWRY_BENEFITS } from '@/constants/collections';
 import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /** « Le coffret de dot » — la pièce maîtresse de la collection mariage. */
-export function DowrySection() {
+export function DowrySection({ visuals }: { readonly visuals: VisualsContent }) {
   return (
     <section aria-labelledby="dot-titre" className="bg-ivory gutter py-14 lg:py-27.5">
       <div className="grid items-stretch lg:grid-cols-2">
         <Reveal variant="settle" className="h-[16rem] lg:h-[35rem]">
           <MediaFrame
-            asset={MEDIA.presentationParures}
+            asset={resolveVisual(visuals.dowry, MEDIA.presentationParures)}
             alt="Coffret de mariage : parure complète présentée dans son écrin"
             sizes="(min-width: 1024px) 50vw, 100vw"
             className="h-full w-full"

@@ -29,18 +29,18 @@ export default async function HomePage() {
     <>
       <JsonLd id="schema-faq" data={buildFaqSchema(faq)} />
 
-      <HeroSection hero={settings.hero} />
+      <HeroSection hero={settings.hero} visuals={settings.visuals} />
       <ProofSection stats={settings.stats.items} testimonial={testimonials.hero} />
       <CollectionsSection collections={collections} />
-      <BuybackSection contact={settings.contact} />
+      <BuybackSection contact={settings.contact} visuals={settings.visuals} />
       <CraftSection />
-      <QuoteBandSection />
+      <QuoteBandSection visuals={settings.visuals} />
       <GallerySection gallery={gallery} />
       <StorySection about={settings.about} />
       <ServicesSection services={services} />
-      <TestimonialsSection featured={testimonials.featured} cards={testimonials.cards} />
+      <TestimonialsSection featured={testimonials.featured} cards={testimonials.cards} visuals={settings.visuals} />
       <FaqSection entries={faq} />
-      <VisitSection contact={settings.contact} hours={settings.hours} />
+      <VisitSection contact={settings.contact} hours={settings.hours} visuals={settings.visuals} />
       <SiteFooter contact={settings.contact} collections={collections} />
     </>
   );

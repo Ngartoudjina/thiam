@@ -9,6 +9,8 @@ import { TestimonialCard } from '@/features/home/components/testimonial-card';
 import { TestimonialCarousel } from '@/features/home/components/testimonial-carousel';
 import type { Testimonial } from '@/types';
 import { SECTIONS } from '@/constants/navigation';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /** Décalage vertical des trois cartes — l'arrivée « en éventail ». */
 const FAN_OFFSETS = ['lg:mt-0', 'lg:mt-10', 'lg:mt-3.5'] as const;
@@ -17,9 +19,10 @@ const FAN_OFFSETS = ['lg:mt-0', 'lg:mt-10', 'lg:mt-3.5'] as const;
 interface TestimonialsSectionProps {
   readonly featured: Testimonial;
   readonly cards: readonly Testimonial[];
+  readonly visuals: VisualsContent;
 }
 
-export function TestimonialsSection({ featured, cards }: TestimonialsSectionProps) {
+export function TestimonialsSection({ featured, cards, visuals }: TestimonialsSectionProps) {
   return (
     <Section id={SECTIONS.testimonials} theme="light" labelledBy="temoignages-titre">
       <Eyebrow className="mb-6 lg:mb-7">Témoignages</Eyebrow>
@@ -38,7 +41,7 @@ export function TestimonialsSection({ featured, cards }: TestimonialsSectionProp
       <div className="mb-12 grid gap-10 lg:mb-15 lg:grid-cols-[27.5rem_1fr] lg:items-stretch lg:gap-15">
         <Reveal variant="settle">
           <MediaFrame
-            asset={MEDIA.bouclesFleurPerle}
+            asset={resolveVisual(visuals.testimonialPortrait, MEDIA.bouclesFleurPerle)}
             placeholder="Portrait cliente en boutique"
             sizes="(min-width: 1024px) 440px, 100vw"
             className="h-[18rem] w-full lg:h-[32.5rem]"

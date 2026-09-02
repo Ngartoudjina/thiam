@@ -4,6 +4,7 @@ import {
   HelpCircle,
   Home,
   Images,
+  Image as ImageIcon,
   LayoutDashboard,
   MapPin,
   MessageSquareQuote,
@@ -27,6 +28,7 @@ export const ADMIN_ROUTES = {
   login: '/admin/connexion',
   collections: '/admin/collections',
   gallery: '/admin/galerie',
+  visuals: '/admin/visuels',
   services: '/admin/services',
   testimonials: '/admin/temoignages',
   faq: '/admin/questions',
@@ -61,6 +63,12 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
         href: ADMIN_ROUTES.gallery,
         icon: Images,
         description: 'Mosaïque de la vitrine',
+      },
+      {
+        label: 'Visuels',
+        href: ADMIN_ROUTES.visuals,
+        icon: ImageIcon,
+        description: 'Hero, bandeaux et portraits',
       },
       {
         label: 'Services',

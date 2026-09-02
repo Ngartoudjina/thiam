@@ -2,17 +2,19 @@ import { MediaFrame } from '@/components/common/media-frame';
 import { Reveal } from '@/components/motion/reveal';
 import { MEDIA } from '@/constants/media';
 import { HOUSE_QUOTE } from '@/constants/craft';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /**
  * Bande de respiration entre le savoir-faire et la galerie : une photo large
  * assombrie, et la phrase de la maison posée dessus en verre dépoli.
  */
-export function QuoteBandSection() {
+export function QuoteBandSection({ visuals }: { readonly visuals: VisualsContent }) {
   return (
     <section aria-label="La promesse de la maison" className="bg-obsidian pt-14 lg:pt-27">
       <div className="relative h-[22rem] overflow-hidden lg:h-[32.5rem]">
         <MediaFrame
-          asset={MEDIA.presentationParures}
+          asset={resolveVisual(visuals.quoteBand, MEDIA.presentationParures)}
           sizes="100vw"
           objectPosition="object-[50%_40%]"
           className="absolute inset-0 h-full w-full"

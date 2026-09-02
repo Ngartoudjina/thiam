@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { MEDIA } from '@/constants/media';
 import { TRUST_SIGNALS } from '@/constants/craft';
 import type { HeroContent } from '@/lib/schemas/content';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /**
  * Hero de l'accueil.
@@ -32,10 +34,16 @@ import type { HeroContent } from '@/lib/schemas/content';
  * qualité : le navigateur choisit alors la même source pour l'une et l'autre,
  * et ne télécharge la photo qu'une seule fois.
  */
-export function HeroSection({ hero }: { readonly hero: HeroContent }) {
+export function HeroSection({
+  hero,
+  visuals,
+}: {
+  readonly hero: HeroContent;
+  readonly visuals: VisualsContent;
+}) {
   const heroImage = (
     <MediaFrame
-      asset={MEDIA.heroParure}
+      asset={resolveVisual(visuals.heroMain, MEDIA.heroParure)}
       priority
       quality={86}
       sizes="(min-width: 1024px) 42vw, 100vw"
@@ -200,7 +208,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
 
           <div className="hero-rise absolute bottom-33 -left-26 h-[19.375rem] w-[14.875rem] border border-[rgb(232_191_163/0.24)] shadow-(--shadow-float) [--hero-step:7]">
             <MediaFrame
-              asset={MEDIA.bouclesPerle}
+              asset={resolveVisual(visuals.heroCard, MEDIA.bouclesPerle)}
               sizes="238px"
               quality={82}
               className="h-full w-full"

@@ -224,6 +224,106 @@ export const SETTING_KEYS = {
   contact: 'contact',
   hours: 'hours',
   stats: 'stats',
+  visuals: 'visuals',
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
+
+/* -------------------------------------------------------------------------- */
+/*  Visuels fixes du site                                                      */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Emplacements photographiques qui ne relèvent ni d'une collection ni de la
+ * galerie : les grandes images de composition. Chacun est remplaçable depuis
+ * le tableau de bord ; tant qu'aucune photo n'est fournie, la maquette sert de
+ * repli.
+ */
+const visualSchema = z.object({
+  /** Chemin dans le compartiment de stockage. Vide = visuel de la maquette. */
+  path: z.string().trim().max(400).default(''),
+  alt: z.string().trim().max(200).default(''),
+});
+
+export const visualsSchema = z.object({
+  heroMain: visualSchema,
+  heroCard: visualSchema,
+  buyback: visualSchema,
+  quoteBand: visualSchema,
+  visitBand: visualSchema,
+  testimonialPortrait: visualSchema,
+  dowry: visualSchema,
+  contactPhoto: visualSchema,
+});
+
+export type VisualsContent = z.infer<typeof visualsSchema>;
+export type VisualSlotId = keyof VisualsContent;
+
+interface VisualSlotDefinition {
+  readonly id: VisualSlotId;
+  readonly page: string;
+  readonly label: string;
+  readonly hint: string;
+  /** Proportion attendue, pour guider le cadrage lors du téléversement. */
+  readonly aspect: 'portrait' | 'paysage' | 'carre';
+}
+
+/** Décrit chaque emplacement pour le tableau de bord. */
+export const VISUAL_SLOTS: readonly VisualSlotDefinition[] = [
+  {
+    id: 'heroMain',
+    page: 'Accueil',
+    label: 'Grande photo du hero',
+    hint: 'La première image du site, à droite du titre. Format vertical.',
+    aspect: 'portrait',
+  },
+  {
+    id: 'heroCard',
+    page: 'Accueil',
+    label: 'Carte flottante du hero',
+    hint: 'Le petit cadre posé sur la grande photo. Format vertical.',
+    aspect: 'portrait',
+  },
+  {
+    id: 'buyback',
+    page: 'Accueil',
+    label: 'Rachat d’or',
+    hint: 'Illustre le protocole de rachat. Format vertical.',
+    aspect: 'portrait',
+  },
+  {
+    id: 'quoteBand',
+    page: 'Accueil',
+    label: 'Bandeau de citation',
+    hint: 'Photo large derrière « Un bijou n’est pas un objet ».',
+    aspect: 'paysage',
+  },
+  {
+    id: 'visitBand',
+    page: 'Accueil',
+    label: 'Bandeau « Passez la porte »',
+    hint: 'Photo large en tête du bloc de visite. Idéalement la devanture.',
+    aspect: 'paysage',
+  },
+  {
+    id: 'testimonialPortrait',
+    page: 'Accueil',
+    label: 'Portrait de cliente',
+    hint: 'À côté du grand témoignage. Format vertical.',
+    aspect: 'portrait',
+  },
+  {
+    id: 'dowry',
+    page: 'Collections',
+    label: 'Coffret de dot',
+    hint: 'Accompagne la parure complète de cérémonie.',
+    aspect: 'portrait',
+  },
+  {
+    id: 'contactPhoto',
+    page: 'Contact',
+    label: 'Photo de la page Contact',
+    hint: 'Colonne de droite, pleine hauteur. Format vertical.',
+    aspect: 'portrait',
+  },
+] as const;

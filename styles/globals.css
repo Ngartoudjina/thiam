@@ -53,9 +53,11 @@
   --color-clay: #59524b; /* plancher AA sur ivoire — 5.24:1 */
   --color-fog: #c3b9af; /* décoratif uniquement (séparateurs) */
 
-  /* ---- Statut ---- */
-  --color-open: #8fbf87;
-  --color-open-soft: #b9d9b2;
+  /* ---- Statut ----
+     Verts assombris : les teintes précédentes étaient pensées pour un fond
+     nocturne et s'effaçaient sur le beige de la maison. */
+  --color-open: #2f7d4f;
+  --color-open-soft: #24603c;
 
   /* ---- Encres sur fond sombre (opacités ≥ .55 = AA) ---- */
   --color-on-dark: #16120f;

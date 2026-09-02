@@ -14,21 +14,24 @@ import { SITE, WHATSAPP_INTENTS } from '@/constants/site';
 import { contactLinks } from '@/services/content';
 import type { ContactSettings, HoursContent } from '@/lib/schemas/content';
 import { SECTIONS } from '@/constants/navigation';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /** « Passez la porte, le reste est simple » — bloc de visite et de rendez-vous. */
 interface VisitSectionProps {
   readonly contact: ContactSettings;
   readonly hours: HoursContent;
+  readonly visuals: VisualsContent;
 }
 
-export function VisitSection({ contact, hours }: VisitSectionProps) {
+export function VisitSection({ contact, hours, visuals }: VisitSectionProps) {
   const links = contactLinks(contact);
 
   return (
     <section id={SECTIONS.visit} aria-labelledby="visite-titre" className="relative bg-obsidian">
       <div className="relative h-[18rem] overflow-hidden lg:h-[28.75rem]">
         <MediaFrame
-          asset={MEDIA.ecrinParure}
+          asset={resolveVisual(visuals.visitBand, MEDIA.ecrinParure)}
           sizes="100vw"
           objectPosition="object-[50%_45%]"
           className="absolute inset-0 h-full w-full"

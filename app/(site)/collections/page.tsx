@@ -95,7 +95,7 @@ export default async function CollectionsPage() {
       </section>
 
       <BespokeBanner />
-      <DowrySection />
+      <DowrySection visuals={settings.visuals} />
       <CompactFooter variant="hours" contact={settings.contact} hours={settings.hours} />
     </>
   );

@@ -42,3 +42,15 @@ export function pathToMediaAsset(
     height: fallback.height,
   };
 }
+
+/**
+ * Visuel d'un emplacement fixe.
+ * Le chemin téléversé depuis le tableau de bord l'emporte ; à défaut, la
+ * photographie livrée avec la maquette tient la place.
+ */
+export function resolveVisual(
+  visual: { readonly path: string; readonly alt: string } | undefined,
+  fallback: MediaAsset,
+): MediaAsset {
+  return pathToMediaAsset(visual?.path, visual?.alt ?? '', fallback);
+}

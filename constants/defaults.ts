@@ -9,6 +9,7 @@ import type {
   HeroContent,
   HoursContent,
   StatsContent,
+  VisualsContent,
 } from '@/lib/schemas/content';
 
 /**
@@ -83,4 +84,20 @@ export const DEFAULT_STATS: StatsContent = {
     mobileLabel: stat.mobileLabel,
     mobileDisplay: stat.mobileDisplay ?? '',
   })),
+};
+
+/**
+ * Aucun emplacement n'est renseigné au départ : chaque section retombe sur la
+ * photographie livrée avec la maquette, jusqu'à ce que la maison en téléverse
+ * une depuis le tableau de bord.
+ */
+export const DEFAULT_VISUALS: VisualsContent = {
+  heroMain: { path: '', alt: MEDIA.heroParure.alt },
+  heroCard: { path: '', alt: MEDIA.bouclesPerle.alt },
+  buyback: { path: '', alt: MEDIA.rachatPieces.alt },
+  quoteBand: { path: '', alt: MEDIA.presentationParures.alt },
+  visitBand: { path: '', alt: MEDIA.ecrinParure.alt },
+  testimonialPortrait: { path: '', alt: MEDIA.bouclesFleurPerle.alt },
+  dowry: { path: '', alt: MEDIA.presentationParures.alt },
+  contactPhoto: { path: '', alt: MEDIA.parureCristaux.alt },
 };

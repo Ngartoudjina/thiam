@@ -7,6 +7,7 @@ import {
   heroSchema,
   hoursSchema,
   statsSchema,
+  visualsSchema,
   SETTING_KEYS,
 } from '@/lib/schemas/content';
 import {
@@ -179,5 +180,54 @@ export async function saveHoursAction(
     }
 
     return writeSetting(SETTING_KEYS.hours, parsed.data, 'Horaires mis à jour.');
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Visuels fixes                                                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Remplace la photographie d'un emplacement de composition.
+ *
+ * L'ancienne image est supprimée du stockage une fois la nouvelle enregistrée :
+ * remplacer une photo dix fois ne laisse pas neuf fichiers orphelins derrière.
+ */
+export async function saveVisualsAction(
+  _previous: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const submitted = readJson<unknown>(formData, 'visuals');
+    if (submitted === null) return failure('Données illisibles.');
+
+    const parsed = visualsSchema.safeParse(submitted);
+    if (!parsed.success) {
+      return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+    }
+
+    const previousPaths = readJson<Record<string, string>>(formData, 'previousPaths') ?? {};
+
+    const result = await writeSetting(
+      SETTING_KEYS.visuals,
+      parsed.data,
+      'Visuels enregistrés. Le site est à jour.',
+    );
+    if (!result.ok) return result;
+
+    // Nettoyage : uniquement les fichiers qu'aucun emplacement ne référence plus.
+    const stillUsed = new Set(
+      Object.values(parsed.data)
+        .map((visual) => visual.path)
+        .filter(Boolean),
+    );
+
+    const orphans = Object.values(previousPaths).filter(
+      (path) => Boolean(path) && !stillUsed.has(path),
+    );
+
+    if (orphans.length > 0) await removeStorageObjects(orphans);
+
+    return result;
   });
 }

@@ -7,6 +7,7 @@ import {
   DEFAULT_HERO,
   DEFAULT_HOURS,
   DEFAULT_STATS,
+  DEFAULT_VISUALS,
 } from '@/constants/defaults';
 import { CACHE_TAGS, CONTENT_REVALIDATE_SECONDS } from '@/lib/cache';
 import {
@@ -15,12 +16,14 @@ import {
   heroSchema,
   hoursSchema,
   statsSchema,
+  visualsSchema,
   SETTING_KEYS,
   type AboutContent,
   type ContactSettings,
   type HeroContent,
   type HoursContent,
   type StatsContent,
+  type VisualsContent,
 } from '@/lib/schemas/content';
 import { createPublicSupabase } from '@/lib/supabase/server';
 
@@ -30,6 +33,7 @@ export interface SiteSettings {
   readonly contact: ContactSettings;
   readonly hours: HoursContent;
   readonly stats: StatsContent;
+  readonly visuals: VisualsContent;
 }
 
 const FALLBACK: SiteSettings = {
@@ -38,6 +42,7 @@ const FALLBACK: SiteSettings = {
   contact: DEFAULT_CONTACT,
   hours: DEFAULT_HOURS,
   stats: DEFAULT_STATS,
+  visuals: DEFAULT_VISUALS,
 };
 
 /**
@@ -73,6 +78,7 @@ export const getSiteSettings = unstable_cache(
       contact: parse(SETTING_KEYS.contact, contactSettingsSchema, FALLBACK.contact),
       hours: parse(SETTING_KEYS.hours, hoursSchema, FALLBACK.hours),
       stats: parse(SETTING_KEYS.stats, statsSchema, FALLBACK.stats),
+      visuals: parse(SETTING_KEYS.visuals, visualsSchema, FALLBACK.visuals),
     };
   },
   ['reglages-publics'],

@@ -10,6 +10,8 @@ import { SECTIONS } from '@/constants/navigation';
 import { WHATSAPP_INTENTS } from '@/constants/site';
 import type { ContactSettings } from '@/lib/schemas/content';
 import { contactLinks } from '@/services/content';
+import { resolveVisual } from '@/services/content/media';
+import type { VisualsContent } from '@/lib/schemas/content';
 
 /**
  * Rachat d'or.
@@ -18,7 +20,13 @@ import { contactLinks } from '@/services/content';
  * largeur, une photo, et le protocole en trois gestes. La question « Comment
  * faire ? » est posée telle que la boutique la formule au comptoir.
  */
-export function BuybackSection({ contact }: { readonly contact: ContactSettings }) {
+export function BuybackSection({
+  contact,
+  visuals,
+}: {
+  readonly contact: ContactSettings;
+  readonly visuals: VisualsContent;
+}) {
   const links = contactLinks(contact);
 
   return (
@@ -30,7 +38,7 @@ export function BuybackSection({ contact }: { readonly contact: ContactSettings 
       <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20">
         <Reveal variant="settle" className="order-2 lg:order-1">
           <MediaFrame
-            asset={MEDIA.rachatPieces}
+            asset={resolveVisual(visuals.buyback, MEDIA.rachatPieces)}
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="h-[18rem] w-full lg:h-[32rem]"
           />

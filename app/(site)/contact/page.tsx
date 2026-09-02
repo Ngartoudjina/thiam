@@ -18,6 +18,7 @@ import { contactLinks, getSiteSettings } from '@/services/content';
 import { SHOP_QUOTE } from '@/constants/craft';
 import { createMetadata } from '@/lib/seo';
 import { buildBreadcrumbSchema } from '@/lib/structured-data';
+import { resolveVisual } from '@/services/content/media';
 
 export const metadata = createMetadata({
   title: 'Contact — trois façons de nous joindre',
@@ -129,7 +130,7 @@ export default async function ContactPage() {
 
         <div className="relative min-h-[20rem] bg-slate lg:min-h-full">
           <MediaFrame
-            asset={MEDIA.parureCristaux}
+            asset={resolveVisual(settings.visuals.contactPhoto, MEDIA.parureCristaux)}
             alt="Vitrine éclairée de la bijouterie"
             sizes="(min-width: 1024px) 620px, 100vw"
             className="absolute inset-0 h-full w-full"

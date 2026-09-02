@@ -19,8 +19,8 @@ const VARIANTS = {
 
 /** Le panneau prend la teinte de l'état : vert ouvert, or fermé. */
 const PANEL_TONE = {
-  open: 'border border-[rgb(143_191_135/0.22)] bg-[rgb(143_191_135/0.09)] text-open-soft',
-  closed: 'border border-[rgb(192_138_98/0.22)] bg-[rgb(192_138_98/0.08)] text-gold-light',
+  open: 'border border-[rgb(47_125_79/0.28)] bg-[rgb(47_125_79/0.08)] text-open-soft',
+  closed: 'border border-[rgb(169_113_63/0.3)] bg-[rgb(169_113_63/0.08)] text-gold-ink',
 } as const;
 
 /**
