@@ -121,7 +121,7 @@ export function CollectionCard({
               >
                 {collection.name}
               </h3>
-              <span className="text-micro tracking-(--tracking-badge) text-on-dark-faint uppercase">
+              <span className="text-micro tracking-(--tracking-badge) text-on-scrim-faint uppercase">
                 {collection.tagline}
               </span>
             </>
@@ -131,7 +131,7 @@ export function CollectionCard({
                 <span className="font-serif text-[0.875rem] tracking-(--tracking-wordmark) text-gold">
                   {collection.index}
                 </span>
-                <span className="text-micro tracking-(--tracking-badge) text-on-dark-soft uppercase">
+                <span className="text-micro tracking-(--tracking-badge) text-on-scrim-soft uppercase">
                   {collection.tagline}
                 </span>
               </div>
@@ -143,7 +143,7 @@ export function CollectionCard({
               </h3>
 
               {showDescription && collection.description ? (
-                <p className="mb-6 max-w-[26.25rem] text-body-sm leading-[1.65] font-normal text-on-dark-muted">
+                <p className="mb-6 max-w-[26.25rem] text-body-sm leading-[1.65] font-normal text-on-scrim-muted">
                   {collection.description}
                 </p>
               ) : null}

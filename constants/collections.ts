@@ -44,7 +44,7 @@ export const COLLECTIONS: readonly Collection[] = [
     name: 'Argent',
     tagline: '925 rhodié',
     image: null,
-    placeholder: 'Photo bijoux argent',
+    placeholder: 'Photo de bijoux en argent — à fournir depuis le tableau de bord',
   },
   {
     slug: 'montres',

@@ -27,6 +27,12 @@ const eslintConfig = [
       'react/jsx-no-target-blank': ['error', { allowReferrer: false }],
     },
   },
+  {
+    // Les scripts en ligne de commande rendent compte sur la sortie standard :
+    // c'est leur interface, pas une trace de débogage oubliée.
+    files: ['scripts/**'],
+    rules: { 'no-console': 'off' },
+  },
 ];
 
 export default eslintConfig;

@@ -1,12 +1,14 @@
 'use client';
 
 import { ArrowLeft, ExternalLink, LogOut, Menu, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState, type ReactNode } from 'react';
 import { ThemeToggle } from '@/components/admin/theme-toggle';
 import { AdminButton } from '@/components/admin/ui/primitives';
 import { ADMIN_NAV, ADMIN_ROUTES } from '@/constants/admin-navigation';
+import { BRAND_MARK } from '@/constants/media';
 import { ROUTES } from '@/constants/navigation';
 import { SITE } from '@/constants/site';
 import { cn } from '@/lib/utils';
@@ -80,9 +82,14 @@ export function AdminShell({ staff, signOut, children }: AdminShellProps) {
       aria-label="Retour au site public"
       className="flex h-14 shrink-0 items-center gap-2.5 border-b border-panel-border px-4 transition-colors duration-150 ease-out hover:bg-panel-muted dark:border-panel-dark-border dark:hover:bg-panel-dark-sunken"
     >
-      <span
+      <Image
+        src={BRAND_MARK.src}
+        alt=""
+        width={BRAND_MARK.width}
+        height={BRAND_MARK.height}
+        sizes="48px"
         aria-hidden="true"
-        className="size-6 rotate-45 rounded-[2px] bg-gradient-to-br from-gold-mist via-gold to-gold-deep"
+        className="size-8 shrink-0 object-contain"
       />
       <span className="flex flex-col leading-none">
         <span className="font-sans text-[0.8125rem] font-semibold text-panel-ink dark:text-panel-dark-ink">

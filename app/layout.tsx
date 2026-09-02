@@ -57,10 +57,9 @@ export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f7f4ef' },
-    { media: '(prefers-color-scheme: dark)', color: '#0b0b0c' },
-  ],
+  // Le site n'a qu'une tenue, claire : la barre d'adresse prend l'ivoire de la
+  // maison quelle que soit la préférence du système.
+  themeColor: '#fffcf7',
   colorScheme: 'light',
 };
 

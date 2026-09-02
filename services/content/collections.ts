@@ -28,7 +28,8 @@ function toCollection(
     images: secondary
       .map(toMediaAsset)
       .filter((asset): asset is NonNullable<typeof asset> => asset !== null),
-    placeholder: `Photo ${row.name.toLowerCase()}`,
+    // Note éditoriale : rappelle où déposer la photo manquante.
+    placeholder: `Photo « ${row.name} » — à déposer depuis Collections dans le tableau de bord`,
   };
 }
 

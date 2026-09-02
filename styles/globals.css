@@ -25,8 +25,8 @@
   /* ---- Noirs ---- */
   --color-obsidian: #ede3d4;
   --color-ink: #16120f;
-  --color-ink-soft: #141110;
-  --color-slate: #1c1917;
+  --color-ink-soft: #e7dccc;
+  --color-slate: #e2d5c2;
   --color-espresso: #17130f;
   --color-cacao: #17100a;
   --color-graphite: #2a241f;
@@ -59,11 +59,24 @@
   --color-open: #2f7d4f;
   --color-open-soft: #24603c;
 
-  /* ---- Encres sur fond sombre (opacités ≥ .55 = AA) ---- */
+  /* ---- Encres sur les surfaces beiges de la maison ----
+     Nommées « on-dark » du temps de la palette nocturne, elles portent
+     désormais l'encre foncée : le fond a changé, pas leur rôle — écrire sur
+     la surface principale, celle qui n'est pas blanche. */
   --color-on-dark: #16120f;
   --color-on-dark-muted: rgb(22 18 15 / 0.84);
   --color-on-dark-soft: rgb(22 18 15 / 0.74);
   --color-on-dark-faint: rgb(22 18 15 / 0.68);
+
+  /* ---- Encres sur voile photographique ----
+     Les cartes d'univers posent un dégradé sombre sur la photographie pour
+     détacher le titre. Ce voile reste sombre quelle que soit la palette : le
+     texte qui s'y pose doit donc rester clair. Opacités calées pour tenir
+     4,5:1 sur le voile le plus léger. */
+  --color-on-scrim: #fffcf7;
+  --color-on-scrim-muted: rgb(255 252 247 / 0.88);
+  --color-on-scrim-soft: rgb(255 252 247 / 0.82);
+  --color-on-scrim-faint: rgb(255 252 247 / 0.76);
 
   /* ---- Filets ---- */
   --color-rule-dark: rgb(22 18 15 / 0.14);

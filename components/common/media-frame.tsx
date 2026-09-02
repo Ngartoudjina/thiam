@@ -54,9 +54,9 @@ export function MediaFrame({
         data-media-slot={placeholder ?? 'Visuel à fournir'}
         role="presentation"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(192,138,98,0.16),transparent_68%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(192,138,98,0.22),transparent_70%)]" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="h-10 w-10 rotate-45 border border-gold/25" />
+          <span className="h-10 w-10 rotate-45 border border-gold/45" />
         </div>
       </div>
     );

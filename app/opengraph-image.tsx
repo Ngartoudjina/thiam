@@ -10,9 +10,13 @@ export const contentType = 'image/png';
 /**
  * Vignette de partage.
  *
- * Le logotype de la maison est intégré en base64 : la vignette porte donc la
- * typographie réelle de la marque sans dépendre d'une fonte externe, et se
- * génère au build sans aucun appel réseau.
+ * C'est le premier visuel qu'un client voit quand le lien circule sur
+ * WhatsApp : il porte donc les couleurs réelles de la maison — ivoire, beige
+ * et or — et non un fond sombre qui trancherait avec le site.
+ *
+ * Le logotype est intégré en base64 : la vignette porte la typographie réelle
+ * de la marque sans dépendre d'une fonte externe, et se génère au build sans
+ * aucun appel réseau.
  */
 export default async function OpengraphImage(): Promise<ImageResponse> {
   const logo = await readFile(join(process.cwd(), 'public', 'brand', 'thiam-logo.png'));
@@ -26,33 +30,28 @@ export default async function OpengraphImage(): Promise<ImageResponse> {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        background: '#0B0B0C',
+        background: '#FFFCF7',
         padding: '72px 80px',
         position: 'relative',
       }}
     >
+      {/* Halo chaud repris du hero, pour que la vignette et la page d'accueil
+          se reconnaissent au premier regard. */}
       <div
         style={{
           position: 'absolute',
-          top: -180,
-          left: -140,
-          width: 760,
-          height: 760,
+          top: -200,
+          right: -160,
+          width: 780,
+          height: 780,
           borderRadius: 999,
-          background: 'radial-gradient(circle, rgba(192,138,98,0.26), rgba(192,138,98,0) 66%)',
+          background: 'radial-gradient(circle, rgba(169,113,63,0.20), rgba(169,113,63,0) 68%)',
         }}
       />
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        <div style={{ width: 56, height: 1, background: '#C08A62' }} />
-        <div
-          style={{
-            fontSize: 20,
-            letterSpacing: 8,
-            textTransform: 'uppercase',
-            color: '#C99A76',
-          }}
-        >
+        <div style={{ width: 56, height: 1, background: '#A9713F' }} />
+        <div style={{ fontSize: 20, letterSpacing: 8, textTransform: 'uppercase', color: '#8E5C3D' }}>
           {LOCATION.cityCountry}
         </div>
       </div>
@@ -64,19 +63,19 @@ export default async function OpengraphImage(): Promise<ImageResponse> {
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
-              fontSize: 76,
+              fontSize: 74,
               lineHeight: 1.04,
-              color: '#F7F4EF',
+              color: '#16120F',
               letterSpacing: -1,
               display: 'flex',
               flexDirection: 'column',
             }}
           >
-            <span>L’éclat</span>
-            <span style={{ color: '#E3B79A' }}>qui se transmet</span>
+            <span>{SITE.tagline}</span>
+            <span style={{ color: '#8E5C3D' }}>{SITE.taglineSecond}</span>
           </div>
-          <div style={{ marginTop: 28, fontSize: 26, color: 'rgba(247,244,239,0.62)' }}>
-            Or 18 · 21 · 24 carats — diamants, alliances, sur mesure
+          <div style={{ marginTop: 28, fontSize: 26, color: 'rgba(22,18,15,0.68)' }}>
+            Or 14 · 18 · 21 · 24 carats — alliances, diamants, rachat d’or
           </div>
         </div>
       </div>
@@ -86,10 +85,10 @@ export default async function OpengraphImage(): Promise<ImageResponse> {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          borderTop: '1px solid rgba(247,244,239,0.14)',
+          borderTop: '1px solid rgba(22,18,15,0.14)',
           paddingTop: 28,
           fontSize: 22,
-          color: 'rgba(247,244,239,0.58)',
+          color: 'rgba(22,18,15,0.62)',
         }}
       >
         <span>{SITE.name}</span>
