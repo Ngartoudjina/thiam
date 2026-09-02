@@ -34,6 +34,20 @@ export function FooterMap({ contact }: { readonly contact: ContactSettings }) {
         />
       </div>
 
+      {MAPS.usesOpenStreetMap ? (
+        <p className="mt-2 text-[0.6875rem] text-on-dark-faint">
+          Fond de plan{' '}
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline underline-offset-2 hover:text-gold-ink"
+          >
+            © OpenStreetMap
+          </a>
+        </p>
+      ) : null}
+
       <p className="mt-3.5 text-caption-lg font-normal text-on-dark-soft">{address}</p>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">

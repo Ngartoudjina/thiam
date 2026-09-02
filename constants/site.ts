@@ -52,6 +52,20 @@ export const LOCATION = {
 
 const COORDS = `${LOCATION.latitude},${LOCATION.longitude}`;
 
+/** Emprise resserrée autour de la boutique, équivalente à un zoom 17. */
+const OSM_EMBED = (() => {
+  const dLat = 0.003;
+  const dLon = 0.004;
+  const bbox = [
+    LOCATION.longitude - dLon,
+    LOCATION.latitude - dLat,
+    LOCATION.longitude + dLon,
+    LOCATION.latitude + dLat,
+  ].join(',');
+
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${COORDS}`;
+})();
+
 /**
  * Cartographie.
  *
@@ -70,10 +84,23 @@ export const MAPS = {
 
   searchHref: `https://www.google.com/maps/search/?api=1&query=${COORDS}`,
 
-  /** Carte intégrée, centrée sur la boutique et légendée à son nom. */
-  embedSrc:
-    process.env.NEXT_PUBLIC_MAPS_EMBED_SRC ||
-    `https://maps.google.com/maps?q=${encodeURIComponent(LOCATION.mapsQuery)}&ll=${COORDS}&z=17&hl=fr&output=embed`,
+  /**
+   * Carte intégrée.
+   *
+   * Google renvoie `X-Frame-Options: SAMEORIGIN` sur ses URL `output=embed` :
+   * le navigateur refuse de les afficher dans un cadre, et l'astuce
+   * d'intégration sans clé ne fonctionne plus. On sert donc OpenStreetMap par
+   * défaut — affichable, sans clé d'API et sans traceur.
+   *
+   * Pour retrouver la carte Google, coller dans `NEXT_PUBLIC_MAPS_EMBED_SRC`
+   * l'adresse du cadre fourni par « Partager → Intégrer une carte » sur la
+   * fiche de l'établissement : elle commence par
+   * `https://www.google.com/maps/embed?pb=` et reste, elle, affichable.
+   */
+  embedSrc: process.env.NEXT_PUBLIC_MAPS_EMBED_SRC || OSM_EMBED,
+
+  /** Vrai lorsque la carte affichée provient d'OpenStreetMap. */
+  usesOpenStreetMap: !process.env.NEXT_PUBLIC_MAPS_EMBED_SRC,
 } as const;
 
 /**
