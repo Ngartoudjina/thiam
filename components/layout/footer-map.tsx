@@ -1,4 +1,5 @@
 import { ArrowRightIcon, PinIcon } from '@/components/common/icons';
+import { StaticMap } from '@/components/common/static-map';
 import { LOCATION, MAPS } from '@/constants/site';
 import { contactLinks } from '@/services/content';
 import type { ContactSettings } from '@/lib/schemas/content';
@@ -24,29 +25,13 @@ export function FooterMap({ contact }: { readonly contact: ContactSettings }) {
         Nous trouver
       </h2>
 
-      <div className="overflow-hidden border border-rule-dark">
-        <iframe
-          src={MAPS.embedSrc}
-          title={`Plan d’accès — ${LOCATION.mapsQuery}`}
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-          className="block h-44 w-full border-0 grayscale-[0.15] lg:h-52"
-        />
-      </div>
-
-      {MAPS.usesOpenStreetMap ? (
-        <p className="mt-2 text-[0.6875rem] text-on-dark-faint">
-          Fond de plan{' '}
-          <a
-            href="https://www.openstreetmap.org/copyright"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline underline-offset-2 hover:text-gold-ink"
-          >
-            © OpenStreetMap
-          </a>
-        </p>
-      ) : null}
+      <StaticMap
+        latitude={LOCATION.latitude}
+        longitude={LOCATION.longitude}
+        label={LOCATION.mapsQuery}
+        href={MAPS.placeHref}
+        className="h-44 w-full lg:h-52"
+      />
 
       <p className="mt-3.5 text-caption-lg font-normal text-on-dark-soft">{address}</p>
 

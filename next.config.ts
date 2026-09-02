@@ -38,9 +38,20 @@ const nextConfig: NextConfig = {
   images: {
     // Les visuels téléversés depuis le tableau de bord sont servis par
     // Supabase Storage ; ils restent optimisés par `next/image`.
-    remotePatterns: supabaseHost
-      ? [{ protocol: 'https', hostname: supabaseHost, pathname: '/storage/v1/object/public/**' }]
-      : [],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'tile.openstreetmap.org', pathname: '/**' },
+      ...(supabaseHost
+        ? [
+            {
+              protocol: 'https' as const,
+              hostname: supabaseHost,
+              pathname: '/storage/v1/object/public/**',
+            },
+          ]
+        : []),
+    ],
+    // Tuiles du plan de situation : mises en cache par notre serveur, la
+    // charge sur OpenStreetMap reste négligeable.
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [360, 414, 640, 768, 1024, 1280, 1440, 1920, 2560],
     imageSizes: [16, 32, 48, 64, 96, 128, 192, 256, 384],
