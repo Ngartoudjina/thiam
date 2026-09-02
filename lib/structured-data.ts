@@ -68,12 +68,21 @@ export function buildJewelryStoreSchema({
       absoluteUrl(MEDIA.alliances.src),
       absoluteUrl(MEDIA.rachatPesee.src),
     ],
+    /**
+     * Logotype détouré, sur fond blanc opaque.
+     *
+     * L'original livré par la maison est un carré de 1772 px dont le dessin
+     * n'occupe que 26 % — Google, qui met le logo à l'échelle, n'y verrait
+     * surtout du vide. `scripts/brand-assets.mjs` en dérive cette version
+     * cadrée au dessin, sans transparence : les surfaces sur lesquelles Google
+     * compose le logo ne sont pas toujours claires.
+     */
     logo: {
       '@type': 'ImageObject',
       '@id': SCHEMA_ID.logo,
-      url: absoluteUrl('/brand/thiam-logo.png'),
-      width: 1772,
-      height: 1772,
+      url: absoluteUrl('/brand/logo-marque.png'),
+      width: 648,
+      height: 345,
       caption: SITE.name,
     },
     foundingDate: String(SITE.foundedYear),

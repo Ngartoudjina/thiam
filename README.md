@@ -228,6 +228,12 @@ structurées en découlent tous.
   un contenu qui ne reprend pas l'accueil et ses propres questions fréquentes.
   Une section d'accueil ne se positionne pas sur « rachat d'or Cotonou » : il
   faut une adresse, un titre et un contenu propres.
+- **Le logotype de la maison partout où un moteur le lit** : propriété `logo`
+  des données structurées (celle que Google reprend dans son encadré de
+  connaissance), favicon, icône d'application iOS et Android, et vignettes de
+  partage. Les deux fichiers livrés étant des carrés dont le dessin n'occupe
+  que 26 % et 41 %, `npm run brand` en dérive des versions détourées : sans
+  cela, tout ce qui met le logo à l'échelle réduit surtout du vide.
 - `sitemap.xml` avec le visuel principal de chaque page, `robots.txt` fermant
   `/admin` et `/api`.
 
