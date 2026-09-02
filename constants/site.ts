@@ -21,7 +21,7 @@ export const SITE = {
   language: 'fr',
   foundedYear: 2012,
   copyrightYear: 2026,
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://thiam24carats.bj',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.thiam24carats.com',
 } as const;
 
 export const CONTACT = {

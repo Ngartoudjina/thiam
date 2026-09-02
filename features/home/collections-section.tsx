@@ -3,6 +3,7 @@ import { SectionHeading } from '@/components/common/section-heading';
 import { Section } from '@/components/common/section';
 import { RevealGroup } from '@/components/motion/reveal';
 import { Button } from '@/components/ui/button';
+import { ArrowLink } from '@/components/common/arrow-link';
 import { ArrowRightIcon } from '@/components/common/icons';
 import { CollectionCard } from '@/features/home/components/collection-card';
 import type { Collection } from '@/types';
@@ -35,6 +36,11 @@ export function CollectionsSection({ collections }: CollectionsSectionProps) {
         ]}
         description="Chaque pièce est choisie, pesée et contrôlée avant d'entrer en vitrine. Ce que vous voyez est disponible en boutique — ou reproductible sur mesure."
         className="mb-12 lg:mb-19"
+        action={
+          // Le mariage est le premier motif de visite : il mérite un lien
+          // direct depuis l'accueil, pas seulement une carte parmi six.
+          <ArrowLink href={ROUTES.wedding}>Alliances &amp; bijoux de mariage</ArrowLink>
+        }
       />
 
       {/* Mobile : deux cartes pleines, puis deux tuiles jumelles. */}

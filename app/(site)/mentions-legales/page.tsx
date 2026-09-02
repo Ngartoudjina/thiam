@@ -5,7 +5,7 @@ import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata({
   title: 'Mentions légales',
-  description: `Mentions légales du site de la ${SITE.name}, bijoutier joaillier à ${LOCATION.city}.`,
+  description: `Éditeur, hébergement et propriété intellectuelle du site de la ${SITE.name}, bijoutier joaillier à ${LOCATION.cityCountry}.`,
   path: ROUTES.legal,
 });
 

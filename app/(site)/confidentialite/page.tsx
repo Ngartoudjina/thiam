@@ -5,7 +5,7 @@ import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata({
   title: 'Confidentialité',
-  description: `Comment la ${SITE.name} traite les informations que vous lui confiez.`,
+  description: `Comment la ${SITE.name} recueille, utilise et conserve les informations que vous lui confiez par formulaire, par téléphone ou sur WhatsApp.`,
   path: ROUTES.privacy,
 });
 

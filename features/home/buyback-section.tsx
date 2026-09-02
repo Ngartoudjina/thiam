@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ArrowRightIcon, ServicePictogram, WhatsAppIcon } from '@/components/common/icons';
 import { Eyebrow } from '@/components/common/eyebrow';
 import { MediaFrame } from '@/components/common/media-frame';
@@ -6,7 +7,7 @@ import { TextLines } from '@/components/motion/text-lines';
 import { Button } from '@/components/ui/button';
 import { BUYBACK } from '@/constants/craft';
 import { MEDIA } from '@/constants/media';
-import { SECTIONS } from '@/constants/navigation';
+import { ROUTES, SECTIONS } from '@/constants/navigation';
 import { WHATSAPP_INTENTS } from '@/constants/site';
 import type { ContactSettings } from '@/lib/schemas/content';
 import { contactLinks } from '@/services/content';
@@ -103,8 +104,18 @@ export function BuybackSection({
             <span className="inline-flex items-center gap-2.5 text-label-lg tracking-(--tracking-label) text-gold-ink uppercase">
               <ServicePictogram name="buyback" size={18} />
               Paiement immédiat
-              <ArrowRightIcon size={16} />
             </span>
+
+            {/* Vers la page dédiée : ce qui est repris, comment le prix se
+                forme, les papiers à prévoir. La flèche appartient désormais à
+                un vrai lien, pas à une mention décorative. */}
+            <Link
+              href={ROUTES.buyback}
+              className="inline-flex items-center gap-2.5 text-label-lg tracking-(--tracking-label) text-gold-ink uppercase underline-offset-4 transition-colors duration-(--duration-state) ease-out hover:text-ink hover:underline"
+            >
+              Tout savoir sur le rachat d’or
+              <ArrowRightIcon size={16} />
+            </Link>
           </Reveal>
         </div>
       </div>

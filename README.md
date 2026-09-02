@@ -202,14 +202,48 @@ acceptée et tracée dans les journaux du serveur — aucune n'est perdue silenc
 
 ## SEO
 
-- Métadonnées par page via `lib/seo.ts` : titre, description, canonique, Open Graph,
-  Twitter Card
-- Image de partage générée au build (`app/opengraph-image.tsx`), portant le
-  logotype réel de la maison
-- `sitemap.xml` et `robots.txt` générés, incluant chaque univers de collection
-- Données structurées : `JewelryStore`, `WebSite`, `FAQPage`, `BreadcrumbList`,
-  `CollectionPage`
-- Hiérarchie de titres vérifiée : un seul `h1` par page, aucun niveau sauté
+Domaine de référence : **https://www.thiam24carats.com**. Il est écrit en dur
+comme valeur de repli dans `constants/site.ts` et surchargeable par
+`NEXT_PUBLIC_SITE_URL` ; canoniques, sitemap, Open Graph et données
+structurées en découlent tous.
+
+### Ce qui est en place
+
+- **Métadonnées par page** via `lib/seo.ts` : titre, description, canonique
+  absolue, Open Graph, Twitter Card, repères géographiques. Titres tenus sous
+  65 caractères et descriptions entre 120 et 160, mesurés sur le rendu.
+- **Canoniques systématiques.** Une page partagée avec `?utm_source=whatsapp`
+  ou `?fbclid=` renvoie vers son adresse propre ; les filtres
+  `/collections?univers=…` renvoient vers `/collections`.
+- **Vignettes de partage** générées au build, 1200 × 630, aux couleurs de la
+  maison : `/opengraph-image` pour le site, `/og/rachat-or` et
+  `/og/alliances-mariage` pour les deux pages de destination. Adresses stables,
+  volontairement hors de la convention `opengraph-image.tsx` de Next qui
+  suffixe les routes imbriquées d'un identifiant régénéré à chaque build.
+- **Données structurées** : `JewelryStore` (nœud central, avec horaires, zone
+  desservie, moyens de paiement, langues, lien vers la fiche Google),
+  `WebSite`, `WebPage` + `BreadcrumbList` par page, `CollectionPage`,
+  `FAQPage` et deux nœuds `Service` pour le rachat d'or et le mariage.
+- **Deux pages de destination** — `/rachat-or` et `/alliances-mariage` — avec
+  un contenu qui ne reprend pas l'accueil et ses propres questions fréquentes.
+  Une section d'accueil ne se positionne pas sur « rachat d'or Cotonou » : il
+  faut une adresse, un titre et un contenu propres.
+- `sitemap.xml` avec le visuel principal de chaque page, `robots.txt` fermant
+  `/admin` et `/api`.
+
+### Deux partis pris
+
+**Aucun `aggregateRating` n'est déclaré.** Google ignore les notes qu'une
+entreprise s'attribue sur son propre site pour les types `LocalBusiness` et
+`Organization`, et un balisage d'avis sans avis réellement collectés expose à
+une action manuelle. Les étoiles des résultats viennent de la fiche Google, à
+laquelle `hasMap` et `sameAs` rattachent le site.
+
+**L'accueil porte deux `h1` identiques**, un par variante responsive du hero,
+dont une seule est visible à la fois. Google documente explicitement que
+plusieurs `h1` ne posent pas de problème ; fusionner les deux imposerait de
+refondre la mise en page du hero pour un gain nul. Les autres pages n'en ont
+qu'un, et aucun niveau de titre n'est sauté.
 
 ---
 
@@ -291,6 +325,39 @@ Le projet est un build Next.js standard, sans adhérence à un hébergeur.
 Avant la mise en ligne, deux points relèvent de la maison : compléter l'adresse
 exacte de la boutique (`NEXT_PUBLIC_STREET_ADDRESS`) et les mentions légales
 (RCCM, IFU, hébergeur), signalés comme « à compléter » dans les pages concernées.
+
+### Mise en service du référencement
+
+Le code est prêt ; ces cinq gestes se font une fois, en dehors du dépôt, et
+conditionnent la vitesse à laquelle Google prendra le site en compte.
+
+1. **Variables sur Vercel.** Reporter dans les réglages du projet toutes les
+   variables de `.env.example`. `NEXT_PUBLIC_SITE_URL` doit valoir exactement
+   `https://www.thiam24carats.com` — sans barre oblique finale, avec le
+   `www`, en HTTPS. Une divergence ici fausse toutes les canoniques.
+2. **Une seule adresse canonique.** Dans Vercel › Settings › Domains, faire de
+   `www.thiam24carats.com` le domaine principal et rediriger
+   `thiam24carats.com` vers lui. Sans cette redirection, le site existe à deux
+   adresses et Google partage la notoriété entre les deux.
+3. **Search Console.** Ajouter la propriété, relever le jeton de vérification
+   HTML, le poser dans `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` puis redéployer :
+   la balise apparaît alors seule dans le `<head>`. Soumettre ensuite
+   `https://www.thiam24carats.com/sitemap.xml`.
+4. **Fiche Google de l'établissement.** C'est elle qui porte les avis, les
+   photos et la position dans le encadré local — souvent plus déterminante que
+   le site lui-même pour un commerce de quartier. Y inscrire le site,
+   l'adresse et des horaires strictement identiques à ceux du site : toute
+   divergence de nom, d'adresse ou de téléphone affaiblit le rattachement.
+5. **Réseaux sociaux.** Renseigner `NEXT_PUBLIC_INSTAGRAM_URL` et
+   `NEXT_PUBLIC_FACEBOOK_URL` : ils alimentent le `sameAs` des données
+   structurées, qui confirme à Google qu'il s'agit bien de la même maison.
+
+### Ce qui manque encore, côté maison
+
+- **L'adresse postale exacte.** `NEXT_PUBLIC_STREET_ADDRESS` est vide, donc
+  `streetAddress` est absent du balisage. C'est le manque le plus coûteux pour
+  le référencement local : une bijouterie se cherche par son quartier.
+- **Une photographie d'argent** pour l'univers du même nom.
 
 ---
 

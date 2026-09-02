@@ -13,7 +13,23 @@ import { StorySection } from '@/features/home/story-section';
 import { TestimonialsSection } from '@/features/home/testimonials-section';
 import { VisitSection } from '@/features/home/visit-section';
 import { getHomeContent } from '@/services/content';
+import { createMetadata, PAGE_KEYWORDS } from '@/lib/seo';
+import { ROUTES } from '@/constants/navigation';
 import { buildFaqSchema } from '@/lib/structured-data';
+
+/**
+ * L'accueil déclare sa propre canonique et son propre titre plutôt que
+ * d'hériter de ceux de la mise en page : c'est la page la plus exposée aux
+ * variantes d'URL (`?utm_source=`, `?fbclid=`, partages WhatsApp), et sans
+ * canonique explicite chacune deviendrait une page distincte pour Google.
+ */
+export const metadata = createMetadata({
+  title: 'Bijouterie à Cotonou — or, diamant, alliances',
+  description:
+    'Bijoutier joaillier à Cotonou : or 14 à 24 carats, diamants, alliances gravées à la main, sur mesure. Rachat d’or au cours du jour, pesée devant vous.',
+  path: ROUTES.home,
+  keywords: PAGE_KEYWORDS.home,
+});
 
 /**
  * Accueil — écran 1a de la direction artistique, dans l'ordre exact de la

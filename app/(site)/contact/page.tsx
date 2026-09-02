@@ -17,11 +17,11 @@ import { WHATSAPP_INTENTS } from '@/constants/site';
 import { contactLinks, getSiteSettings } from '@/services/content';
 import { SHOP_QUOTE } from '@/constants/craft';
 import { createMetadata } from '@/lib/seo';
-import { buildBreadcrumbSchema } from '@/lib/structured-data';
+import { buildWebPageSchema } from '@/lib/structured-data';
 import { resolveVisual } from '@/services/content/media';
 
 export const metadata = createMetadata({
-  title: 'Contact — trois façons de nous joindre',
+  title: 'Contact — bijouterie à Cotonou',
   description:
     'WhatsApp, téléphone ou visite en boutique à Cotonou. Ouvert du lundi au samedi, 09h — 21h. Réponse en général dans l’heure.',
   path: ROUTES.contact,
@@ -37,11 +37,17 @@ export default async function ContactPage() {
   return (
     <>
       <JsonLd
-        id="schema-fil-ariane-contact"
-        data={buildBreadcrumbSchema([
-          { name: 'Accueil', path: ROUTES.home },
-          { name: 'Contact', path: ROUTES.contact },
-        ])}
+        id="schema-page-contact"
+        data={buildWebPageSchema({
+          name: 'Contact — Bijouterie THIAM 24 Carats',
+          description:
+            'WhatsApp, téléphone ou visite en boutique à Cotonou. Ouvert du lundi au samedi.',
+          path: ROUTES.contact,
+          trail: [
+            { name: 'Accueil', path: ROUTES.home },
+            { name: 'Contact', path: ROUTES.contact },
+          ],
+        })}
       />
 
       {/* `pt` compense la hauteur de la barre fixe : les deux colonnes, texte

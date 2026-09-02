@@ -15,9 +15,9 @@ import { createMetadata } from '@/lib/seo';
 import { buildBreadcrumbSchema, buildCollectionPageSchema } from '@/lib/structured-data';
 
 export const metadata = createMetadata({
-  title: 'Collections — ce qui est en vitrine',
+  title: 'Vitrine — bijoux en or, diamant et argent',
   description:
-    'Solitaires, alliances, parures en or 18, 21 et 24 carats, argent, montres et créations sur mesure. Poids réels vérifiés à la balance certifiée, prix au cours du jour.',
+    'Solitaires, alliances, parures en or 14 à 24 carats, argent, montres et sur mesure, à Cotonou. Poids réels à la balance certifiée, prix au cours du jour.',
   path: ROUTES.collections,
   keywords: ['parure or Cotonou', 'solitaire diamant Bénin', 'coffret de dot', 'alliances or 18K'],
 });
