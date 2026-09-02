@@ -91,7 +91,7 @@ export function VisitSection({ contact, hours }: VisitSectionProps) {
                 <br />
                 {links.cityCountry}
               </p>
-              <p className="text-caption-lg font-light text-on-dark-faint">
+              <p className="text-caption-lg font-normal text-on-dark-faint">
                 {contact.streetAddress || 'Adresse détaillée à compléter'}
               </p>
 

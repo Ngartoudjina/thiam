@@ -25,7 +25,7 @@ export default function NotFound() {
           <em className="font-light text-gold">est vide</em>
         </h1>
 
-        <p className="mb-10 max-w-[30rem] text-body leading-[1.75] font-light text-on-dark-faint">
+        <p className="mb-10 max-w-[30rem] text-body leading-[1.75] font-normal text-on-dark-faint">
           La page que vous cherchez n’existe plus, ou n’a jamais existé. Nos pièces, elles, sont
           toujours là.
         </p>

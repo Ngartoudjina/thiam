@@ -15,7 +15,10 @@ export type MediaId =
   | 'bagueOrRosePerle'
   | 'parureMontre'
   | 'bouclesFleurPerle'
-  | 'creolesOrZircon';
+  | 'creolesOrZircon'
+  | 'rachatPieces'
+  | 'rachatPesee'
+  | 'rachatComptoir';
 
 /**
  * Visuels livrés avec la maquette, servant de contenu de repli tant que la
@@ -109,12 +112,41 @@ export const MEDIA: Readonly<Record<MediaId, MediaAsset>> = {
     height: 980,
     alt: 'Créoles en or serties d’un zircon taille poire',
   },
+
+  /* --- Rachat d'or : photographies fournies par la maison --------------- */
+  rachatPieces: {
+    src: '/images/rachat-or-pieces.jpg',
+    width: 1024,
+    height: 1280,
+    alt: 'Bijoux en or repris par la maison, présentés dans une main gantée',
+  },
+  rachatPesee: {
+    src: '/images/rachat-or-pesee.jpg',
+    width: 1024,
+    height: 1024,
+    alt: 'Lingots et poudre d’or pesés sur une balance de précision',
+  },
+  rachatComptoir: {
+    src: '/images/rachat-or-comptoir.jpg',
+    width: 1200,
+    height: 1200,
+    alt: 'Or apporté au comptoir de la boutique pour estimation',
+  },
 } as const;
 
+/** Symbole seul — médaillon « T ». Barre de navigation, favicon, tableau de bord. */
+export const BRAND_MARK = {
+  src: '/brand/thiam-mark.png',
+  width: 1770,
+  height: 1770,
+  alt: 'Symbole de la Bijouterie THIAM 24 Carats',
+} as const;
+
+/** Logotype complet : symbole et nom. Vignette de partage, documents. */
 export const BRAND_LOGO = {
   src: '/brand/thiam-logo.png',
-  width: 500,
-  height: 500,
+  width: 1772,
+  height: 1772,
   alt: 'Logo de la Bijouterie THIAM 24 Carats',
 } as const;
 

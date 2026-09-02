@@ -100,7 +100,7 @@ export function SiteHeader() {
           <a
             href={links.phoneHref}
             className={cn(
-              'hidden text-meta font-light tracking-[0.06em] transition-colors duration-(--duration-state) ease-out xl:block',
+              'hidden text-meta font-normal tracking-[0.06em] transition-colors duration-(--duration-state) ease-out xl:block',
               'text-stone hover:text-gold-ink',
             )}
           >

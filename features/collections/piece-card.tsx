@@ -51,7 +51,7 @@ export function PieceCard({ piece }: { readonly piece: Piece }) {
         {/* Mobile : nom, matière et poids empilés. */}
         <div className="lg:hidden">
           <h3 className="mb-1.5 font-serif text-[1.3125rem] font-normal text-ink">{piece.name}</h3>
-          <p className="mb-2 text-caption font-light text-clay">{piece.detailShort}</p>
+          <p className="mb-2 text-caption font-normal text-clay">{piece.detailShort}</p>
           <p className="text-label tracking-[0.1em] text-gold-ink uppercase">
             {piece.weight} · cours du jour
           </p>
@@ -63,7 +63,7 @@ export function PieceCard({ piece }: { readonly piece: Piece }) {
             <h3 className="mb-1.5 font-serif text-product font-normal text-ink transition-colors duration-(--duration-state) ease-out group-hover:text-gold-ink">
               {piece.name}
             </h3>
-            <p className="text-meta-lg font-light text-clay">{piece.detail}</p>
+            <p className="text-meta-lg font-normal text-clay">{piece.detail}</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-meta tracking-[0.06em] text-ink">{piece.weight}</p>

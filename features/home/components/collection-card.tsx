@@ -143,7 +143,7 @@ export function CollectionCard({
               </h3>
 
               {showDescription && collection.description ? (
-                <p className="mb-6 max-w-[26.25rem] text-body-sm leading-[1.65] font-light text-on-dark-muted">
+                <p className="mb-6 max-w-[26.25rem] text-body-sm leading-[1.65] font-normal text-on-dark-muted">
                   {collection.description}
                 </p>
               ) : null}

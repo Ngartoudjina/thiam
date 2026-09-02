@@ -68,7 +68,7 @@ export function SectionHeading({
             <Reveal variant="up-sm" as="p" delay={0.12}>
               <span
                 className={cn(
-                  'block text-body leading-[1.75] font-light',
+                  'block text-body leading-[1.75] font-normal',
                   theme === 'dark' ? 'text-on-dark-faint' : 'text-clay',
                   descriptionClassName,
                 )}

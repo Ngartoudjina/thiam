@@ -42,7 +42,7 @@ export function FaqSection({ entries }: { readonly entries: readonly FaqEntry[] 
           />
 
           <Reveal variant="up-sm" as="p" className="mb-7 lg:mb-8">
-            <span className="block max-w-[22rem] text-body-sm leading-[1.75] font-light text-clay">
+            <span className="block max-w-[22rem] text-body-sm leading-[1.75] font-normal text-clay">
               Une question qui n’est pas là ? Écrivez-nous, nous répondons en général dans l’heure.
             </span>
           </Reveal>

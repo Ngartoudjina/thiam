@@ -65,7 +65,7 @@ export default async function ContactPage() {
           />
 
           <Reveal variant="up-sm" as="p" className="mb-9 lg:mb-11.5">
-            <span className="block max-w-[29.375rem] text-body leading-[1.75] font-light text-stone">
+            <span className="block max-w-[29.375rem] text-body leading-[1.75] font-normal text-stone">
               La plus rapide reste WhatsApp : envoyez une photo, une question ou un budget, et nous
               répondons en général dans l’heure.
             </span>
@@ -117,10 +117,10 @@ export default async function ContactPage() {
                 <br />
                 24 Carats
               </p>
-              <p className="mb-1.5 text-body-sm leading-[1.7] font-light text-clay">
+              <p className="mb-1.5 text-body-sm leading-[1.7] font-normal text-clay">
                 {links.cityCountry}
               </p>
-              <p className="text-caption-lg font-light text-clay">
+              <p className="text-caption-lg font-normal text-clay">
                 {contact.streetAddress || 'Rue et repère à compléter'}
               </p>
             </div>

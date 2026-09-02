@@ -41,7 +41,7 @@ export function Timeline({ milestones }: { readonly milestones: readonly Milesto
             <h3 className="mb-3 font-serif text-milestone leading-[1.15] font-normal text-ink">
               {milestone.title}
             </h3>
-            <p className="text-body-sm leading-[1.72] font-light text-clay">
+            <p className="text-body-sm leading-[1.72] font-normal text-clay">
               {milestone.description}
             </p>
           </div>

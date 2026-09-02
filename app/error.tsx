@@ -32,7 +32,7 @@ export default function GlobalError({
         <em className="font-light text-gold">s’est interrompu</em>
       </h1>
 
-      <p className="mb-10 max-w-[30rem] text-body leading-[1.75] font-light text-on-dark-faint">
+      <p className="mb-10 max-w-[30rem] text-body leading-[1.75] font-normal text-on-dark-faint">
         Rechargez la page. Si cela persiste, appelez-nous : la boutique répond du lundi au samedi.
       </p>
 

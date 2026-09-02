@@ -35,7 +35,7 @@ export const COLLECTIONS: readonly Collection[] = [
     slug: 'or',
     index: '03',
     name: 'Or',
-    tagline: '18K · 21K · 24K',
+    tagline: '14K · 18K · 21K · 24K',
     image: MEDIA.parureOr,
   },
   {

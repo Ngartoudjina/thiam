@@ -82,7 +82,7 @@ export default async function CollectionsPage() {
           </div>
 
           <Reveal variant="up-sm" as="p" className="lg:mb-4 lg:max-w-[22.5rem]">
-            <span className="block text-body leading-[1.75] font-light text-clay">
+            <span className="block text-body leading-[1.75] font-normal text-clay">
               Les {TOTAL_PIECES} pièces disponibles aujourd’hui en boutique. Les poids sont réels et
               vérifiés à la balance certifiée ; le prix suit le cours du jour de l’or.
             </span>

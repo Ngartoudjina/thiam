@@ -30,9 +30,7 @@ export function BuybackSection({ contact }: { readonly contact: ContactSettings 
       <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center lg:gap-20">
         <Reveal variant="settle" className="order-2 lg:order-1">
           <MediaFrame
-            asset={MEDIA.parureOr}
-            placeholder="Photo de rachat d’or : pesée au comptoir, balance certifiée"
-            alt="Pesée de bijoux en or sur balance certifiée"
+            asset={MEDIA.rachatPieces}
             sizes="(min-width: 1024px) 45vw, 100vw"
             className="h-[18rem] w-full lg:h-[32rem]"
           />
@@ -53,7 +51,7 @@ export function BuybackSection({ contact }: { readonly contact: ContactSettings 
           />
 
           <Reveal variant="up-sm" as="p" className="mb-10">
-            <span className="block max-w-[34rem] text-body leading-[1.8] font-light text-stone">
+            <span className="block max-w-[34rem] text-body leading-[1.8] font-normal text-stone">
               {BUYBACK.description}
             </span>
           </Reveal>
@@ -75,7 +73,7 @@ export function BuybackSection({ contact }: { readonly contact: ContactSettings 
                   <h3 className="mb-2 font-serif text-[1.375rem] leading-[1.2] font-normal text-ink lg:text-[1.5rem]">
                     {step.title}
                   </h3>
-                  <p className="text-body-sm leading-[1.7] font-light text-clay">
+                  <p className="text-body-sm leading-[1.7] font-normal text-clay">
                     {step.description}
                   </p>
                 </div>

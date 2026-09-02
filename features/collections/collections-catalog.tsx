@@ -118,7 +118,7 @@ export function CollectionsCatalog({ filters }: { readonly filters: readonly Col
             id="tri-pieces"
             value={sort}
             onChange={(event) => setSort(event.target.value as SortKey)}
-            className="cursor-pointer border-b border-[rgb(22_18_15/0.25)] bg-transparent pb-1 text-meta font-light text-ink focus:outline-none focus-visible:border-gold-dim"
+            className="cursor-pointer border-b border-[rgb(22_18_15/0.25)] bg-transparent pb-1 text-meta font-normal text-ink focus:outline-none focus-visible:border-gold-dim"
           >
             {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -142,13 +142,13 @@ export function CollectionsCatalog({ filters }: { readonly filters: readonly Col
           ))}
         </m.ul>
       ) : (
-        <p className="py-16 text-center text-body font-light text-clay">
+        <p className="py-16 text-center text-body font-normal text-clay">
           Aucune pièce de cet univers n’est en vitrine en ce moment. Écrivez-nous : nous en recevons
           chaque semaine, et nous fabriquons sur mesure.
         </p>
       )}
 
-      <p className="mt-10 text-center text-caption-lg font-light text-clay lg:text-left">
+      <p className="mt-10 text-center text-caption-lg font-normal text-clay lg:text-left">
         {pieces.length} pièce{pieces.length > 1 ? 's' : ''} affichée
         {pieces.length > 1 ? 's' : ''} sur {TOTAL_PIECES} disponibles en boutique.
       </p>

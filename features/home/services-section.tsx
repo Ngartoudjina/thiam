@@ -54,7 +54,7 @@ export function ServicesSection({ services }: { readonly services: readonly Serv
 
               <h3 className="font-serif text-question font-normal text-ink">{service.title}</h3>
 
-              <p className="col-span-2 text-body-sm font-light text-on-dark-faint lg:col-span-1 lg:pr-[3.125rem]">
+              <p className="col-span-2 text-body-sm font-normal text-on-dark-faint lg:col-span-1 lg:pr-[3.125rem]">
                 {service.description}
               </p>
 

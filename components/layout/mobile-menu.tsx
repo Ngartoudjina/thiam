@@ -155,7 +155,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                     href={ADMIN_ROUTES.dashboard}
                     rel="nofollow"
                     onClick={() => setOpen(false)}
-                    className="mb-4 block text-caption font-light text-[rgb(22_18_15/0.4)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+                    className="mb-4 block text-caption font-normal text-[rgb(22_18_15/0.4)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
                   >
                     Espace maison
                   </Link>

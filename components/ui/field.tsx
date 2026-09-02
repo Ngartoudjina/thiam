@@ -38,7 +38,7 @@ function FieldShell({ id, label, error, className, children }: FieldShellProps) 
       {children}
 
       {error ? (
-        <p id={`${id}-error`} role="alert" className="text-caption font-light text-gold-light">
+        <p id={`${id}-error`} role="alert" className="text-caption font-normal text-gold-light">
           {error}
         </p>
       ) : null}
@@ -176,7 +176,7 @@ export function TopicChoice({
       </div>
 
       {error ? (
-        <p role="alert" className="text-caption font-light text-gold-light">
+        <p role="alert" className="text-caption font-normal text-gold-light">
           {error}
         </p>
       ) : null}

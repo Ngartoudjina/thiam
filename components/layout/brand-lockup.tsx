@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { BRAND_LOGO } from '@/constants/media';
+import { BRAND_MARK } from '@/constants/media';
 import { ROUTES } from '@/constants/navigation';
 import { SITE } from '@/constants/site';
 import { cn } from '@/lib/utils';
@@ -9,15 +9,15 @@ import type { Theme } from '@/types';
 type LockupSize = 'sm' | 'md';
 
 /**
- * Le fichier fourni par la maison est un bloc carré « symbole + nom ».
- * La maquette n'affiche que le symbole : on le fenêtre exactement aux mêmes
- * cotes (34 × 42 en desktop, 26 × 32 en mobile) plutôt que de recadrer le
- * fichier source, ce qui garde un seul asset à maintenir.
+ * Le symbole de la maison est désormais fourni seul, détouré : il s'affiche
+ * tel quel. La version précédente fenêtrait un logotype complet à coups de
+ * marges négatives, faute d'avoir le signe isolé — ce bricolage n'a plus lieu
+ * d'être.
  */
 const MARK_SIZES = {
-  sm: { frame: 'h-8 w-[26px]', image: 'h-22 w-22 -translate-x-[31px] -translate-y-[18px]' },
-  md: { frame: 'h-[42px] w-[34px]', image: 'h-[114px] w-[114px] -translate-x-10 -translate-y-6' },
-} as const satisfies Record<LockupSize, { frame: string; image: string }>;
+  sm: 'size-9',
+  md: 'size-12',
+} as const satisfies Record<LockupSize, string>;
 
 const WORDMARK_SIZES = {
   sm: { name: 'text-base tracking-[0.28em]', suffix: 'text-[0.40625rem]' },
@@ -32,26 +32,18 @@ interface LogoMarkProps {
 
 export function LogoMark({ size = 'md', priority = false, className }: LogoMarkProps) {
   return (
-    <span
-      className={cn('relative block shrink-0 overflow-hidden', MARK_SIZES[size].frame, className)}
-    >
-      {/*
-        `sizes` est indispensable ici : le fichier source fait 500 px de côté,
-        mais le symbole n'est affiché qu'à 114 px (88 px en mobile). Sans cette
-        indication, `next/image` servait la variante 640 px — 57 ko pour un
-        logotype de la taille d'un ongle, la ressource la plus lourde de la page.
-      */}
-      <Image
-        src={BRAND_LOGO.src}
-        alt=""
-        width={BRAND_LOGO.width}
-        height={BRAND_LOGO.height}
-        sizes="114px"
-        priority={priority}
-        aria-hidden="true"
-        className={cn('max-w-none object-contain', MARK_SIZES[size].image)}
-      />
-    </span>
+    <Image
+      src={BRAND_MARK.src}
+      alt=""
+      width={BRAND_MARK.width}
+      height={BRAND_MARK.height}
+      /* Le fichier source fait 1770 px de côté pour un affichage de 48 px :
+         sans `sizes`, le navigateur téléchargerait une variante démesurée. */
+      sizes="48px"
+      priority={priority}
+      aria-hidden="true"
+      className={cn('shrink-0 object-contain', MARK_SIZES[size], className)}
+    />
   );
 }
 
@@ -86,9 +78,9 @@ export function BrandLockup({
         </span>
         <span
           className={cn(
-            'leading-none tracking-(--tracking-wordmark-sub)',
+            'tracking-(--tracking-wordmark-sub) leading-none',
             WORDMARK_SIZES[size].suffix,
-            theme === 'dark' ? 'text-gold' : 'text-gold-dim',
+            theme === 'dark' ? 'text-gold' : 'text-gold-ink',
           )}
         >
           {SITE.wordmarkSuffix}
@@ -97,7 +89,7 @@ export function BrandLockup({
     </>
   );
 
-  const classes = cn('flex items-center gap-[13px]', className);
+  const classes = cn('flex items-center gap-3', className);
 
   if (!asLink) {
     return <span className={classes}>{content}</span>;

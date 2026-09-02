@@ -2,7 +2,7 @@ import type { CraftPillar, Milestone, TrustSignal } from '@/types';
 
 /** Bandeau de réassurance sous le hero. */
 export const TRUST_SIGNALS: readonly TrustSignal[] = [
-  { icon: 'hallmark', label: 'Or poinçonné 18/24K', mobileLabel: 'Or poinçonné' },
+  { icon: 'hallmark', label: 'Or poinçonné 14 à 24K', mobileLabel: 'Or poinçonné' },
   { icon: 'certificate', label: 'Certificat remis', mobileLabel: 'Certificat remis' },
   { icon: 'workshop', label: 'Atelier sur place', mobileLabel: 'Atelier sur place' },
 ] as const;

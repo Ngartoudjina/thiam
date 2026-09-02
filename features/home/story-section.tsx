@@ -40,7 +40,7 @@ export function StorySection({ about }: { readonly about: AboutContent }) {
             />
 
             <Reveal variant="up-sm" as="p" className="mb-8 max-w-[26.875rem] lg:mb-10">
-              <span className="block text-body leading-[1.8] font-light text-stone">
+              <span className="block text-body leading-[1.8] font-normal text-stone">
                 {about.description}
               </span>
             </Reveal>

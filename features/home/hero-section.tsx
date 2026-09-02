@@ -97,7 +97,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
               </span>
             </h1>
 
-            <p className="hero-rise text-lead leading-[1.65] font-light text-[rgb(247_244_239/0.82)] [--hero-step:3]">
+            <p className="hero-rise text-lead leading-[1.65] font-normal text-[rgb(247_244_239/0.82)] [--hero-step:3]">
               {hero.descriptionMobile || hero.description}
             </p>
           </div>
@@ -155,7 +155,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
             </span>
           </h1>
 
-          <p className="hero-rise mb-11 max-w-[26.875rem] text-lead leading-[1.72] font-light text-on-dark-muted [--hero-step:3]">
+          <p className="hero-rise mb-11 max-w-[26.875rem] text-lead leading-[1.72] font-normal text-on-dark-muted [--hero-step:3]">
             {hero.description}
           </p>
 

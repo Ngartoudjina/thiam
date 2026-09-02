@@ -37,7 +37,7 @@ export function DowrySection() {
           />
 
           <Reveal variant="up-sm" as="p" className="mb-8 lg:mb-8.5">
-            <span className="block text-body leading-[1.8] font-light text-stone">
+            <span className="block text-body leading-[1.8] font-normal text-stone">
               Parure complète, écrin, gravure des prénoms et certificat pour chaque pièce. Nous
               réservons le salon privé une heure pour l’essayage — thé compris.
             </span>
@@ -50,7 +50,7 @@ export function DowrySection() {
                 className="flex items-center gap-3.5 border-b border-[rgb(22_18_15/0.1)] pb-3.5"
               >
                 <CheckIcon size={16} className="text-gold-dim" />
-                <span className="text-body-sm font-light text-umber">{benefit}</span>
+                <span className="text-body-sm font-normal text-umber">{benefit}</span>
               </li>
             ))}
           </ul>

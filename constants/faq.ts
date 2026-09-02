@@ -5,7 +5,7 @@ export const FAQ_ENTRIES: readonly FaqEntry[] = [
   {
     question: 'Comment garantissez-vous le titrage de l’or ?',
     answer:
-      'Chaque pièce est poinçonnée et testée à l’acide devant vous si vous le souhaitez. Vous repartez avec un certificat nominatif mentionnant le titre (18K, 21K ou 24K), le poids exact et le prix au gramme appliqué le jour de l’achat.',
+      'Chaque pièce est poinçonnée et testée à l’acide devant vous si vous le souhaitez. Vous repartez avec un certificat nominatif mentionnant le titre (14K, 18K, 21K ou 24K), le poids exact et le prix au gramme appliqué le jour de l’achat.',
   },
   {
     question: 'Quels moyens de paiement acceptez-vous ?',

@@ -50,7 +50,7 @@ export function NewsletterForm() {
             aria-invalid={errors.email ? 'true' : undefined}
             aria-describedby={errors.email ? 'newsletter-email-error' : 'newsletter-hint'}
             className={cn(
-              'w-full border-b bg-transparent pb-2.5 text-body-sm font-light text-ink',
+              'w-full border-b bg-transparent pb-2.5 text-body-sm font-normal text-ink',
               'placeholder:text-[rgb(22_18_15/0.3)] focus:outline-none',
               'transition-colors duration-(--duration-state) ease-out focus:border-gold',
               errors.email ? 'border-gold-light' : 'border-[rgb(22_18_15/0.2)]',
@@ -74,7 +74,7 @@ export function NewsletterForm() {
         role={errors.email ? 'alert' : undefined}
         aria-live="polite"
         className={cn(
-          'mt-3 text-caption font-light',
+          'mt-3 text-caption font-normal',
           errors.email ? 'text-gold-light' : 'text-on-dark-faint',
         )}
       >

@@ -69,7 +69,7 @@ export function AccordionContent({
     >
       <div
         className={cn(
-          'max-w-[41.25rem] pb-7 text-body leading-[1.8] font-light text-stone',
+          'max-w-[41.25rem] pb-7 text-body leading-[1.8] font-normal text-stone',
           className,
         )}
       >

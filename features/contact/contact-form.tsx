@@ -150,7 +150,7 @@ export function ContactForm({
           <ArrowRightIcon size={17} />
         </Button>
 
-        <p className="max-w-[15.625rem] text-caption-lg leading-[1.6] font-light text-on-dark-faint">
+        <p className="max-w-[15.625rem] text-caption-lg leading-[1.6] font-normal text-on-dark-faint">
           {note}
         </p>
       </m.div>
@@ -158,7 +158,7 @@ export function ContactForm({
       <p
         aria-live="polite"
         className={cn(
-          'mt-6 text-body-sm font-light',
+          'mt-6 text-body-sm font-normal',
           feedback ? (feedback.ok ? 'text-open-soft' : 'text-gold-light') : 'sr-only',
         )}
       >

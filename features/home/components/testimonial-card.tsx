@@ -36,7 +36,7 @@ export function TestimonialCard({ testimonial, className }: TestimonialCardProps
           <span className="block text-label-lg tracking-(--tracking-label) text-ink uppercase">
             {testimonial.author}
           </span>
-          <span className="mt-1 block text-caption-lg font-light text-clay">
+          <span className="mt-1 block text-caption-lg font-normal text-clay">
             {testimonial.context}
           </span>
         </span>

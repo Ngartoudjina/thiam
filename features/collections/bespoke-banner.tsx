@@ -29,7 +29,7 @@ export function BespokeBanner() {
         />
 
         <Reveal variant="up-sm" as="p">
-          <span className="block max-w-[35rem] text-body leading-[1.7] font-light text-on-dark-faint">
+          <span className="block max-w-[35rem] text-body leading-[1.7] font-normal text-on-dark-faint">
             Envoyez-nous une photo, une idée, ou même un ancien bijou. Vous recevez un dessin sous
             48 heures et un prix ferme avant tout engagement.
           </span>

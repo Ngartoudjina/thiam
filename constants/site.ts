@@ -16,7 +16,7 @@ export const SITE = {
   tagline: 'Une référence de qualité',
   taglineSecond: 'Or, argent et diamant',
   description:
-    'Bijoutier joaillier à Cotonou. Or 18, 21 et 24 carats, diamants, alliances et créations sur mesure. Pesée devant vous, certificat nominatif, atelier sur place.',
+    'Bijoutier joaillier à Cotonou. Or 14, 18, 21 et 24 carats, diamants, alliances et créations sur mesure. Pesée devant vous, certificat nominatif, atelier sur place.',
   locale: 'fr_BJ',
   language: 'fr',
   foundedYear: 2012,

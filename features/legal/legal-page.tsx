@@ -32,7 +32,7 @@ export function LegalPage({ eyebrow, titleLines, intro, blocks, updatedAt }: Leg
             className="mb-6 font-serif text-section leading-[1.02] font-light tracking-(--tracking-display) text-ink lg:mb-8"
           />
 
-          <p className="mb-12 text-body leading-[1.8] font-light text-stone lg:mb-16">{intro}</p>
+          <p className="mb-12 text-body leading-[1.8] font-normal text-stone lg:mb-16">{intro}</p>
 
           <div className="flex flex-col">
             {blocks.map((block) => (
@@ -43,7 +43,7 @@ export function LegalPage({ eyebrow, titleLines, intro, blocks, updatedAt }: Leg
                 {block.paragraphs.map((paragraph, index) => (
                   <p
                     key={index}
-                    className="mb-3 text-body-sm leading-[1.8] font-light text-clay last:mb-0"
+                    className="mb-3 text-body-sm leading-[1.8] font-normal text-clay last:mb-0"
                   >
                     {paragraph}
                   </p>
@@ -52,7 +52,7 @@ export function LegalPage({ eyebrow, titleLines, intro, blocks, updatedAt }: Leg
             ))}
           </div>
 
-          <p className="mt-10 border-t border-rule-light pt-8 text-caption-lg font-light text-clay">
+          <p className="mt-10 border-t border-rule-light pt-8 text-caption-lg font-normal text-clay">
             Dernière mise à jour : {updatedAt}
           </p>
         </div>

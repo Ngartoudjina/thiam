@@ -29,7 +29,7 @@ export function CompactFooter({
     <footer className="flex flex-col items-start gap-7 border-t border-rule-dark bg-obsidian gutter pt-14 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:py-14">
       <BrandLockup theme="dark" />
 
-      <p className="text-meta-lg font-light text-on-dark-faint">
+      <p className="text-meta-lg font-normal text-on-dark-faint">
         {variant === 'hours'
           ? `${links.cityCountry} · ${hours.summary}`
           : `© ${SITE.copyrightYear} ${SITE.name} — ${links.cityCountry}`}
@@ -39,7 +39,7 @@ export function CompactFooter({
         <Link
           href={ADMIN_ROUTES.dashboard}
           rel="nofollow"
-          className="text-caption-lg font-light text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+          className="text-caption-lg font-normal text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
         >
           Espace maison
         </Link>

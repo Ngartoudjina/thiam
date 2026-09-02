@@ -12,6 +12,7 @@ const BASE_KEYWORDS = [
   'bijouterie Cotonou',
   'bijoutier Bénin',
   'or 18 carats Cotonou',
+  'or 14 carats Cotonou',
   'or 24 carats',
   'alliances Cotonou',
   'diamant Bénin',

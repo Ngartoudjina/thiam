@@ -54,7 +54,7 @@ export function CraftSection() {
               <h3 className="mb-1.5 font-serif text-[1.625rem] font-normal text-ink">
                 {pillar.mobileTitle ?? pillar.title}
               </h3>
-              <p className="text-body-sm leading-[1.65] font-light text-on-dark-faint">
+              <p className="text-body-sm leading-[1.65] font-normal text-on-dark-faint">
                 {pillar.mobileDescription ?? pillar.description}
               </p>
             </div>
@@ -83,7 +83,7 @@ export function CraftSection() {
             <h3 className="font-serif text-row leading-[1.05] font-light text-ink">
               {pillar.title}
             </h3>
-            <p className="max-w-[32.5rem] pt-2.5 text-body-sm leading-[1.7] font-light text-on-dark-faint">
+            <p className="max-w-[32.5rem] pt-2.5 text-body-sm leading-[1.7] font-normal text-on-dark-faint">
               {pillar.description}
             </p>
           </RevealItem>

@@ -84,7 +84,7 @@ export function ProofSection({ stats, testimonial }: ProofSectionProps) {
           <span className="block text-caption tracking-(--tracking-label) text-gold-light uppercase">
             {testimonial.author}
           </span>
-          <span className="mt-1.5 block text-label-lg font-light text-on-dark-faint">
+          <span className="mt-1.5 block text-label-lg font-normal text-on-dark-faint">
             {testimonial.context}
           </span>
         </figcaption>

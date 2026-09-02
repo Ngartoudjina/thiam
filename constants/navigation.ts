@@ -35,7 +35,7 @@ export const FOOTER_NAV: readonly FooterLinkGroup[] = [
     links: [
       { label: 'Diamant', href: `${ROUTES.collections}?univers=diamant` },
       { label: 'Mariage & alliances', href: `${ROUTES.collections}?univers=mariage` },
-      { label: 'Or 18 / 21 / 24K', href: `${ROUTES.collections}?univers=or` },
+      { label: 'Or 14 / 18 / 21 / 24K', href: `${ROUTES.collections}?univers=or` },
       { label: 'Argent', href: `${ROUTES.collections}?univers=argent` },
       { label: 'Montres', href: `${ROUTES.collections}?univers=montres` },
       { label: 'Sur mesure', href: `${ROUTES.collections}?univers=sur-mesure` },

@@ -48,8 +48,8 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
       <div className="grid gap-12 pb-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-15 lg:pb-[70px]">
         <div>
           <BrandLockup theme="dark" className="mb-6" />
-          <p className="mb-7 max-w-[18.75rem] text-body-sm leading-[1.75] font-light text-on-dark-faint">
-            Bijoutier joaillier à {contact.city}. Or 18, 21 et 24 carats, diamants, alliances et
+          <p className="mb-7 max-w-[18.75rem] text-body-sm leading-[1.75] font-normal text-on-dark-faint">
+            Bijoutier joaillier à {contact.city}. Or 14, 18, 21 et 24 carats, diamants, alliances et
             créations sur mesure.
           </p>
           <div className="flex gap-3">
@@ -97,7 +97,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
                 <li key={`${group.title}-${link.label}`}>
                   <Link
                     href={link.href}
-                    className="text-body-sm font-light text-on-dark-soft transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+                    className="text-body-sm font-normal text-on-dark-soft transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
                   >
                     {link.label}
                   </Link>
@@ -111,7 +111,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
           <h2 className="mb-6 font-sans text-micro tracking-(--tracking-wordmark) text-gold-dim uppercase">
             Boutique
           </h2>
-          <p className="mb-4.5 text-body-sm leading-[1.8] font-light text-on-dark-soft">
+          <p className="mb-4.5 text-body-sm leading-[1.8] font-normal text-on-dark-soft">
             {links.cityCountry}
             <br />
             {OPENING_SUMMARY}
@@ -138,7 +138,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
       </div>
 
       <div className="flex flex-col gap-5 border-t border-[rgb(22_18_15/0.09)] pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-caption-lg font-light text-on-dark-faint">
+        <p className="text-caption-lg font-normal text-on-dark-faint">
           © {SITE.copyrightYear} {SITE.name} — {links.cityCountry}. Tous droits réservés.
         </p>
         <ul className="flex flex-wrap gap-7">
@@ -146,7 +146,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
             <li key={link.href}>
               <Link
                 href={link.href}
-                className="text-caption-lg font-light text-on-dark-faint transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+                className="text-caption-lg font-normal text-on-dark-faint transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
               >
                 {link.label}
               </Link>
@@ -158,7 +158,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
             <Link
               href={ADMIN_ROUTES.dashboard}
               rel="nofollow"
-              className="text-caption-lg font-light text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
+              className="text-caption-lg font-normal text-[rgb(22_18_15/0.32)] transition-colors duration-(--duration-state) ease-out hover:text-gold-light"
             >
               Espace maison
             </Link>

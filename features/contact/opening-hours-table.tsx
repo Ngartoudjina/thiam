@@ -19,7 +19,7 @@ export function OpeningHoursTable({
         <div
           key={day.label}
           className={cn(
-            'flex justify-between gap-4 border-b py-2.75 text-body-sm font-light',
+            'flex justify-between gap-4 border-b py-2.75 text-body-sm font-normal',
             theme === 'dark' ? 'border-[rgb(247_244_239/0.08)]' : 'border-[rgb(22_18_15/0.1)]',
             day.byAppointmentOnly
               ? theme === 'dark'

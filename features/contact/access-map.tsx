@@ -62,7 +62,7 @@ export function AccessMap({
               aria-hidden="true"
               className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(247,244,239,0.05)_0_1px,transparent_1px_64px),repeating-linear-gradient(0deg,rgba(247,244,239,0.05)_0_1px,transparent_1px_64px)]"
             />
-            <p className="absolute inset-x-6 bottom-6 text-caption font-light text-on-dark-faint">
+            <p className="absolute inset-x-6 bottom-6 text-caption font-normal text-on-dark-faint">
               {`${contact.city}, ${contact.country}`}
             </p>
           </>

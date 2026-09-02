@@ -58,7 +58,7 @@ export function TestimonialsSection({ featured, cards }: TestimonialsSectionProp
               <span className="block text-caption-lg tracking-(--tracking-button) text-ink uppercase">
                 {featured.author}
               </span>
-              <span className="mt-1.5 block text-meta-lg font-light text-clay">
+              <span className="mt-1.5 block text-meta-lg font-normal text-clay">
                 {featured.context}
               </span>
             </span>
