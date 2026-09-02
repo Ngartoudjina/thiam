@@ -45,7 +45,7 @@ export function VisitSection({ contact, hours }: VisitSectionProps) {
         />
 
         <div className="absolute inset-x-0 bottom-8 gutter lg:bottom-14">
-          <Eyebrow theme="dark" className="mb-5 lg:mb-6">
+          <Eyebrow theme="dark" className="mb-5 [&_span:last-child]:text-gold-pale lg:mb-6">
             Nous rendre visite
           </Eyebrow>
           <TextLines

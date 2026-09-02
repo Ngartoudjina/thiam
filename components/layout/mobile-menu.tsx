@@ -122,7 +122,7 @@ export function MobileMenu({ theme }: MobileMenuProps) {
                     </button>
                   </Dialog.Close>
 
-                  <BrandLockup theme="dark" size="sm" asLink={false} />
+                  <BrandLockup theme="light" size="sm" asLink={false} />
                   <span className="w-11" />
                 </div>
 

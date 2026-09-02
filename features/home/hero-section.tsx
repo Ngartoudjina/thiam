@@ -78,7 +78,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
 
           <div className="absolute inset-x-6 bottom-9">
             <div className="hero-rise [--hero-step:0]">
-              <EyebrowStatic theme="dark" fade className="mb-4.5">
+              <EyebrowStatic theme="dark" fade className="mb-4.5 [&_span:last-child]:text-gold-pale">
                 {hero.eyebrow}
               </EyebrowStatic>
             </div>
@@ -136,7 +136,7 @@ export function HeroSection({ hero }: { readonly hero: HeroContent }) {
       <div className="hidden lg:grid lg:h-[56.25rem] lg:grid-cols-[1fr_37.75rem] lg:pt-26">
         <div className="relative z-4 flex flex-col justify-center pr-[4.375rem] pl-[clamp(1.25rem,0.712rem+2.21vw,3.75rem)]">
           <div className="hero-rise [--hero-step:0]">
-            <EyebrowStatic theme="dark" fade className="mb-8.5">
+            <EyebrowStatic theme="light" fade className="mb-8.5">
               {hero.eyebrow}
             </EyebrowStatic>
           </div>

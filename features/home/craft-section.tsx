@@ -18,7 +18,7 @@ export function CraftSection() {
   return (
     <Section
       id={SECTIONS.craft}
-      theme="dark"
+      theme="light"
       labelledBy="savoir-faire-titre"
       className="overflow-hidden pb-0 lg:pb-0"
     >
@@ -26,7 +26,7 @@ export function CraftSection() {
 
       <SectionHeading
         id="savoir-faire-titre"
-        theme="dark"
+        theme="light"
         eyebrow="Pourquoi la maison THIAM"
         lines={[
           'Ce qui ne se voit pas',

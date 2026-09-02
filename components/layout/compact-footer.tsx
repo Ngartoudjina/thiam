@@ -27,7 +27,7 @@ export function CompactFooter({
   return (
     /* Même réserve que le pied complet : la barre d'action mobile est fixe. */
     <footer className="flex flex-col items-start gap-7 border-t border-rule-dark bg-obsidian gutter pt-14 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:py-14">
-      <BrandLockup theme="dark" />
+      <BrandLockup theme="light" />
 
       <p className="text-meta-lg font-normal text-on-dark-faint">
         {variant === 'hours'

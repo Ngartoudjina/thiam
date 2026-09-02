@@ -13,7 +13,7 @@ export function BespokeBanner() {
       className="mt-14 flex flex-col gap-9 bg-obsidian gutter py-14 lg:mt-27.5 lg:flex-row lg:items-center lg:justify-between lg:gap-17.5 lg:py-24"
     >
       <div>
-        <Eyebrow theme="dark" className="mb-5 lg:mb-6">
+        <Eyebrow theme="light" className="mb-5 lg:mb-6">
           Sur mesure
         </Eyebrow>
 

@@ -18,7 +18,7 @@ export function ServicesSection({ services }: { readonly services: readonly Serv
   return (
     <Section
       id={SECTIONS.services}
-      theme="dark"
+      theme="light"
       labelledBy="services-titre"
       className="overflow-hidden"
     >
@@ -26,7 +26,7 @@ export function ServicesSection({ services }: { readonly services: readonly Serv
 
       <SectionHeading
         id="services-titre"
-        theme="dark"
+        theme="light"
         eyebrow="Services"
         lines={[
           'Tout ce que l’on fait',

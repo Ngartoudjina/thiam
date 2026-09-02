@@ -43,27 +43,37 @@ export const LOCATION = {
   /** Renseigné par la maison — la maquette indique « à compléter ». */
   streetAddress: process.env.NEXT_PUBLIC_STREET_ADDRESS ?? '',
   streetAddressFallback: 'Adresse détaillée à compléter',
-  latitude: 6.3703,
-  longitude: 2.3912,
+  /** Relevées sur la fiche Google de l'établissement. */
+  latitude: 6.35966,
+  longitude: 2.425658,
   timeZone: 'Africa/Porto-Novo',
   mapsQuery: process.env.NEXT_PUBLIC_MAPS_QUERY ?? 'Bijouterie THIAM 24 Carats, Cotonou, Bénin',
 } as const;
 
+const COORDS = `${LOCATION.latitude},${LOCATION.longitude}`;
+
+/**
+ * Cartographie.
+ *
+ * Les liens visent les coordonnées exactes de la fiche Google de la maison,
+ * et non une recherche par nom : un itinéraire ne peut alors pas se tromper
+ * d'établissement. Aucune clé d'API n'est nécessaire, ni pour les liens ni
+ * pour la carte intégrée.
+ */
 export const MAPS = {
-  directionsHref: `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(
-    LOCATION.mapsQuery,
-  )}`,
-  searchHref: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    LOCATION.mapsQuery,
-  )}`,
-  /**
-   * Carte intégrée. À défaut d'une adresse d'intégration fournie par la
-   * maison, on centre sur la recherche du nom commercial : aucune clé d'API
-   * n'est requise, et le plan s'affiche réellement au lieu d'un cadre vide.
-   */
+  /** Fiche complète de l'établissement sur Google Maps. */
+  placeHref:
+    'https://www.google.com/maps/place/Bijouterie+THIAM+24+CARATS/@6.35966,2.425658,17z/data=!3m1!4b1!4m6!3m5!1s0x102355ea6e9265c7:0x9cedde16500004fa!8m2!3d6.35966!4d2.425658!16s%2Fg%2F11xg89zbrw',
+
+  /** Itinéraire depuis la position du visiteur. */
+  directionsHref: `https://www.google.com/maps/dir/?api=1&destination=${COORDS}`,
+
+  searchHref: `https://www.google.com/maps/search/?api=1&query=${COORDS}`,
+
+  /** Carte intégrée, centrée sur la boutique et légendée à son nom. */
   embedSrc:
     process.env.NEXT_PUBLIC_MAPS_EMBED_SRC ||
-    `https://www.google.com/maps?q=${encodeURIComponent(LOCATION.mapsQuery)}&output=embed`,
+    `https://maps.google.com/maps?q=${encodeURIComponent(LOCATION.mapsQuery)}&ll=${COORDS}&z=17&hl=fr&output=embed`,
 } as const;
 
 /**

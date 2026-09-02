@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { BrandLockup } from '@/components/layout/brand-lockup';
+import { FooterMap } from '@/components/layout/footer-map';
 import { NewsletterForm } from '@/components/layout/newsletter-form';
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from '@/components/common/icons';
 import { ADMIN_ROUTES } from '@/constants/admin-navigation';
@@ -47,7 +48,7 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
     <footer className="border-t border-rule-dark bg-obsidian gutter pt-[clamp(3.25rem,2rem+5vw,5.625rem)] pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:pb-11">
       <div className="grid gap-12 pb-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-15 lg:pb-[70px]">
         <div>
-          <BrandLockup theme="dark" className="mb-6" />
+          <BrandLockup theme="light" className="mb-6" />
           <p className="mb-7 max-w-[18.75rem] text-body-sm leading-[1.75] font-normal text-on-dark-faint">
             Bijoutier joaillier à {contact.city}. Or 14, 18, 21 et 24 carats, diamants, alliances et
             créations sur mesure.
@@ -133,8 +134,11 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
         </div>
       </div>
 
-      <div className="border-t border-[rgb(22_18_15/0.09)] py-10">
+      {/* Lettre de la maison et plan d'accès partagent le même bandeau :
+          l'un renseigne, l'autre situe. */}
+      <div className="grid gap-10 border-t border-[rgb(22_18_15/0.09)] py-10 lg:grid-cols-2 lg:gap-16">
         <NewsletterForm />
+        <FooterMap contact={contact} />
       </div>
 
       <div className="flex flex-col gap-5 border-t border-[rgb(22_18_15/0.09)] pt-8 sm:flex-row sm:items-center sm:justify-between">

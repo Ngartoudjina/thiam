@@ -1,7 +1,7 @@
 import { COLLECTIONS } from '@/constants/collections';
 import { FAQ_ENTRIES } from '@/constants/faq';
 import { SERVICES } from '@/constants/services';
-import { LOCATION, SITE } from '@/constants/site';
+import { LOCATION, MAPS, SITE } from '@/constants/site';
 import { DEFAULT_CONTACT, DEFAULT_HOURS } from '@/constants/defaults';
 import { RATING } from '@/constants/testimonials';
 import { absoluteUrl } from '@/lib/seo';
@@ -55,6 +55,8 @@ export function buildJewelryStoreSchema({
       addressLocality: contact.city,
       addressCountry: LOCATION.countryCode,
     },
+    // Lien vers la fiche Google : Google rattache ainsi la fiche au site.
+    hasMap: MAPS.placeHref,
     geo: {
       '@type': 'GeoCoordinates',
       latitude: LOCATION.latitude,
