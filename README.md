@@ -627,3 +627,9 @@ la validation, le stockage des images et l'import Supabase.
   services, questions, coffret de dot, pages Rachat d'or et Alliances, 404, pages
   légales et données structurées lisaient encore les valeurs figées de la
   maquette.
+
+---
+
+## Développement
+
+Site conçu et développé par **abel-beingar-dev** — <https://abelbeingar.me>.

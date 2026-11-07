@@ -157,3 +157,9 @@ export const WHATSAPP_INTENTS = {
     `Bonjour, je souhaite des informations sur votre service « ${service} ».`,
   piece: (piece: string): string => `Bonjour, la pièce « ${piece} » est-elle toujours disponible ?`,
 } as const;
+
+/** Signature du développeur du site, en pied de page et dans les métadonnées. */
+export const DEVELOPER = {
+  name: 'abel-beingar-dev',
+  url: 'https://abelbeingar.me',
+} as const;

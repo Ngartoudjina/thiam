@@ -1,3 +1,4 @@
+import { DeveloperCredit } from '@/components/layout/developer-credit';
 import Link from 'next/link';
 import { BrandLockup } from '@/components/layout/brand-lockup';
 import { ADMIN_ROUTES } from '@/constants/admin-navigation';
@@ -31,11 +32,14 @@ export async function CompactFooter({ variant = 'hours', ...props }: CompactFoot
     <footer className="flex flex-col items-start gap-7 border-t border-rule-dark bg-obsidian gutter pt-14 pb-[calc(6.5rem+env(safe-area-inset-bottom))] lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:py-14">
       <BrandLockup theme="light" />
 
-      <p className="text-meta-lg font-normal text-on-dark-faint">
-        {variant === 'hours'
-          ? `${links.cityCountry} · ${hours.summary}`
-          : `© ${SITE.copyrightYear} ${SITE.name} — ${links.cityCountry}`}
-      </p>
+      <div className="flex flex-col gap-1.5">
+        <p className="text-meta-lg font-normal text-on-dark-faint">
+          {variant === 'hours'
+            ? `${links.cityCountry} · ${hours.summary}`
+            : `© ${SITE.copyrightYear} ${SITE.name} — ${links.cityCountry}`}
+        </p>
+        <DeveloperCredit />
+      </div>
 
       <div className="flex flex-wrap items-center gap-6">
         <Link

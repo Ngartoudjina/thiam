@@ -1,3 +1,4 @@
+import { DeveloperCredit } from '@/components/layout/developer-credit';
 import Link from 'next/link';
 import { BrandLockup } from '@/components/layout/brand-lockup';
 import { FooterMap } from '@/components/layout/footer-map';
@@ -142,9 +143,12 @@ export function SiteFooter({ contact, collections }: SiteFooterProps) {
       </div>
 
       <div className="flex flex-col gap-5 border-t border-[rgb(22_18_15/0.09)] pt-8 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-caption-lg font-normal text-on-dark-faint">
-          © {SITE.copyrightYear} {SITE.name} — {links.cityCountry}. Tous droits réservés.
-        </p>
+        <div className="flex flex-col gap-2">
+          <p className="text-caption-lg font-normal text-on-dark-faint">
+            © {SITE.copyrightYear} {SITE.name} — {links.cityCountry}. Tous droits réservés.
+          </p>
+          <DeveloperCredit />
+        </div>
         <ul className="flex flex-wrap gap-7">
           {LEGAL_NAV.map((link) => (
             <li key={link.href}>

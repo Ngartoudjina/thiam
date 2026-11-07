@@ -6,7 +6,7 @@ import { fontVariables } from '@/app/fonts';
 import { JsonLd } from '@/components/common/json-ld';
 import { AppProviders } from '@/components/providers/app-providers';
 import { SiteContentProvider } from '@/components/providers/site-content-provider';
-import { SITE } from '@/constants/site';
+import { DEVELOPER, SITE } from '@/constants/site';
 import { getCollections, getServices, getSiteSettings } from '@/services/content';
 import { buildJewelryStoreSchema, buildWebsiteSchema } from '@/lib/structured-data';
 
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   description: SITE.description,
   applicationName: SITE.name,
   authors: [{ name: SITE.name }],
-  creator: SITE.name,
+  creator: DEVELOPER.name,
   publisher: SITE.name,
   alternates: { canonical: '/' },
   formatDetection: { telephone: true, address: true, email: true },

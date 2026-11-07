@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Site vitrine de la Bijouterie THIAM 24 Carats — Cotonou, Bénin.",
+  "author": "abel-beingar-dev (https://abelbeingar.me)",
   "engines": {
     "node": ">=22.12.0"
   },
