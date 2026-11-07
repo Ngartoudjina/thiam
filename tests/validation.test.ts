@@ -78,3 +78,16 @@ describe('erreurs Postgres', () => {
     expect(pgErrorCode(new Error('sans code'))).toBeUndefined();
   });
 });
+
+describe('adresse de la base', () => {
+  it('tolère les guillemets et la ligne .env entière collés dans Vercel', async () => {
+    const { cleanConnectionString } = await import('@/lib/db/connection');
+    const url = 'postgresql://u:p@ep-x.us-east-2.aws.neon.tech/neondb?sslmode=require';
+
+    expect(cleanConnectionString(url)).toBe(url);
+    expect(cleanConnectionString(`"${url}"`)).toBe(url);
+    expect(cleanConnectionString(`'${url}'`)).toBe(url);
+    expect(cleanConnectionString(`DATABASE_URL="${url}"\n`)).toBe(url);
+    expect(cleanConnectionString(`export DATABASE_URL=${url}`)).toBe(url);
+  });
+});

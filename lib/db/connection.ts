@@ -101,7 +101,20 @@ function configureNeon(): void {
  * intégrations Vercel.
  */
 export function readDatabaseUrl(): string {
-  return (process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? '').trim();
+  return cleanConnectionString(process.env.DATABASE_URL ?? process.env.POSTGRES_URL ?? '');
+}
+
+/**
+ * Nettoie une adresse collée depuis un fichier `.env` : la ligne entière
+ * (`DATABASE_URL="…"`) ou les guillemets finissent souvent dans le champ de
+ * Vercel, qui les enregistre tels quels — et l'adresse devient invalide.
+ */
+export function cleanConnectionString(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^(?:export\s+)?[A-Z_]+\s*=\s*/, '')
+    .replace(/^(['"])(.*)\1$/, '$2')
+    .trim();
 }
 
 export function createDatabase(url: string) {
