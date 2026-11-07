@@ -81,7 +81,9 @@ async function main(): Promise<void> {
   }
   if (!databaseUrl) throw new Error('DATABASE_URL est absente : la base Neon de destination.');
 
-  const useBlob = Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
+  const useBlob = Boolean(
+    process.env.BLOB_READ_WRITE_TOKEN?.trim() || process.env.BLOB_STORE_ID?.trim(),
+  );
   const db = createDatabase(databaseUrl);
 
   if (!dryRun && (await hasCollections(db))) {

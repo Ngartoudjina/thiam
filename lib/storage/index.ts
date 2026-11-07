@@ -26,7 +26,9 @@ export function storageDriver(): StorageDriver | null {
   const explicit = process.env.STORAGE_DRIVER?.trim();
   if (explicit === 'blob' || explicit === 'local') return explicit;
 
-  if (process.env.BLOB_READ_WRITE_TOKEN?.trim()) return 'blob';
+  // Jeton classique, ou connexion OIDC de Vercel (BLOB_STORE_ID, sans secret
+  // durable) : le SDK choisit seul le mode d'authentification disponible.
+  if (process.env.BLOB_READ_WRITE_TOKEN?.trim() || process.env.BLOB_STORE_ID?.trim()) return 'blob';
   if (process.env.NODE_ENV !== 'production') return 'local';
 
   return null;
@@ -35,7 +37,7 @@ export function storageDriver(): StorageDriver | null {
 export class StorageNotConfiguredError extends Error {
   constructor() {
     super(
-      'Le stockage des images n’est pas configuré : reliez un magasin Vercel Blob au projet (BLOB_READ_WRITE_TOKEN).',
+      'Le stockage des images n’est pas configuré : reliez un magasin Vercel Blob au projet (BLOB_STORE_ID ou BLOB_READ_WRITE_TOKEN).',
     );
     this.name = 'StorageNotConfiguredError';
   }
