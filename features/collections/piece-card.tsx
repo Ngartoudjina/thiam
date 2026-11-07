@@ -2,7 +2,8 @@
 
 import { m } from 'framer-motion';
 import { MediaFrame } from '@/components/common/media-frame';
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { useSiteContent } from '@/components/providers/site-content-provider';
+import { WHATSAPP_INTENTS } from '@/constants/site';
 import { fadeUp } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import type { Piece } from '@/types';
@@ -20,10 +21,12 @@ const BADGE_TONE = {
  * de la pièce, ce qui est exactement le parcours voulu par la maquette.
  */
 export function PieceCard({ piece }: { readonly piece: Piece }) {
+  const { links } = useSiteContent();
+
   return (
     <m.li variants={fadeUp}>
       <a
-        href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.piece(piece.name))}
+        href={links.whatsappWithMessage(WHATSAPP_INTENTS.piece(piece.name))}
         target="_blank"
         rel="noopener noreferrer"
         className="group block"
@@ -53,7 +56,7 @@ export function PieceCard({ piece }: { readonly piece: Piece }) {
           <h3 className="mb-1.5 font-serif text-[1.3125rem] font-normal text-ink">{piece.name}</h3>
           <p className="mb-2 text-caption font-normal text-clay">{piece.detailShort}</p>
           <p className="text-label tracking-[0.1em] text-gold-ink uppercase">
-            {piece.weight} · cours du jour
+            {piece.weight ? `${piece.weight} · cours du jour` : 'Cours du jour'}
           </p>
         </div>
 
@@ -66,7 +69,9 @@ export function PieceCard({ piece }: { readonly piece: Piece }) {
             <p className="text-meta-lg font-normal text-clay">{piece.detail}</p>
           </div>
           <div className="shrink-0 text-right">
-            <p className="text-meta tracking-[0.06em] text-ink">{piece.weight}</p>
+            {piece.weight ? (
+              <p className="text-meta tracking-[0.06em] text-ink">{piece.weight}</p>
+            ) : null}
             <p className="mt-1.5 text-label-lg tracking-[0.12em] text-gold-ink uppercase">
               Cours du jour
             </p>

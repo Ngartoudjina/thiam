@@ -113,6 +113,48 @@ export const galleryImageSchema = z.object({
 export type GalleryImageInput = z.infer<typeof galleryImageSchema>;
 
 /* -------------------------------------------------------------------------- */
+/*  Pièces en vitrine                                                          */
+/* -------------------------------------------------------------------------- */
+
+/** « 3,2 » ou « 3.2 » → 3.2 ; vide → pas de poids affiché. */
+const weightSchema = z
+  .string()
+  .trim()
+  .max(12, 'Douze caractères maximum.')
+  .default('')
+  .transform((value) => (value === '' ? null : Number(value.replace(/\s/g, '').replace(',', '.'))))
+  .refine(
+    (value) => value === null || (Number.isFinite(value) && value > 0 && value < 100_000),
+    'Poids en grammes, par exemple 3,2.',
+  );
+
+export const pieceSchema = z.object({
+  name: trimmed(2, 80, 'Le nom est obligatoire.'),
+  detail: z.string().trim().max(120, 'Cent vingt caractères maximum.').default(''),
+  detailShort: z.string().trim().max(60, 'Soixante caractères maximum.').default(''),
+  weight: weightSchema,
+  collectionId: z.union([z.uuid('Univers inconnu.'), z.literal('')]).default(''),
+  badgeLabel: z.string().trim().max(30, 'Trente caractères maximum.').default(''),
+  badgeTone: z.enum(['gold', 'dark']).default('gold'),
+  imageAlt: z.string().trim().max(200, 'Deux cents caractères maximum.').default(''),
+  status: statusSchema,
+});
+
+export type PieceInput = z.infer<typeof pieceSchema>;
+
+/** Réglages de la page Collections. */
+export const catalogSchema = z.object({
+  /** Pièces disponibles en boutique — annoncé en tête du catalogue. */
+  totalInStore: z.coerce
+    .number()
+    .int('Un nombre entier.')
+    .min(0, 'Un nombre positif.')
+    .max(100_000, 'Ce nombre semble trop grand.'),
+});
+
+export type CatalogSettings = z.infer<typeof catalogSchema>;
+
+/* -------------------------------------------------------------------------- */
 /*  Blocs singuliers stockés dans `settings`                                   */
 /* -------------------------------------------------------------------------- */
 
@@ -129,7 +171,7 @@ export const heroSchema = z.object({
   descriptionMobile: z.string().trim().max(240).default(''),
   primaryCta: ctaSchema,
   secondaryCta: ctaSchema,
-  imagePath: z.string().trim().max(400).default(''),
+  imagePath: z.string().trim().max(600).default(''),
   imageAlt: z.string().trim().max(160).default(''),
 });
 
@@ -148,7 +190,7 @@ export const aboutSchema = z.object({
   description: trimmed(10, 600, 'Le paragraphe est obligatoire.'),
   quote: trimmed(5, 400, 'La citation est obligatoire.'),
   quoteAuthor: trimmed(2, 80, 'L’auteur de la citation est obligatoire.'),
-  portraitPath: z.string().trim().max(400).default(''),
+  portraitPath: z.string().trim().max(600).default(''),
   portraitAlt: z.string().trim().max(160).default(''),
   milestones: z.array(milestoneSchema).max(12, 'Douze jalons maximum.'),
 });
@@ -225,6 +267,7 @@ export const SETTING_KEYS = {
   hours: 'hours',
   stats: 'stats',
   visuals: 'visuals',
+  catalog: 'catalog',
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
@@ -240,9 +283,12 @@ export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
  * repli.
  */
 const visualSchema = z.object({
-  /** Chemin dans le compartiment de stockage. Vide = visuel de la maquette. */
-  path: z.string().trim().max(400).default(''),
+  /** Adresse de l'image téléversée. Vide = visuel de la maquette. */
+  path: z.string().trim().max(600).default(''),
   alt: z.string().trim().max(200).default(''),
+  /** Dimensions réelles du fichier ; 0 quand elles sont inconnues. */
+  width: z.coerce.number().int().min(0).max(20_000).default(0),
+  height: z.coerce.number().int().min(0).max(20_000).default(0),
 });
 
 export const visualsSchema = z.object({

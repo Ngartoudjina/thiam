@@ -78,7 +78,7 @@ export function BrandLockup({
         </span>
         <span
           className={cn(
-            'tracking-(--tracking-wordmark-sub) leading-none',
+            'leading-none tracking-(--tracking-wordmark-sub)',
             WORDMARK_SIZES[size].suffix,
             theme === 'dark' ? 'text-gold' : 'text-gold-ink',
           )}

@@ -7,9 +7,10 @@ import { StatusBadge } from '@/components/common/status-badge';
 import { Button } from '@/components/ui/button';
 import { MEDIA } from '@/constants/media';
 import { TRUST_SIGNALS } from '@/constants/craft';
-import type { HeroContent } from '@/lib/schemas/content';
+import { isExternalHref, resolveCtaHref } from '@/lib/cta';
+import type { ContactSettings, HeroContent, VisualsContent } from '@/lib/schemas/content';
+import { contactLinks } from '@/services/content';
 import { resolveVisual } from '@/services/content/media';
-import type { VisualsContent } from '@/lib/schemas/content';
 
 /**
  * Hero de l'accueil.
@@ -37,10 +38,20 @@ import type { VisualsContent } from '@/lib/schemas/content';
 export function HeroSection({
   hero,
   visuals,
+  contact,
 }: {
   readonly hero: HeroContent;
   readonly visuals: VisualsContent;
+  readonly contact: ContactSettings;
 }) {
+  const links = contactLinks(contact);
+  const primaryHref = resolveCtaHref(hero.primaryCta.href, links);
+  const secondaryHref = resolveCtaHref(hero.secondaryCta.href, links);
+  // Un appel ou une page du site s'ouvrent sur place ; un lien externe, dans un nouvel onglet.
+  const primaryTarget = isExternalHref(primaryHref)
+    ? ({ target: '_blank', rel: 'noopener noreferrer' } as const)
+    : {};
+
   const heroImage = (
     <MediaFrame
       asset={resolveVisual(visuals.heroMain, MEDIA.heroParure)}
@@ -86,7 +97,11 @@ export function HeroSection({
 
           <div className="absolute inset-x-6 bottom-9">
             <div className="hero-rise [--hero-step:0]">
-              <EyebrowStatic theme="dark" fade className="mb-4.5 [&_span:last-child]:text-gold-pale">
+              <EyebrowStatic
+                theme="dark"
+                fade
+                className="mb-4.5 [&_span:last-child]:text-gold-pale"
+              >
                 {hero.eyebrow}
               </EyebrowStatic>
             </div>
@@ -113,13 +128,13 @@ export function HeroSection({
 
         <div className="hero-rise flex flex-col gap-3 gutter pt-6 pb-5.5 [--hero-step:4]">
           <Button asChild variant="gold" size="lg" block className="min-h-14">
-            <a href={hero.primaryCta.href} target="_blank" rel="noopener noreferrer">
+            <a href={primaryHref} {...primaryTarget}>
               <WhatsAppIcon size={15} />
               {hero.primaryCta.label}
             </a>
           </Button>
           <Button asChild variant="outlineBeige" size="lg" block className="min-h-14">
-            <Link href={hero.secondaryCta.href}>{hero.secondaryCta.label}</Link>
+            <Link href={secondaryHref}>{hero.secondaryCta.label}</Link>
           </Button>
         </div>
 
@@ -169,13 +184,13 @@ export function HeroSection({
 
           <div className="hero-rise flex flex-wrap items-center gap-4 [--hero-step:4]">
             <Button asChild variant="gold" size="lg" className="px-8.5">
-              <a href={hero.primaryCta.href} target="_blank" rel="noopener noreferrer">
+              <a href={primaryHref} {...primaryTarget}>
                 <WhatsAppIcon size={15} />
                 {hero.primaryCta.label}
               </a>
             </Button>
             <Button asChild variant="outlineBeige" size="lg">
-              <Link href={hero.secondaryCta.href}>
+              <Link href={secondaryHref}>
                 {hero.secondaryCta.label}
                 <ArrowRightIcon size={16} />
               </Link>

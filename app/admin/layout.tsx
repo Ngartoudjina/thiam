@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Toaster } from 'sonner';
 import { SetupNotice } from '@/components/admin/setup-notice';
 import { ThemeScript } from '@/components/admin/theme-toggle';
-import { SUPABASE } from '@/lib/supabase/env';
+import { isDatabaseConfigured } from '@/lib/db';
 
 export const metadata: Metadata = {
   title: 'Administration',
@@ -22,7 +22,7 @@ export default function AdminSegmentLayout({ children }: { readonly children: Re
   return (
     <>
       <ThemeScript />
-      {SUPABASE.isConfigured ? children : <SetupNotice />}
+      {isDatabaseConfigured() ? children : <SetupNotice />}
       <Toaster
         position="bottom-right"
         toastOptions={{

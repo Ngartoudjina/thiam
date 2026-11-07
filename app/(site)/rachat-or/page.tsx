@@ -55,7 +55,7 @@ export default async function BuybackPage() {
           trail: TRAIL,
         })}
       />
-      <JsonLd id="schema-service-rachat" data={buildBuybackServiceSchema()} />
+      <JsonLd id="schema-service-rachat" data={buildBuybackServiceSchema(settings.contact)} />
       <JsonLd id="schema-faq-rachat" data={buildFaqSchema(BUYBACK_PAGE.faq)} />
 
       <LandingHero

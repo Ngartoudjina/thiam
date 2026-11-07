@@ -1,157 +1,170 @@
 import 'server-only';
 
+import { eq, sql, type SQL } from 'drizzle-orm';
 import { requireStaff } from '@/lib/auth';
-import { createServerSupabase } from '@/lib/supabase/server';
+import { requireDb, type Database } from '@/lib/db';
 import {
-  failure,
-  publishChanges,
-  success,
-  type ActionResult,
-} from '@/services/admin/action-result';
+  type collectionImages,
+  collections,
+  faq,
+  galleryImages,
+  pieces,
+  services,
+  testimonials,
+} from '@/lib/db/schema';
+import { publishChanges, success, type ActionResult } from '@/services/admin/action-result';
 import type { CacheTag } from '@/lib/cache';
-import type { Database } from '@/types/database';
-
-type OrderableTable = 'collections' | 'gallery_images' | 'services' | 'testimonials' | 'faq';
-type ManagedTable = OrderableTable | 'collection_images';
-
-type InsertOf<T extends ManagedTable> = Database['public']['Tables'][T]['Insert'];
-type UpdateOf<T extends ManagedTable> = Database['public']['Tables'][T]['Update'];
+import type { ContentStatus } from '@/types/database';
 
 /**
  * Opérations communes à toutes les rubriques du tableau de bord.
  *
- * Chaque fonction commence par vérifier les droits : le middleware protège les
- * pages, ces contrôles-ci protègent les écritures, y compris contre un appel
- * d'action forgé hors interface.
+ * Chaque point d'entrée commence par vérifier les droits : le middleware
+ * protège les pages, ces contrôles-ci protègent les écritures, y compris
+ * contre un appel d'action forgé hors interface.
  */
+
+export const ORDERED_TABLES = {
+  collections,
+  pieces,
+  gallery_images: galleryImages,
+  services,
+  testimonials,
+  faq,
+} as const;
+
+export type OrderedTableName = keyof typeof ORDERED_TABLES;
+type OrderedTable = (typeof ORDERED_TABLES)[OrderedTableName];
+type PositionedTable = OrderedTable | typeof collectionImages;
+
+/** Base de données, après contrôle des droits. */
+export async function staffDb(): Promise<Database> {
+  await requireStaff();
+  return requireDb();
+}
+
+/** Prochaine position libre : les nouveautés se posent en fin de liste. */
+export async function nextPosition(
+  db: Database,
+  table: PositionedTable,
+  where?: SQL,
+): Promise<number> {
+  const [row] = await db
+    .select({ next: sql<number>`coalesce(max(${table.position}), -1)::integer + 1` })
+    .from(table)
+    .where(where);
+
+  return Number(row?.next ?? 0);
+}
 
 /**
- * Note de typage : postgrest-js dérive le nom des colonnes du nom de la table.
- * Sur une table générique, il ne peut pas conclure que `id` existe partout —
- * alors que les tables gérées ici la possèdent toutes. Les rares `as never`
- * ci-dessous restreignent ce seul point de passage, jamais la donnée elle-même,
- * qui reste typée par `Database`.
+ * Applique un nouvel ordre en une seule instruction.
+ *
+ * Les positions sont réécrites d'un bloc plutôt qu'échangées deux à deux : la
+ * liste reste cohérente même si deux personnes réordonnent en même temps, et
+ * l'instruction unique est atomique.
  */
-async function client() {
-  await requireStaff();
-  const supabase = await createServerSupabase();
-  if (!supabase) throw new Error('Supabase n’est pas configuré.');
-  return supabase;
+export async function writePositions(
+  db: Database,
+  table: PositionedTable,
+  orderedIds: readonly string[],
+): Promise<void> {
+  const ids = orderedIds.filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  if (ids.length === 0) return;
+
+  const cases = sql.join(
+    ids.map((id, index) => sql`when ${table.id} = ${id}::uuid then ${index}::integer`),
+    sql` `,
+  );
+  const list = sql.join(
+    ids.map((id) => sql`${id}::uuid`),
+    sql`, `,
+  );
+
+  await db.execute(
+    sql`update ${table} set position = case ${cases} else ${table.position} end where ${table.id} in (${list})`,
+  );
 }
 
-/** Prochaine position libre — les nouveautés se posent en fin de liste. */
-async function nextPosition(table: OrderableTable): Promise<number> {
-  const supabase = await client();
-
-  const { data } = await supabase
-    .from(table)
-    .select('position')
-    .order('position', { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  return typeof data?.position === 'number' ? data.position + 1 : 0;
-}
-
-export async function createRow<T extends OrderableTable>(
-  table: T,
-  values: Omit<InsertOf<T>, 'position'>,
+export async function createRow<N extends OrderedTableName>(
+  name: N,
+  values: Omit<(typeof ORDERED_TABLES)[N]['$inferInsert'], 'position'>,
   tag: CacheTag,
   message: string,
 ): Promise<ActionResult<{ id: string }>> {
-  const supabase = await client();
-  const position = await nextPosition(table);
+  const db = await staffDb();
+  const table: OrderedTable = ORDERED_TABLES[name];
+  const position = await nextPosition(db, table);
 
-  const { data, error } = await supabase
-    .from(table)
-    .insert({ ...values, position } as never)
-    .select('id')
-    .returns<{ id: string }[]>()
-    .single();
-
-  if (error || !data) {
-    return failure(
-      error?.code === '23505'
-        ? 'Un élément portant cet identifiant existe déjà.'
-        : 'Enregistrement impossible.',
-    );
-  }
+  const [row] = (await db
+    .insert(table)
+    .values({ ...values, position } as never)
+    .returning({ id: table.id })) as { id: string }[];
 
   publishChanges(tag);
-  return success(message, { id: data.id });
+  return success(message, { id: row?.id ?? '' });
 }
 
-export async function updateRow<T extends ManagedTable>(
-  table: T,
+export async function updateRow<N extends OrderedTableName>(
+  name: N,
   id: string,
-  values: UpdateOf<T>,
+  values: Partial<(typeof ORDERED_TABLES)[N]['$inferInsert']>,
   tag: CacheTag,
   message: string,
 ): Promise<ActionResult> {
-  const supabase = await client();
+  const db = await staffDb();
+  const table: OrderedTable = ORDERED_TABLES[name];
 
-  const { error } = await supabase
-    .from(table)
-    .update(values as never)
-    .eq('id' as never, id as never);
-
-  if (error) {
-    return failure(
-      error.code === '23505'
-        ? 'Un élément portant cet identifiant existe déjà.'
-        : 'Mise à jour impossible.',
-    );
-  }
+  await db
+    .update(table)
+    .set(values as never)
+    .where(eq(table.id, id));
 
   publishChanges(tag);
   return success(message);
 }
 
-export async function deleteRow<T extends ManagedTable>(
-  table: T,
+export async function deleteRow(
+  name: OrderedTableName,
   id: string,
   tag: CacheTag,
   message: string,
 ): Promise<ActionResult> {
-  const supabase = await client();
+  const db = await staffDb();
+  const table: OrderedTable = ORDERED_TABLES[name];
 
-  const { error } = await supabase
-    .from(table)
-    .delete()
-    .eq('id' as never, id as never);
-  if (error) return failure('Suppression impossible.');
+  await db.delete(table).where(eq(table.id, id));
 
   publishChanges(tag);
   return success(message);
 }
 
-/**
- * Applique un nouvel ordre après un glisser-déposer.
- * Les positions sont réécrites d'un bloc plutôt qu'échangées deux à deux :
- * la liste reste cohérente même si deux personnes réordonnent en même temps.
- */
 export async function reorderRows(
-  table: OrderableTable,
+  name: OrderedTableName,
   orderedIds: readonly string[],
   tag: CacheTag,
 ): Promise<ActionResult> {
-  const supabase = await client();
-
-  const results = await Promise.all(
-    orderedIds.map((id, index) =>
-      supabase
-        .from(table)
-        .update({ position: index } as never)
-        .eq('id' as never, id as never),
-    ),
-  );
-
-  if (results.some((result) => result.error)) {
-    return failure('Le nouvel ordre n’a pas pu être enregistré.');
-  }
+  const db = await staffDb();
+  await writePositions(db, ORDERED_TABLES[name], orderedIds);
 
   publishChanges(tag);
   return success('Ordre mis à jour.');
 }
 
-export { client as adminClient };
+export async function setRowStatus(
+  name: OrderedTableName,
+  id: string,
+  status: ContentStatus,
+  tag: CacheTag,
+): Promise<ActionResult> {
+  const db = await staffDb();
+  const table: OrderedTable = ORDERED_TABLES[name];
+
+  await db
+    .update(table)
+    .set({ status } as never)
+    .where(eq(table.id, id));
+
+  publishChanges(tag);
+  return success(status === 'visible' ? 'Élément publié.' : 'Élément masqué.');
+}

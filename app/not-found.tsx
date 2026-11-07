@@ -4,14 +4,17 @@ import { CompactFooter } from '@/components/layout/compact-footer';
 import { Eyebrow } from '@/components/common/eyebrow';
 import { Button } from '@/components/ui/button';
 import { ROUTES } from '@/constants/navigation';
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { WHATSAPP_INTENTS } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 
 export const metadata = {
   title: 'Page introuvable',
   robots: { index: false, follow: true },
 };
 
-export default function NotFound() {
+export default async function NotFound() {
+  const links = contactLinks((await getSiteSettings()).contact);
+
   return (
     <>
       <section className="flex min-h-[70vh] flex-col justify-center bg-obsidian gutter pt-[10rem] pb-24 lg:pt-[14rem] lg:pb-32">
@@ -39,7 +42,7 @@ export default function NotFound() {
           </Button>
           <Button asChild variant="outlineLight" size="lg">
             <a
-              href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.question)}
+              href={links.whatsappWithMessage(WHATSAPP_INTENTS.question)}
               target="_blank"
               rel="noopener noreferrer"
             >

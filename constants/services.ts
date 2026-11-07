@@ -63,3 +63,8 @@ export const CONTACT_FORM_TOPICS: readonly ProjectTopic[] = [
   { value: 'reparation', label: 'Réparation' },
   { value: 'estimation', label: 'Estimation' },
 ] as const;
+
+/** Libellé de chaque sujet, quel que soit le formulaire d'origine. */
+export const FORM_TOPIC_LABELS: Readonly<Record<string, string>> = Object.fromEntries(
+  [...HOME_FORM_TOPICS, ...CONTACT_FORM_TOPICS].map((topic) => [topic.value, topic.label]),
+);

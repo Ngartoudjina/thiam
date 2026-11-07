@@ -1,81 +1,54 @@
-import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? '';
-const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? '';
+import { SESSION_COOKIE, SESSION_TTL_MS, sessionCookieOptions } from '@/lib/auth/cookie';
 
 const LOGIN_PATH = '/admin/connexion';
-const DASHBOARD_PATH = '/admin';
 
 /**
- * Rafraîchit la session Supabase et garde l'espace d'administration.
+ * Garde optimiste de l'espace d'administration.
  *
- * Le contrôle est fait ici, avant tout rendu : sans session valide, aucune
- * page `/admin` n'est jamais produite. Les actions serveur revérifient malgré
- * tout les droits de leur côté — le middleware n'est pas une frontière de
- * sécurité à lui seul.
+ * Elle ne consulte pas la base : sans cookie de session, elle renvoie vers la
+ * connexion avant tout rendu ; avec un cookie, elle laisse passer et prolonge
+ * sa durée de vie. La vérification qui fait foi — jeton confronté à la base —
+ * a lieu dans la mise en page du tableau de bord et dans chaque action
+ * serveur : le middleware n'est pas, à lui seul, une frontière de sécurité.
  */
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAdminArea = pathname.startsWith(DASHBOARD_PATH);
 
-  // Sans configuration Supabase, seule la page d'installation reste accessible.
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-    return NextResponse.next();
-  }
+  // Sans base configurée, `/admin` affiche sa page d'installation.
+  if (!process.env.DATABASE_URL && !process.env.POSTGRES_URL) return NextResponse.next();
 
-  let response = NextResponse.next({ request });
+  // La page de connexion décide seule : elle redirige un visiteur déjà connecté.
+  if (pathname === LOGIN_PATH) return NextResponse.next();
 
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-    cookies: {
-      getAll: () => request.cookies.getAll(),
-      setAll: (cookiesToSet) => {
-        for (const { name, value } of cookiesToSet) {
-          request.cookies.set(name, value);
-        }
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
 
-        response = NextResponse.next({ request });
-
-        for (const { name, value, options } of cookiesToSet) {
-          response.cookies.set(name, value, options);
-        }
-      },
-    },
-  });
-
-  // `getUser()` valide le jeton auprès de Supabase, contrairement à `getSession()`
-  // qui se contente de lire le cookie — indispensable dans un middleware.
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!isAdminArea) return response;
-
-  if (!user && pathname !== LOGIN_PATH) {
+  if (!token) {
     const redirect = request.nextUrl.clone();
     redirect.pathname = LOGIN_PATH;
+    redirect.search = '';
     redirect.searchParams.set('suite', pathname);
     return NextResponse.redirect(redirect);
   }
 
-  if (user && pathname === LOGIN_PATH) {
-    const redirect = request.nextUrl.clone();
-    redirect.pathname = DASHBOARD_PATH;
-    redirect.search = '';
-    return NextResponse.redirect(redirect);
-  }
+  // Le cookie suit la session : tant qu'on travaille, on reste connecté.
+  // Seulement sur les navigations : une action serveur (POST) gère elle-même
+  // le cookie — la déconnexion l'efface, il ne faut pas le reposer à côté.
+  if (request.method !== 'GET') return NextResponse.next();
 
+  const response = NextResponse.next();
+  response.cookies.set(
+    SESSION_COOKIE,
+    token,
+    sessionCookieOptions(new Date(Date.now() + SESSION_TTL_MS)),
+  );
   return response;
 }
 
 export const config = {
   /*
-   * Restreint à l'espace d'administration.
-   *
-   * Le site vitrine est entièrement statique et n'a besoin d'aucune session :
-   * le faire passer par le middleware ajoutait un traitement — et, pour un
-   * administrateur connecté, un aller-retour vers Supabase — à chaque
-   * navigation et à chaque préchargement de lien.
+   * Restreint à l'espace d'administration : le site vitrine est statique et
+   * n'a besoin d'aucune session.
    */
   matcher: ['/admin/:path*'],
 };

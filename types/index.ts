@@ -6,7 +6,7 @@
 
 /**
  * Visuel résolu, quelle que soit sa provenance : fichier livré avec la maquette
- * ou objet téléversé dans Supabase Storage. C'est le seul format que les
+ * ou image téléversée depuis le tableau de bord. C’est le seul format que les
  * composants d'affichage connaissent.
  */
 export interface MediaAsset {
@@ -58,7 +58,10 @@ export interface Piece {
   readonly detail: string;
   /** Version courte affichée sur la grille mobile. */
   readonly detailShort: string;
+  /** Poids affiché, « 3,2 g » ; vide quand il n'est pas communiqué. */
   readonly weight: string;
+  /** Poids en grammes, pour le tri ; déduit de `weight` à défaut. */
+  readonly weightGrams?: number | null;
   readonly collection: string;
   readonly image: MediaAsset | null;
   readonly badge?: PieceBadge;

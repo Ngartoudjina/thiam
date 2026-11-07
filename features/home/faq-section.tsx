@@ -10,7 +10,8 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { WHATSAPP_INTENTS } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 import { SECTIONS } from '@/constants/navigation';
 import type { FaqEntry } from '@/types';
 
@@ -19,7 +20,9 @@ import type { FaqEntry } from '@/types';
  * La première question est ouverte par défaut, les autres se révèlent en
  * cascade. Le contenu alimente aussi le balisage `FAQPage`.
  */
-export function FaqSection({ entries }: { readonly entries: readonly FaqEntry[] }) {
+export async function FaqSection({ entries }: { readonly entries: readonly FaqEntry[] }) {
+  const links = contactLinks((await getSiteSettings()).contact);
+
   return (
     <section
       id={SECTIONS.faq}
@@ -50,7 +53,7 @@ export function FaqSection({ entries }: { readonly entries: readonly FaqEntry[] 
           <Reveal variant="up-sm">
             <Button asChild variant="outlineGold" size="md">
               <a
-                href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.question)}
+                href={links.whatsappWithMessage(WHATSAPP_INTENTS.question)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

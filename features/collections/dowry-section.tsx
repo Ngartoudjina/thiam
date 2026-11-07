@@ -6,12 +6,15 @@ import { TextLines } from '@/components/motion/text-lines';
 import { Button } from '@/components/ui/button';
 import { MEDIA } from '@/constants/media';
 import { DOWRY_BENEFITS } from '@/constants/collections';
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { WHATSAPP_INTENTS } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 import { resolveVisual } from '@/services/content/media';
 import type { VisualsContent } from '@/lib/schemas/content';
 
 /** « Le coffret de dot » — la pièce maîtresse de la collection mariage. */
-export function DowrySection({ visuals }: { readonly visuals: VisualsContent }) {
+export async function DowrySection({ visuals }: { readonly visuals: VisualsContent }) {
+  const links = contactLinks((await getSiteSettings()).contact);
+
   return (
     <section aria-labelledby="dot-titre" className="bg-ivory gutter py-14 lg:py-27.5">
       <div className="grid items-stretch lg:grid-cols-2">
@@ -60,7 +63,7 @@ export function DowrySection({ visuals }: { readonly visuals: VisualsContent }) 
           <Reveal variant="up-sm" className="self-start">
             <Button asChild variant="ink" size="lg">
               <a
-                href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.fitting)}
+                href={links.whatsappWithMessage(WHATSAPP_INTENTS.fitting)}
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -3,8 +3,7 @@ import { BrandLockup } from '@/components/layout/brand-lockup';
 import { ADMIN_ROUTES } from '@/constants/admin-navigation';
 import { WhatsAppIcon } from '@/components/common/icons';
 import { SITE } from '@/constants/site';
-import { DEFAULT_CONTACT, DEFAULT_HOURS } from '@/constants/defaults';
-import { contactLinks } from '@/services/content';
+import { contactLinks, getSiteSettings } from '@/services/content';
 import type { ContactSettings, HoursContent } from '@/lib/schemas/content';
 
 interface CompactFooterProps {
@@ -17,12 +16,15 @@ interface CompactFooterProps {
 /**
  * Bandeau de pied de page des pages intérieures — écrans Collections et
  * Contact de la maquette : logotype, une ligne d'information, contact direct.
+ *
+ * Sans coordonnées fournies par la page (404, pages légales), il les lit
+ * lui-même : jamais les valeurs figées de la maquette, qui ne suivraient pas
+ * une modification faite dans le tableau de bord.
  */
-export function CompactFooter({
-  variant = 'hours',
-  contact = DEFAULT_CONTACT,
-  hours = DEFAULT_HOURS,
-}: CompactFooterProps) {
+export async function CompactFooter({ variant = 'hours', ...props }: CompactFooterProps) {
+  const settings = props.contact && props.hours ? null : await getSiteSettings();
+  const contact = props.contact ?? settings!.contact;
+  const hours = props.hours ?? settings!.hours;
   const links = contactLinks(contact);
   return (
     /* Même réserve que le pied complet : la barre d'action mobile est fixe. */

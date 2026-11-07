@@ -6,11 +6,15 @@ import { useCallback, useId, useRef, useState, type DragEvent } from 'react';
 import { toast } from 'sonner';
 import { AdminButton } from '@/components/admin/ui/primitives';
 import { compressImage, validateImageFile } from '@/lib/image-compression';
-import { publicStorageUrl } from '@/lib/supabase/env';
-import { createUploadUrlAction, type UploadFolder } from '@/services/admin/upload-actions';
 import { cn } from '@/lib/utils';
 
+/** Dossiers du stockage — miroir de `UPLOAD_FOLDERS` côté serveur. */
+export type UploadFolder = 'collections' | 'pieces' | 'gallery' | 'content';
+
+const UPLOAD_ENDPOINT = '/api/admin/upload';
+
 export interface UploadedImage {
+  /** Adresse publique de l'image enregistrée. */
   readonly storagePath: string;
   readonly width: number;
   readonly height: number;
@@ -34,17 +38,18 @@ const ASPECT: Record<'portrait' | 'landscape' | 'square', string> = {
   square: 'aspect-square',
 };
 
-/** Envoie le fichier à l'URL signée en suivant la progression réelle. */
-function putWithProgress(
-  signedUrl: string,
-  blob: Blob,
+/**
+ * Envoie l'image au serveur en suivant la progression réelle.
+ * `fetch` ne sait pas encore rendre compte de l'envoi : XMLHttpRequest, si.
+ */
+function postWithProgress(
+  form: FormData,
   onProgress: (percent: number) => void,
-): Promise<void> {
+): Promise<{ readonly url: string }> {
   return new Promise((resolve, reject) => {
     const request = new XMLHttpRequest();
-    request.open('PUT', signedUrl, true);
-    request.setRequestHeader('Content-Type', blob.type);
-    request.setRequestHeader('x-upsert', 'true');
+    request.open('POST', UPLOAD_ENDPOINT, true);
+    request.responseType = 'json';
 
     request.upload.addEventListener('progress', (event) => {
       if (event.lengthComputable) {
@@ -52,13 +57,22 @@ function putWithProgress(
       }
     });
 
-    request.addEventListener('load', () =>
-      request.status >= 200 && request.status < 300
-        ? resolve()
-        : reject(new Error(`Envoi refusé (${request.status}).`)),
-    );
+    request.addEventListener('load', () => {
+      const body = (request.response ?? {}) as { url?: unknown; error?: unknown };
+
+      if (request.status >= 200 && request.status < 300 && typeof body.url === 'string') {
+        resolve({ url: body.url });
+        return;
+      }
+
+      reject(
+        new Error(
+          typeof body.error === 'string' ? body.error : `Envoi refusé (${request.status}).`,
+        ),
+      );
+    });
     request.addEventListener('error', () => reject(new Error('Connexion interrompue.')));
-    request.send(blob);
+    request.send(form);
   });
 }
 
@@ -67,7 +81,8 @@ function putWithProgress(
  *
  * Glisser-déposer ou sélection classique, aperçu immédiat depuis le fichier
  * local, compression avant envoi, barre de progression réelle, remplacement et
- * suppression. Le fichier va directement dans Supabase Storage.
+ * suppression. Le fichier rejoint le stockage du site (Vercel Blob, ou le
+ * disque en développement).
  */
 export function ImageUploader({
   folder,
@@ -75,7 +90,7 @@ export function ImageUploader({
   value,
   onChange,
   label = 'Photo',
-  hint = 'JPG, PNG ou WEBP — 10 Mo maximum. L’image est compressée avant l’envoi.',
+  hint = 'JPG, PNG ou WEBP — 15 Mo maximum. L’image est compressée avant l’envoi.',
   className,
   aspect = 'landscape',
 }: ImageUploaderProps) {
@@ -99,18 +114,16 @@ export function ImageUploader({
 
       try {
         const compressed = await compressImage(file);
-        const signed = await createUploadUrlAction(folder, scope, compressed.extension);
 
-        if (!signed.ok || !signed.data) {
-          toast.error(signed.ok ? 'Envoi impossible.' : signed.message);
-          setProgress(null);
-          return;
-        }
+        const form = new FormData();
+        form.append('file', compressed.blob, `photo.${compressed.extension}`);
+        form.append('folder', folder);
+        form.append('scope', scope);
 
-        await putWithProgress(signed.data.signedUrl, compressed.blob, setProgress);
+        const uploaded = await postWithProgress(form, setProgress);
 
         onChange({
-          storagePath: signed.data.path,
+          storagePath: uploaded.url,
           width: compressed.width,
           height: compressed.height,
         });
@@ -134,7 +147,7 @@ export function ImageUploader({
     if (file) void handleFile(file);
   };
 
-  const currentSrc = value ? publicStorageUrl(value.storagePath) : preview;
+  const currentSrc = value ? value.storagePath : preview;
   const isUploading = progress !== null;
 
   return (

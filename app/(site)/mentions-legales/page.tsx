@@ -1,6 +1,8 @@
 import { LegalPage, type LegalBlock } from '@/features/legal/legal-page';
 import { ROUTES } from '@/constants/navigation';
-import { CONTACT, LOCATION, SITE } from '@/constants/site';
+import { LOCATION, SITE } from '@/constants/site';
+import { getSiteSettings } from '@/services/content';
+import type { ContactSettings } from '@/lib/schemas/content';
 import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata({
@@ -9,12 +11,12 @@ export const metadata = createMetadata({
   path: ROUTES.legal,
 });
 
-const BLOCKS: readonly LegalBlock[] = [
+const blocks = (contact: ContactSettings): readonly LegalBlock[] => [
   {
     heading: 'Éditeur du site',
     paragraphs: [
       `${SITE.name} — bijouterie joaillerie, ${LOCATION.cityCountry}.`,
-      `Téléphone : ${CONTACT.phoneDisplay} · Courriel : ${CONTACT.email}`,
+      `Téléphone : ${contact.phoneDisplay} · Courriel : ${contact.email}`,
       'Numéro RCCM, IFU et forme juridique : à compléter par la maison avant mise en ligne.',
     ],
   },
@@ -51,13 +53,15 @@ const BLOCKS: readonly LegalBlock[] = [
   },
 ];
 
-export default function MentionsLegalesPage() {
+export default async function MentionsLegalesPage() {
+  const { contact } = await getSiteSettings();
+
   return (
     <LegalPage
       eyebrow="Informations légales"
       titleLines={['Mentions', 'légales']}
       intro={`Les informations ci-dessous concernent le site vitrine de la ${SITE.name}. Elles complètent, sans les remplacer, les conditions de vente remises en boutique.`}
-      blocks={BLOCKS}
+      blocks={blocks(contact)}
       updatedAt="30 juillet 2026"
     />
   );

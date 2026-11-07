@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { AdminButton, Panel, PanelHeader } from '@/components/admin/ui/primitives';
 import { TextInput } from '@/components/admin/ui/form-fields';
 import { ImageUploader, type UploadedImage } from '@/components/admin/image-uploader';
-import { publicStorageUrl } from '@/lib/supabase/env';
 import { VISUAL_SLOTS, type VisualsContent, type VisualSlotId } from '@/lib/schemas/content';
 import { saveVisualsAction } from '@/services/admin/settings-actions';
 
@@ -40,6 +39,8 @@ export function VisualsManager({ visuals }: { readonly visuals: VisualsContent }
     if (!image) return;
     update(id, {
       path: image.storagePath,
+      width: image.width,
+      height: image.height,
       // Un texte alternatif de départ, que l'on peut affiner ensuite.
       alt: draft[id].alt || VISUAL_SLOTS.find((slot) => slot.id === id)?.label || '',
     });
@@ -48,17 +49,10 @@ export function VisualsManager({ visuals }: { readonly visuals: VisualsContent }
   return (
     <form action={action} className="flex flex-col gap-5">
       <input type="hidden" name="visuals" value={JSON.stringify(draft)} />
-      <input
-        type="hidden"
-        name="previousPaths"
-        value={JSON.stringify(
-          Object.fromEntries(Object.entries(visuals).map(([id, v]) => [id, v.path])),
-        )}
-      />
 
       {VISUAL_SLOTS.map((slot) => {
         const current = draft[slot.id];
-        const preview = current.path ? publicStorageUrl(current.path) : null;
+        const preview = current.path || null;
 
         return (
           <Panel key={slot.id}>
@@ -110,7 +104,7 @@ export function VisualsManager({ visuals }: { readonly visuals: VisualsContent }
                     variant="ghost"
                     size="sm"
                     className="self-start"
-                    onClick={() => update(slot.id, { path: '' })}
+                    onClick={() => update(slot.id, { path: '', width: 0, height: 0 })}
                   >
                     Revenir au visuel d’origine
                   </AdminButton>

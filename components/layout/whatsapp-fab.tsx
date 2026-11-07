@@ -29,7 +29,7 @@ export function WhatsAppFab() {
       aria-label="Écrire à la boutique sur WhatsApp"
       className={cn(
         'group fixed right-6 bottom-6 z-70 hidden items-center gap-3 lg:flex',
-        'bg-gold-gradient hover:bg-gold-gradient-hover rounded-full py-4 pr-6 pl-4.5',
+        'rounded-full bg-gold-gradient py-4 pr-6 pl-4.5 hover:bg-gold-gradient-hover',
         'shadow-[0_14px_34px_-12px_rgb(22_18_15/0.55)] ring-1 ring-[rgb(255_252_247/0.35)]',
         'transition-[opacity,transform,background] duration-(--duration-state) ease-out',
         'hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0',

@@ -1,17 +1,5 @@
 import type { NextConfig } from 'next';
 
-/** Hôte Supabase, extrait de l'URL du projet lorsqu'elle est renseignée. */
-const supabaseHost = (() => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  if (!url) return null;
-
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return null;
-  }
-})();
-
 /**
  * En-têtes de sécurité appliqués à toutes les routes.
  * Nécessaires pour viser 100 en « Best Practices » sur Lighthouse.
@@ -37,18 +25,10 @@ const nextConfig: NextConfig = {
 
   images: {
     // Les visuels téléversés depuis le tableau de bord sont servis par
-    // Supabase Storage ; ils restent optimisés par `next/image`.
+    // Vercel Blob ; ils restent optimisés par `next/image`.
     remotePatterns: [
       { protocol: 'https', hostname: 'tile.openstreetmap.org', pathname: '/**' },
-      ...(supabaseHost
-        ? [
-            {
-              protocol: 'https' as const,
-              hostname: supabaseHost,
-              pathname: '/storage/v1/object/public/**',
-            },
-          ]
-        : []),
+      { protocol: 'https', hostname: '*.public.blob.vercel-storage.com', pathname: '/**' },
     ],
     // Tuiles du plan de situation : mises en cache par notre serveur, la
     // charge sur OpenStreetMap reste négligeable.
@@ -91,15 +71,11 @@ const nextConfig: NextConfig = {
        */
       {
         source: '/images/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
       {
         source: '/brand/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
     ];
   },

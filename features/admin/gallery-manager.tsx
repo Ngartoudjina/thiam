@@ -13,7 +13,6 @@ import {
   saveGalleryImageAction,
   toggleStatusAction,
 } from '@/services/admin/content-actions';
-import { publicStorageUrl } from '@/lib/supabase/env';
 import type { ActionResult } from '@/services/admin/action-result';
 import type { GalleryImageRow } from '@/types/database';
 
@@ -47,13 +46,7 @@ export function GalleryManager({ images }: { readonly images: readonly GalleryIm
       renderSummary={(image) => (
         <div className="flex items-center gap-3">
           <span className="relative size-11 shrink-0 overflow-hidden rounded-lg bg-panel-sunken dark:bg-panel-dark-sunken">
-            <Image
-              src={publicStorageUrl(image.storage_path)}
-              alt=""
-              fill
-              sizes="44px"
-              className="object-cover"
-            />
+            <Image src={image.storage_path} alt="" fill sizes="44px" className="object-cover" />
           </span>
           <span className="min-w-0">
             <span className="block truncate font-sans text-sm font-medium text-panel-ink dark:text-panel-dark-ink">
@@ -104,7 +97,6 @@ function GalleryForm({
       </h2>
 
       {image ? <input type="hidden" name="id" value={image.id} /> : null}
-      {image ? <input type="hidden" name="previousStoragePath" value={image.storage_path} /> : null}
       <input type="hidden" name="storagePath" value={upload?.storagePath ?? ''} />
       <input type="hidden" name="width" value={upload?.width ?? 0} />
       <input type="hidden" name="height" value={upload?.height ?? 0} />

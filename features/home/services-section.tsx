@@ -3,7 +3,8 @@ import { GoldHalo, Section } from '@/components/common/section';
 import { SectionHeading } from '@/components/common/section-heading';
 import { RevealGroup, RevealItem } from '@/components/motion/reveal';
 import type { Service } from '@/types';
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { WHATSAPP_INTENTS } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 import { SECTIONS } from '@/constants/navigation';
 
 /**
@@ -14,7 +15,9 @@ import { SECTIONS } from '@/constants/navigation';
  * Au survol : fond or à 5 %, pictogramme qui pivote de 8°, flèche qui avance
  * de 8 px, tarif en blanc plein.
  */
-export function ServicesSection({ services }: { readonly services: readonly Service[] }) {
+export async function ServicesSection({ services }: { readonly services: readonly Service[] }) {
+  const links = contactLinks((await getSiteSettings()).contact);
+
   return (
     <Section
       id={SECTIONS.services}
@@ -42,7 +45,7 @@ export function ServicesSection({ services }: { readonly services: readonly Serv
         {services.map((service) => (
           <RevealItem as="li" key={service.title} variant="up-sm">
             <a
-              href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.service(service.title))}
+              href={links.whatsappWithMessage(WHATSAPP_INTENTS.service(service.title))}
               target="_blank"
               rel="noopener noreferrer"
               className="group grid grid-cols-[2.5rem_1fr_auto] items-center gap-x-4 gap-y-2 border-b border-[rgb(22_18_15/0.09)] px-0 py-6 transition-colors duration-(--duration-state) ease-out hover:bg-[rgb(232_191_163/0.055)] lg:grid-cols-[3.5rem_18.75rem_1fr_12.5rem_2.5rem] lg:gap-0 lg:px-6.5 lg:py-8"

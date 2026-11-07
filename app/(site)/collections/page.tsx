@@ -8,8 +8,7 @@ import { BespokeBanner } from '@/features/collections/bespoke-banner';
 import { CollectionsCatalog } from '@/features/collections/collections-catalog';
 import { DowrySection } from '@/features/collections/dowry-section';
 import { ROUTES } from '@/constants/navigation';
-import { TOTAL_PIECES } from '@/constants/collections';
-import { getCollections, getSiteSettings } from '@/services/content';
+import { getCatalogContent } from '@/services/content';
 import type { CollectionFilter } from '@/types';
 import { createMetadata } from '@/lib/seo';
 import { buildBreadcrumbSchema, buildCollectionPageSchema } from '@/lib/structured-data';
@@ -24,11 +23,12 @@ export const metadata = createMetadata({
 
 /** Écran 1e de la maquette — le catalogue de la vitrine. */
 export default async function CollectionsPage() {
-  const [collections, settings] = await Promise.all([getCollections(), getSiteSettings()]);
+  const { collections, pieces, settings } = await getCatalogContent();
+  const totalInStore = settings.catalog.totalInStore;
 
   // Les filtres suivent les univers publiés depuis le tableau de bord.
   const filters: readonly CollectionFilter[] = [
-    { slug: 'tout', label: 'Tout', count: TOTAL_PIECES },
+    { slug: 'tout', label: 'Tout', ...(totalInStore > 0 ? { count: totalInStore } : {}) },
     ...collections.map((collection) => ({ slug: collection.slug, label: collection.name })),
   ];
 
@@ -83,14 +83,17 @@ export default async function CollectionsPage() {
 
           <Reveal variant="up-sm" as="p" className="lg:mb-4 lg:max-w-[22.5rem]">
             <span className="block text-body leading-[1.75] font-normal text-clay">
-              Les {TOTAL_PIECES} pièces disponibles aujourd’hui en boutique. Les poids sont réels et
-              vérifiés à la balance certifiée ; le prix suit le cours du jour de l’or.
+              {totalInStore > 0
+                ? `Les ${totalInStore} pièces disponibles aujourd’hui en boutique.`
+                : 'Une sélection des pièces disponibles aujourd’hui en boutique.'}{' '}
+              Les poids sont réels et vérifiés à la balance certifiée ; le prix suit le cours du
+              jour de l’or.
             </span>
           </Reveal>
         </div>
 
         <Suspense fallback={<CatalogFallback />}>
-          <CollectionsCatalog filters={filters} />
+          <CollectionsCatalog filters={filters} pieces={pieces} totalInStore={totalInStore} />
         </Suspense>
       </section>
 

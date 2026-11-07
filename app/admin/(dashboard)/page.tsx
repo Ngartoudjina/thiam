@@ -1,11 +1,14 @@
 import Link from 'next/link';
 import { AdminButton, PageHeader, Panel, PanelHeader } from '@/components/admin/ui/primitives';
 import { ADMIN_NAV_ITEMS, ADMIN_ROUTES } from '@/constants/admin-navigation';
+import { RefreshSiteButton } from '@/components/admin/refresh-site-button';
 import { SeedPanel } from '@/features/admin/seed-panel';
-import { getContentSummary } from '@/services/admin/queries';
+import { getCurrentStaff } from '@/lib/auth';
+import { countNewContactRequests, getContentSummary } from '@/services/admin/queries';
 
 const LABELS: Record<string, { readonly label: string; readonly href: string }> = {
   collections: { label: 'Collections', href: ADMIN_ROUTES.collections },
+  pieces: { label: 'Pièces en vitrine', href: ADMIN_ROUTES.pieces },
   gallery_images: { label: 'Photos de la galerie', href: ADMIN_ROUTES.gallery },
   services: { label: 'Services', href: ADMIN_ROUTES.services },
   testimonials: { label: 'Témoignages', href: ADMIN_ROUTES.testimonials },
@@ -14,7 +17,14 @@ const LABELS: Record<string, { readonly label: string; readonly href: string }> 
 
 /** Vue d'ensemble : ce qui est publié, et par où commencer. */
 export default async function DashboardPage() {
-  const summary = await getContentSummary();
+  const [summary, pendingRequests, staff] = await Promise.all([
+    getContentSummary(),
+    countNewContactRequests(),
+    getCurrentStaff(),
+  ]);
+  const sections = ADMIN_NAV_ITEMS.filter(
+    (item) => item.href !== ADMIN_ROUTES.dashboard && (!item.adminOnly || staff?.role === 'admin'),
+  );
   const isEmpty = summary.every((entry) => entry.total === 0);
 
   return (
@@ -22,9 +32,24 @@ export default async function DashboardPage() {
       <PageHeader
         title="Tableau de bord"
         description="Ce que le site affiche en ce moment. Chaque modification est publiée immédiatement."
+        action={<RefreshSiteButton />}
       />
 
       {isEmpty ? <SeedPanel /> : null}
+
+      {pendingRequests > 0 ? (
+        <Link
+          href={ADMIN_ROUTES.requests}
+          className="mb-6 flex items-center justify-between gap-3 rounded-xl border border-accent/50 bg-accent-soft/40 px-5 py-4 transition-colors duration-150 ease-out hover:border-accent dark:border-accent/40 dark:bg-accent/10"
+        >
+          <span className="text-sm font-medium text-panel-ink dark:text-panel-dark-ink">
+            {pendingRequests} demande{pendingRequests > 1 ? 's' : ''} de contact en attente
+          </span>
+          <span className="text-[0.8125rem] text-accent-strong dark:text-accent-soft">
+            Ouvrir la boîte de réception →
+          </span>
+        </Link>
+      ) : null}
 
       <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {summary.map((entry) => {
@@ -62,7 +87,7 @@ export default async function DashboardPage() {
           }
         />
         <ul className="divide-y divide-panel-border dark:divide-panel-dark-border">
-          {ADMIN_NAV_ITEMS.filter((item) => item.href !== ADMIN_ROUTES.dashboard).map((item) => (
+          {sections.map((item) => (
             <li key={item.href}>
               <Link
                 href={item.href}

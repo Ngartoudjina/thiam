@@ -1,34 +1,37 @@
 import 'server-only';
 
+import { asc, eq } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 import { FAQ_ENTRIES } from '@/constants/faq';
 import { GALLERY_TILES, MOBILE_GALLERY_TILES } from '@/constants/gallery';
 import { SERVICES } from '@/constants/services';
 import { FEATURED_TESTIMONIAL, HERO_TESTIMONIAL, TESTIMONIALS } from '@/constants/testimonials';
 import { CACHE_TAGS, CONTENT_REVALIDATE_SECONDS } from '@/lib/cache';
+import { faq, galleryImages, services, testimonials } from '@/lib/db/schema';
 import { serviceIconSchema } from '@/lib/schemas/content';
-import { createPublicSupabase } from '@/lib/supabase/server';
 import { toMediaAsset } from '@/services/content/media';
+import { publicDb, readOrFallback } from '@/services/content/read';
 import type { FaqEntry, GalleryTile, Service, Testimonial } from '@/types';
 
 /* -------------------------------------------------------------------------- */
 /*  Services                                                                   */
 /* -------------------------------------------------------------------------- */
 
-export const getServices = unstable_cache(
-  async (): Promise<readonly Service[]> => {
-    const supabase = createPublicSupabase();
-    if (!supabase) return SERVICES;
+const cachedServices = unstable_cache(
+  async (): Promise<readonly Service[] | null> => {
+    const db = publicDb();
+    if (!db) return null;
 
-    const { data, error } = await supabase
-      .from('services')
-      .select('*')
-      .eq('status', 'visible')
-      .order('position', { ascending: true });
+    const rows = await db
+      .select()
+      .from(services)
+      .where(eq(services.status, 'visible'))
+      .orderBy(asc(services.position));
 
-    if (error || !data || data.length === 0) return SERVICES;
+    if (rows.length === 0) return null;
 
-    return data.map((row) => {
+    return rows.map((row) => {
       const icon = serviceIconSchema.safeParse(row.icon);
 
       return {
@@ -44,14 +47,16 @@ export const getServices = unstable_cache(
   { tags: [CACHE_TAGS.services], revalidate: CONTENT_REVALIDATE_SECONDS },
 );
 
+export const getServices = cache((): Promise<readonly Service[]> =>
+  readOrFallback('services', cachedServices, SERVICES),
+);
+
 /* -------------------------------------------------------------------------- */
 /*  Témoignages                                                                */
 /* -------------------------------------------------------------------------- */
 
-const clampRating = (value: number): Testimonial['rating'] => {
-  const rounded = Math.min(5, Math.max(1, Math.round(value)));
-  return rounded as Testimonial['rating'];
-};
+const clampRating = (value: number): Testimonial['rating'] =>
+  Math.min(5, Math.max(1, Math.round(value))) as Testimonial['rating'];
 
 export interface TestimonialsContent {
   /** Avis du bandeau de preuve sociale, sous le hero. */
@@ -62,26 +67,26 @@ export interface TestimonialsContent {
   readonly cards: readonly Testimonial[];
 }
 
-export const getTestimonials = unstable_cache(
-  async (): Promise<TestimonialsContent> => {
-    const fallback: TestimonialsContent = {
-      hero: HERO_TESTIMONIAL,
-      featured: FEATURED_TESTIMONIAL,
-      cards: TESTIMONIALS,
-    };
+const TESTIMONIALS_FALLBACK: TestimonialsContent = {
+  hero: HERO_TESTIMONIAL,
+  featured: FEATURED_TESTIMONIAL,
+  cards: TESTIMONIALS,
+};
 
-    const supabase = createPublicSupabase();
-    if (!supabase) return fallback;
+const cachedTestimonials = unstable_cache(
+  async (): Promise<TestimonialsContent | null> => {
+    const db = publicDb();
+    if (!db) return null;
 
-    const { data, error } = await supabase
-      .from('testimonials')
-      .select('*')
-      .eq('status', 'visible')
-      .order('position', { ascending: true });
+    const rows = await db
+      .select()
+      .from(testimonials)
+      .where(eq(testimonials.status, 'visible'))
+      .orderBy(asc(testimonials.position));
 
-    if (error || !data || data.length === 0) return fallback;
+    if (rows.length === 0) return null;
 
-    const all: Testimonial[] = data.map((row) => ({
+    const all: Testimonial[] = rows.map((row) => ({
       id: row.id,
       quote: row.quote,
       author: row.author,
@@ -89,9 +94,8 @@ export const getTestimonials = unstable_cache(
       rating: clampRating(row.rating),
     }));
 
-    const featuredRow = data.find((row) => row.is_featured);
-    const featured = featuredRow ? all.find((item) => item.id === featuredRow.id) : undefined;
-
+    const featuredId = rows.find((row) => row.is_featured)?.id;
+    const featured = all.find((item) => item.id === featuredId);
     const cards = all.filter((item) => item.id !== featured?.id);
 
     return {
@@ -104,27 +108,35 @@ export const getTestimonials = unstable_cache(
   { tags: [CACHE_TAGS.testimonials], revalidate: CONTENT_REVALIDATE_SECONDS },
 );
 
+export const getTestimonials = cache((): Promise<TestimonialsContent> =>
+  readOrFallback('témoignages', cachedTestimonials, TESTIMONIALS_FALLBACK),
+);
+
 /* -------------------------------------------------------------------------- */
 /*  Questions fréquentes                                                       */
 /* -------------------------------------------------------------------------- */
 
-export const getFaqEntries = unstable_cache(
-  async (): Promise<readonly FaqEntry[]> => {
-    const supabase = createPublicSupabase();
-    if (!supabase) return FAQ_ENTRIES;
+const cachedFaq = unstable_cache(
+  async (): Promise<readonly FaqEntry[] | null> => {
+    const db = publicDb();
+    if (!db) return null;
 
-    const { data, error } = await supabase
-      .from('faq')
-      .select('*')
-      .eq('status', 'visible')
-      .order('position', { ascending: true });
+    const rows = await db
+      .select()
+      .from(faq)
+      .where(eq(faq.status, 'visible'))
+      .orderBy(asc(faq.position));
 
-    if (error || !data || data.length === 0) return FAQ_ENTRIES;
+    if (rows.length === 0) return null;
 
-    return data.map((row) => ({ id: row.id, question: row.question, answer: row.answer }));
+    return rows.map((row) => ({ id: row.id, question: row.question, answer: row.answer }));
   },
   ['faq-publique'],
   { tags: [CACHE_TAGS.faq], revalidate: CONTENT_REVALIDATE_SECONDS },
+);
+
+export const getFaqEntries = cache((): Promise<readonly FaqEntry[]> =>
+  readOrFallback('questions', cachedFaq, FAQ_ENTRIES),
 );
 
 /* -------------------------------------------------------------------------- */
@@ -136,30 +148,37 @@ export interface GalleryContent {
   readonly mobileTiles: readonly GalleryTile[];
 }
 
-export const getGallery = unstable_cache(
-  async (): Promise<GalleryContent> => {
-    const fallback: GalleryContent = {
-      tiles: GALLERY_TILES,
-      mobileTiles: MOBILE_GALLERY_TILES,
-    };
+const GALLERY_FALLBACK: GalleryContent = {
+  tiles: GALLERY_TILES,
+  mobileTiles: MOBILE_GALLERY_TILES,
+};
 
-    const supabase = createPublicSupabase();
-    if (!supabase) return fallback;
+const cachedGallery = unstable_cache(
+  async (): Promise<GalleryContent | null> => {
+    const db = publicDb();
+    if (!db) return null;
 
-    const { data, error } = await supabase
-      .from('gallery_images')
-      .select('*')
-      .eq('status', 'visible')
-      .order('position', { ascending: true });
+    const rows = await db
+      .select()
+      .from(galleryImages)
+      .where(eq(galleryImages.status, 'visible'))
+      .orderBy(asc(galleryImages.position));
 
-    if (error || !data || data.length === 0) return fallback;
+    const tiles: GalleryTile[] = rows.flatMap((row) => {
+      const image = toMediaAsset(row);
+      if (!image) return [];
 
-    const tiles: GalleryTile[] = data.map((row) => ({
-      id: row.id,
-      image: toMediaAsset(row),
-      ...(row.caption ? { caption: row.caption } : {}),
-      span: { cols: row.col_span, rows: row.row_span },
-    }));
+      return [
+        {
+          id: row.id,
+          image,
+          ...(row.caption ? { caption: row.caption } : {}),
+          span: { cols: row.col_span, rows: row.row_span },
+        },
+      ];
+    });
+
+    if (tiles.length === 0) return null;
 
     return {
       tiles,
@@ -169,4 +188,8 @@ export const getGallery = unstable_cache(
   },
   ['galerie-publique'],
   { tags: [CACHE_TAGS.gallery], revalidate: CONTENT_REVALIDATE_SECONDS },
+);
+
+export const getGallery = cache((): Promise<GalleryContent> =>
+  readOrFallback('galerie', cachedGallery, GALLERY_FALLBACK),
 );

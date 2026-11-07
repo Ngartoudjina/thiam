@@ -7,8 +7,14 @@ Développé à partir de la planche de direction artistique « Maquette THIAM 24
 plus la spécification de mouvement).
 
 Le projet comprend deux parties : le **site vitrine**, fidèle à la maquette, et un
-**tableau de bord** (`/admin`) depuis lequel la maison modifie son contenu sans
-toucher au code. Voir la section « Tableau de bord » plus bas.
+**tableau de bord** (`/admin`) depuis lequel la maison modifie son contenu, reçoit
+les demandes de contact et gère ses pièces en vitrine, sans toucher au code. Voir
+la section « Tableau de bord » plus bas.
+
+Le contenu vit dans une base **Neon** (Postgres serverless) et les photos dans
+**Vercel Blob**. Neon met en veille une base inactive et la réveille en quelques
+centaines de millisecondes à la requête suivante : contrairement à l'offre
+gratuite de Supabase, une période sans visite ne coûte ni la base ni ses données.
 
 ---
 
@@ -20,36 +26,47 @@ npm run dev
 ```
 
 Le site est servi sur <http://localhost:3000>. Aucune variable d'environnement
-n'est nécessaire pour démarrer : toutes ont une valeur de repli, y compris
-Supabase — sans lui, le site affiche le contenu livré avec la maquette et
-`/admin` explique la marche à suivre.
+n'est nécessaire pour démarrer : toutes ont une valeur de repli, y compris la
+base — sans elle, le site affiche le contenu livré avec la maquette et `/admin`
+explique la marche à suivre.
 
-| Commande            | Effet                                    |
-| ------------------- | ---------------------------------------- |
-| `npm run dev`       | Serveur de développement                 |
-| `npm run build`     | Build de production                      |
-| `npm run start`     | Sert le build de production              |
-| `npm run typecheck` | TypeScript en mode strict, sans émission |
-| `npm run lint`      | ESLint (Next + TypeScript + Prettier)    |
-| `npm run format`    | Formate le dépôt avec Prettier           |
-| `npm run verify`    | typecheck + lint + build, dans cet ordre |
+| Commande                  | Effet                                                        |
+| ------------------------- | ------------------------------------------------------------ |
+| `npm run dev`             | Serveur de développement                                     |
+| `npm run build`           | Build de production                                          |
+| `npm run start`           | Sert le build de production                                  |
+| `npm run typecheck`       | TypeScript en mode strict, sans émission                     |
+| `npm run lint`            | ESLint (Next + TypeScript + Prettier)                        |
+| `npm test`                | Tests (Vitest, base Postgres embarquée — sans réseau)        |
+| `npm run format`          | Formate le dépôt avec Prettier                               |
+| `npm run verify`          | typecheck + lint + tests + build, dans cet ordre             |
+| `npm run db:migrate`      | Applique les migrations de `drizzle/` à la base              |
+| `npm run db:generate`     | Écrit une migration après une modification du schéma         |
+| `npm run db:seed`         | Importe le contenu de la maquette dans une base vide         |
+| `npm run db:studio`       | Explore la base dans le navigateur (Drizzle Studio)          |
+| `npm run admin:create`    | Crée un compte du tableau de bord                            |
+| `npm run import:supabase` | Reprend le contenu et les photos de l'ancien projet Supabase |
 
 ---
 
 ## Stack
 
-| Domaine     | Choix                                                      |
-| ----------- | ---------------------------------------------------------- |
-| Framework   | Next.js 15.5 — App Router, composants serveur par défaut   |
-| Vue         | React 19.2                                                 |
-| Langage     | TypeScript 5.9, `strict` + `noUncheckedIndexedAccess`      |
-| Styles      | Tailwind CSS v4 — configuration CSS-first dans `@theme`    |
-| Mouvement   | Framer Motion 12 via `LazyMotion` (`domAnimation`)         |
-| Défilement  | Lenis 1.3                                                  |
-| Carrousel   | Embla 8.6 (témoignages en mobile)                          |
-| Primitives  | Radix UI (dialogue, accordéon, slot) — socle shadcn/ui     |
-| Icônes      | Lucide pour le mobilier d'interface, tracés maison sinon   |
-| Formulaires | React Hook Form 7 + Zod 4, schéma partagé client / serveur |
+| Domaine     | Choix                                                       |
+| ----------- | ----------------------------------------------------------- |
+| Framework   | Next.js 15.5 — App Router, composants serveur par défaut    |
+| Base        | Neon (Postgres serverless), pilote HTTP + Drizzle ORM       |
+| Comptes     | Sessions en base, mots de passe scrypt — sans service tiers |
+| Images      | Vercel Blob (production), disque local (développement)      |
+| Tests       | Vitest + PGlite (Postgres embarqué)                         |
+| Vue         | React 19.2                                                  |
+| Langage     | TypeScript 5.9, `strict` + `noUncheckedIndexedAccess`       |
+| Styles      | Tailwind CSS v4 — configuration CSS-first dans `@theme`     |
+| Mouvement   | Framer Motion 12 via `LazyMotion` (`domAnimation`)          |
+| Défilement  | Lenis 1.3                                                   |
+| Carrousel   | Embla 8.6 (témoignages en mobile)                           |
+| Primitives  | Radix UI (dialogue, accordéon, slot) — socle shadcn/ui      |
+| Icônes      | Lucide pour le mobilier d'interface, tracés maison sinon    |
+| Formulaires | React Hook Form 7 + Zod 4, schéma partagé client / serveur  |
 
 ### Deux écarts assumés par rapport au brief
 
@@ -74,15 +91,23 @@ components/
   motion/             Grammaire de mouvement : révélations, masques, compteurs
   providers/          Lenis, MotionConfig, LazyMotion
   ui/                 Primitives : bouton, champs, accordéon
-constants/            Contenu éditorial et coordonnées de la maison
+constants/            Contenu de repli (maquette) et coordonnées de la maison
+drizzle/              Migrations SQL, générées depuis lib/db/schema.ts
 features/
   home/               Les onze sections de l'accueil
   collections/        Catalogue, filtres, coffret de dot
   contact/            Canaux, horaires, plan, formulaire
   legal/              Gabarit des pages légales
 hooks/                Media queries, état de défilement, état d'ouverture
-lib/                  Utilitaires purs : motion, SEO, schema.org, validation
-services/             Accès réseau, isolés de l'interface
+lib/                  Utilitaires : motion, SEO, schema.org, validation
+  db/                 Schéma Drizzle, connexion Neon, amorçage
+  auth/               Mots de passe, sessions, cookie
+  storage/            Stockage des images (Vercel Blob ou disque)
+services/
+  content/            Lectures publiques, mises en cache par étiquette
+  admin/              Actions serveur et lectures du tableau de bord
+scripts/              Migrations, amorçage, comptes, import Supabase
+tests/                Tests Vitest (base Postgres embarquée)
 styles/               Tokens de design et utilitaires Tailwind
 types/                Contrats de données
 public/               Photographies et logotype
@@ -169,11 +194,13 @@ référencer son identifiant à l'endroit voulu.
 
 ## Contenu et coordonnées
 
-Tout le contenu éditorial vit dans `constants/`. Modifier un tarif, un horaire ou
-un témoignage ne demande d'ouvrir aucun composant.
+Une fois la base branchée, tout le contenu se modifie depuis le tableau de bord.
+`constants/` garde le contenu de la maquette, qui sert à trois choses : l'affichage
+tant que la base est absente ou vide, le repli si elle est injoignable, et
+l'amorçage (`npm run db:seed` ou bouton « Importer le contenu »).
 
 - `site.ts` — identité, téléphone, WhatsApp, horaires, intentions de message
-- `collections.ts` — les six univers et les pièces en vitrine
+- `collections.ts` — les six univers, les pièces en vitrine et leur nombre en boutique
 - `craft.ts` — garanties, chronologie, citations
 - `services.ts` — prestations après-vente et sujets de formulaire
 - `testimonials.ts` — chiffres clés et avis
@@ -191,12 +218,21 @@ visiteur — et le `openingHoursSpecification` de schema.org.
 `lib/validation.ts` définit les schémas Zod. Le formulaire et la route API partagent
 la même définition : un envoi forgé hors navigateur subit exactement les mêmes règles.
 
-Protection anti-robots sans captcha : un champ leurre invisible et une limitation
-à cinq envois par adresse IP et par quart d'heure.
+Chaque demande de contact est **enregistrée en base** et apparaît dans la rubrique
+Demandes du tableau de bord (avec rappel et WhatsApp en un geste) : aucune ne se
+perd. Les inscriptions à la lettre rejoignent la rubrique Abonnés, exportable en
+CSV. `CONTACT_WEBHOOK_URL` et `NEWSLETTER_WEBHOOK_URL` relaient en plus vers un
+outil de la maison (Make, Zapier, CRM…), si on le souhaite.
 
-Pour recevoir les demandes, renseigner `CONTACT_WEBHOOK_URL` (CRM, Make, Zapier,
-e-mail transactionnel, feuille de calcul…). Sans cette variable, la demande est
-acceptée et tracée dans les journaux du serveur — aucune n'est perdue silencieusement.
+Protection anti-robots sans captcha : un champ leurre invisible (le robot reçoit
+une réponse normale, rien n'est enregistré) et une limitation à cinq envois par
+visiteur et par quart d'heure. La limitation est tenue **en base** : sur un
+hébergement serverless, un compteur en mémoire ne limiterait rien, chaque instance
+ayant la sienne. Les adresses IP ne sont jamais conservées, seule une empreinte
+irréversible sert de clé.
+
+Les demandes sont effacées automatiquement au bout de douze mois, comme l'annonce
+la page Confidentialité.
 
 ---
 
@@ -288,10 +324,14 @@ Build de production, JavaScript de premier chargement :
 
 | Route          | Premier chargement |
 | -------------- | ------------------ |
-| `/`            | ~227 kB            |
-| `/collections` | ~142 kB            |
-| `/contact`     | ~174 kB            |
-| Pages légales  | ~137 kB            |
+| `/`            | ~240 kB            |
+| `/collections` | ~145 kB            |
+| `/contact`     | ~188 kB            |
+| Pages légales  | ~112 kB            |
+
+Les pages qui portent un formulaire ont pris ~9 kB en novembre 2026 : c'est la
+mise à jour de sécurité de Zod (4.6.7, correctif d'une vulnérabilité « high »),
+dont le module client a grossi de 7,6 kB compressés. La sécurité l'emporte.
 
 ### Ce qui a été fait après une mesure au navigateur
 
@@ -320,17 +360,40 @@ d'images d'un an.
 
 ## Déploiement
 
-Le projet est un build Next.js standard, sans adhérence à un hébergeur.
+Le projet est un build Next.js standard. Il est pensé pour Vercel + Neon, mais
+tourne aussi sur un serveur classique (Postgres compatible Neon, et
+`STORAGE_DRIVER=local` pour garder les images sur disque).
 
-1. Renseigner les variables listées dans `.env.example` — au minimum
+1. **Base Neon.** Avec la CLI Neon, dans le dossier du projet :
+
+   ```bash
+   npx neon@latest init -y --org-id <org> --project-id <projet> --branch production --services postgres
+   npx neon@latest deploy   # provisionne et écrit DATABASE_URL dans .env.local
+   ```
+
+   Ou, plus simplement sur Vercel : Storage › Neon (intégration officielle),
+   qui pose `DATABASE_URL` dans les variables du projet. Les déploiements de
+   prévisualisation reçoivent alors chacun leur propre branche de base.
+
+2. **Images.** Vercel › Storage › Create › Blob, puis « Connect to project » :
+   `BLOB_READ_WRITE_TOKEN` est ajouté automatiquement.
+3. **Variables.** Reporter les autres variables de `.env.example` — au minimum
    `NEXT_PUBLIC_SITE_URL`, qui conditionne canoniques, sitemap et Open Graph.
-2. `npm run verify` doit passer.
-3. `npm run build` puis `npm run start`, ou déploiement sur la plateforme de votre
-   choix.
+4. **Déployer.** Sur Vercel, le script `vercel-build` applique les migrations
+   (`drizzle/`) avant le build : le schéma de la base suit toujours le code.
+   Chaque migration s'exécute dans une transaction.
+5. **Premier compte**, une seule fois, depuis un poste qui a `DATABASE_URL` :
+   `npm run admin:create -- --email=vous@exemple.com --name="Prénom Nom"`.
+   Le mot de passe généré s'affiche une fois ; il se change dans « Mon compte ».
+6. **Contenu** : soit l'import de l'ancien projet Supabase (voir « Migrer depuis
+   Supabase »), soit le bouton « Importer le contenu » du tableau de bord.
+
+`npm run verify` doit passer avant chaque mise en ligne ; la CI GitHub
+(`.github/workflows/ci.yml`) le vérifie à chaque envoi.
 
 Avant la mise en ligne, deux points relèvent de la maison : compléter l'adresse
-exacte de la boutique (`NEXT_PUBLIC_STREET_ADDRESS`) et les mentions légales
-(RCCM, IFU, hébergeur), signalés comme « à compléter » dans les pages concernées.
+exacte de la boutique (rubrique Coordonnées) et les mentions légales (RCCM, IFU,
+hébergeur), signalés comme « à compléter » dans les pages concernées.
 
 ### Mise en service du référencement
 
@@ -373,113 +436,176 @@ conditionnent la vitesse à laquelle Google prendra le site en compte.
 au code. Chaque enregistrement est publié immédiatement : le cache de la page
 concernée est invalidé par étiquette, sans redéploiement.
 
-### Installation
+### Installation locale
 
-1. **Créer un projet Supabase** sur [supabase.com](https://supabase.com). Dans
-   _Settings → API_, relever l'URL du projet, la clé `anon` et la clé
-   `service_role`.
-2. **Renseigner l'environnement** : copier `.env.example` en `.env.local`, y
-   placer les trois valeurs, puis relancer le serveur.
-3. **Créer les tables** : ouvrir l'éditeur SQL du projet et exécuter, dans
-   l'ordre, `supabase/migrations/0001_schema.sql` puis
-   `supabase/migrations/0002_storage.sql`. Le second crée le compartiment
-   `media` et ses règles d'accès.
-4. **Créer le compte de la maison** : _Authentication → Users → Add user_. Un
-   déclencheur crée automatiquement le profil applicatif ; **le premier compte
-   créé reçoit le rôle administrateur**, les suivants le rôle éditeur.
-5. **Se connecter** sur `/admin`, puis cliquer sur « Importer le contenu » :
-   collections, photos, galerie, services, témoignages, questions et textes de
-   la maquette sont recopiés en base. Les photographies sont référencées par
-   leur chemin public — la vitrine reste donc strictement identique après
-   l'import, et vos propres visuels les remplaceront un à un.
+1. `cp .env.example .env.local`, puis y renseigner `DATABASE_URL` — une branche
+   Neon de développement est gratuite et se crée en un clic depuis la console.
+2. `npm run db:migrate` — crée les tables.
+3. `npm run admin:create -- --email=vous@exemple.com` — le premier compte est
+   administrateur ; le mot de passe généré s'affiche une seule fois.
+4. `npm run dev`, se connecter sur `/admin`, puis « Importer le contenu » : les
+   textes et photos de la maquette sont recopiés en base, référencés par leur
+   chemin public — la vitrine reste identique, vos visuels les remplacent un à un.
+
+Depuis une connexion lointaine des serveurs (Cotonou ↔ us-east-2), Node abandonne
+par défaut chaque tentative de connexion au bout de 250 ms. Le client de base
+élargit ce délai de lui-même ; si un build local échoue sur le téléchargement des
+polices Google (`ETIMEDOUT`), le relancer ainsi :
+`NODE_OPTIONS=--network-family-autoselection-attempt-timeout=2000 npm run build`.
+
+Sans `BLOB_READ_WRITE_TOKEN`, les images téléversées en développement sont
+écrites dans `.data/media` (ignoré par git) et servies par `/media/…`.
 
 ### Ce que l'on peut modifier
 
-| Rubrique        | Contenu piloté                                                         |
-| --------------- | ---------------------------------------------------------------------- |
-| **Collections** | Univers : nom, accroche, description, catégorie, statut, ordre, photos |
-| **Galerie**     | Mosaïque de la vitrine : photos, légendes, empreinte des tuiles, ordre |
-| **Services**    | Prestations après-vente, tarifs, pictogrammes, ordre                   |
-| **Témoignages** | Avis, notes, avis mis en avant, ordre                                  |
-| **Questions**   | Questions fréquentes — alimentent aussi le balisage `FAQPage`          |
-| **Accueil**     | Bandeau principal (titres, texte, boutons, image) et chiffres clés     |
-| **Histoire**    | Récit, portrait, chronologie, citation du fondateur                    |
-| **Coordonnées** | Téléphone, WhatsApp, e-mail, adresse, plan, réseaux sociaux, horaires  |
+| Rubrique        | Contenu piloté                                                           |
+| --------------- | ------------------------------------------------------------------------ |
+| **Demandes**    | Messages du formulaire : rappel, WhatsApp, statut « traitée »            |
+| **Abonnés**     | Inscrits à la lettre, export CSV                                         |
+| **Collections** | Univers : nom, accroche, description, catégorie, statut, ordre, photos   |
+| **Pièces**      | Grille de la page Collections : photo, matière, poids, univers, pastille |
+| **Galerie**     | Mosaïque de la vitrine : photos, légendes, empreinte des tuiles, ordre   |
+| **Visuels**     | Hero, bandeaux, portraits — chaque grande photo de composition           |
+| **Services**    | Prestations après-vente, tarifs, pictogrammes, ordre                     |
+| **Témoignages** | Avis, notes, avis mis en avant, ordre                                    |
+| **Questions**   | Questions fréquentes — alimentent aussi le balisage `FAQPage`            |
+| **Accueil**     | Bandeau principal (titres, texte, boutons) et chiffres clés              |
+| **Histoire**    | Récit, portrait, chronologie, citation du fondateur                      |
+| **Coordonnées** | Téléphone, WhatsApp, e-mail, adresse, plan, réseaux sociaux, horaires    |
+| **Comptes**     | Personnes autorisées, rôles, réinitialisation (administrateurs)          |
+| **Mon compte**  | Nom, mot de passe, fermeture des autres sessions                         |
 
 Chaque élément porte un statut **Visible / Masqué** et se réordonne par
 glisser-déposer — à la souris comme au clavier (Espace pour saisir, flèches pour
 déplacer, Espace pour déposer).
 
+Les boutons du bandeau acceptent deux mots-clés, `whatsapp` et `telephone`,
+résolus à l'affichage avec les numéros des Coordonnées : changer de numéro met à
+jour tous les boutons d'un coup.
+
+Après une modification faite hors du tableau de bord (import en ligne de
+commande, console Neon), le bouton **Actualiser le site** republie toutes les
+pages immédiatement ; sans lui, elles se mettent à jour dans l'heure.
+
 ### Base de données
 
-Huit tables dans le schéma `public` :
+Le schéma est décrit une seule fois, en TypeScript, dans `lib/db/schema.ts`. Les
+types des lignes en sont déduits (`types/database.ts`) et les migrations SQL de
+`drizzle/` en sont générées (`npm run db:generate`).
 
-| Table               | Rôle                                                                    |
-| ------------------- | ----------------------------------------------------------------------- |
-| `users`             | Profils habilités, adossés à `auth.users` (rôle admin / éditeur)        |
-| `collections`       | Univers de la vitrine                                                   |
-| `collection_images` | Photos d'une collection, dont l'image principale                        |
-| `gallery_images`    | Mosaïque de la vitrine                                                  |
-| `services`          | Prestations après-vente                                                 |
-| `testimonials`      | Avis clients                                                            |
-| `faq`               | Questions fréquentes                                                    |
-| `settings`          | Blocs singuliers en JSON : `hero`, `about`, `contact`, `hours`, `stats` |
+| Table                    | Rôle                                                                                   |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| `users`                  | Comptes du tableau de bord (rôle admin / éditeur, empreinte scrypt)                    |
+| `sessions`               | Sessions ouvertes — seule l'empreinte SHA-256 du jeton est gardée                      |
+| `rate_limits`            | Compteurs de limitation (connexion, formulaires)                                       |
+| `collections`            | Univers de la vitrine                                                                  |
+| `collection_images`      | Photos d'une collection, dont l'image principale (unique)                              |
+| `pieces`                 | Pièces en vitrine de la page Collections                                               |
+| `gallery_images`         | Mosaïque de la vitrine                                                                 |
+| `services`               | Prestations après-vente                                                                |
+| `testimonials`           | Avis clients                                                                           |
+| `faq`                    | Questions fréquentes                                                                   |
+| `settings`               | Blocs singuliers en JSON validé : hero, about, contact, hours, stats, visuals, catalog |
+| `contact_requests`       | Demandes du formulaire de contact (effacées après 12 mois)                             |
+| `newsletter_subscribers` | Inscrits à la lettre                                                                   |
 
-`gallery_images` s'ajoute à la liste demandée : la galerie a son propre ordre et
-sa propre empreinte de tuiles, la loger dans `settings` aurait produit un JSON
-ingérable.
-
-**Row Level Security** est active sur toutes les tables. Lecture publique
-limitée aux lignes `visible` ; écriture réservée aux porteurs d'un profil dans
-`public.users`, via les fonctions `is_staff()` et `is_admin()`. Un compte
-authentifié sans profil ne peut donc rien lire de masqué ni rien écrire.
+Le site lit la base par le **pilote HTTP de Neon** : une requête, un aller-retour
+HTTPS, sans connexion persistante — le mode adapté aux fonctions serverless. Un
+délai de huit secondes et un coupe-circuit évitent qu'une base injoignable fige
+les rendus.
 
 ### Stockage des images
 
-Un compartiment `media`, public en lecture, organisé par dossiers :
+Le navigateur compresse chaque photo (2 000 px sur le grand côté, WebP, qualité
+abaissée par paliers si besoin), puis l'envoie à `/api/admin/upload` avec une
+vraie barre de progression. La route vérifie la session, l'origine, la taille,
+puis la **nature réelle du fichier** (signature binaire : un SVG ou un HTML
+déguisé en image est refusé) avant de le confier à Vercel Blob.
 
-```
-media/collections/<univers>/…   photos des collections
-media/gallery/vitrine/…         mosaïque
-media/content/hero|histoire/…   bandeau, portrait
-```
-
-Le fichier ne transite jamais par le serveur Next : le navigateur le compresse
-(2 000 px sur le grand côté, WebP, qualité 0,86), demande une **URL signée à
-usage unique**, puis l'envoie directement à Supabase en XHR — ce qui donne une
-barre de progression réelle. À chaque remplacement ou suppression, l'ancien
-objet est retiré du compartiment ; le stockage n'accumule pas d'orphelins.
+Les adresses enregistrées sont filtrées à l'écriture comme à la lecture : seuls
+les visuels du site, du stockage local et de Vercel Blob sont admis, si bien
+qu'une adresse inconnue en base donne le cadre d'attente au lieu de faire tomber
+la page. À chaque remplacement ou suppression, l'ancien fichier est retiré du
+stockage — d'après la base, jamais d'après une liste envoyée par le navigateur.
 
 ### Sécurité
 
-- **Sessions** par cookies `httpOnly`, rafraîchies dans le middleware.
-- **Middleware** : aucune page `/admin` n'est produite sans session valide. Le
-  contrôle utilise `getUser()`, qui valide le jeton auprès de Supabase, et non
-  `getSession()` qui se contente de lire le cookie.
-- **Double contrôle** : chaque action serveur revérifie les droits de son côté.
-  Une action forgée hors interface est rejetée même si le middleware est
-  contourné.
-- **Validation Zod** partagée entre le formulaire et l'action : un envoi hors
-  navigateur subit exactement les mêmes règles.
-- **Protection XSS** : React échappe tout contenu par défaut, et aucun contenu
-  éditorial n'est injecté en `dangerouslySetInnerHTML`. Le seul usage de cette
-  API concerne le JSON-LD, dont les chevrons sont échappés.
-- **Protection CSRF** : les Server Actions de Next.js vérifient l'origine de la
-  requête et n'acceptent que des identifiants d'action non devinables ; aucun
-  point d'entrée mutant n'est exposé en `GET`.
-- **En-têtes** de sécurité appliqués à toutes les routes (voir `next.config.ts`),
-  et `/admin` marqué `noindex`.
+- **Mots de passe** : scrypt (paramètres OWASP : N = 2¹⁷, r = 8, p = 1), sel
+  unique, comparaison en temps constant ; une adresse inconnue coûte le même
+  calcul qu'une adresse existante, ce qui empêche d'énumérer les comptes.
+- **Sessions** en base, révocables : déconnexion, changement de mot de passe
+  (les autres sessions sont fermées), suppression du compte. Le navigateur ne
+  reçoit qu'un jeton aléatoire de 256 bits, la base n'en garde que l'empreinte.
+- **Cookie** `__Host-thiam-session` : `HttpOnly`, `Secure`, `SameSite=Lax`,
+  prolongé à chaque visite (30 jours d'inactivité au plus).
+- **Force brute** : six essais par compte et trente par adresse IP, par quart
+  d'heure, compteurs en base.
+- **Double contrôle** : le middleware n'autorise l'accès aux pages qu'avec un
+  cookie, puis chaque page, action serveur et route revérifie la session en base
+  — une action forgée hors interface est rejetée.
+- **Rôles** : un éditeur gère le contenu ; seul un administrateur gère les comptes
+  et importe le contenu. Il reste toujours au moins un administrateur.
+- **Validation Zod** partagée entre le formulaire et l'action.
+- **XSS** : React échappe tout contenu ; seul le JSON-LD passe par
+  `dangerouslySetInnerHTML`, chevrons échappés.
+- **CSRF** : les actions serveur de Next vérifient l'origine ; la route d'envoi
+  d'images la vérifie aussi, et le cookie `SameSite=Lax` n'accompagne aucun
+  envoi venu d'un autre site.
+- **Export CSV** neutralisé contre l'injection de formules.
+
+Pas de page d'inscription ni de « mot de passe oublié » par e-mail : un
+administrateur réinitialise le mot de passe d'un compte depuis la rubrique
+Comptes (le nouveau s'affiche une seule fois).
 
 ### Comment le site public lit ce contenu
 
-`services/content/` interroge Supabase et **retombe sur `constants/` en cas
-d'absence** : Supabase non configuré, requête en échec, ou table vide. Le site
-reste donc complet en toutes circonstances, y compris pendant l'installation.
+`services/content/` interroge la base et **retombe sur `constants/`** quand elle
+n'est pas configurée, quand une table est vide, ou quand la requête échoue. Dans
+ce dernier cas, la réponse de repli n'est **pas** mise en cache : la lecture
+suivante réessaie, et la page se reconstruit d'elle-même dans l'heure.
 
-Les lectures sont mémorisées sous des étiquettes de cache
-(`lib/cache.ts`) ; les actions du tableau de bord invalident l'étiquette
-correspondante puis les pages concernées. Les pages publiques restent donc
-statiques et rapides, tout en reflétant les modifications sans délai.
+Les lectures sont mémorisées sous des étiquettes de cache (`lib/cache.ts`) ; les
+actions du tableau de bord invalident l'étiquette correspondante, puis toutes
+les pages. Les pages publiques restent statiques — la base, elle, reste en veille
+l'essentiel du temps.
+
+---
+
+## Migrer depuis Supabase
+
+`npm run import:supabase` reprend le contenu de l'ancien projet : collections et
+leurs photos, galerie, services, témoignages, questions et réglages, avec leurs
+identifiants, positions et dates. Les photos du compartiment `media` sont
+téléchargées puis déposées dans Vercel Blob, et chaque chemin est réécrit — y
+compris dans les réglages (bandeau, portrait, visuels).
+
+1. Si le projet Supabase est en pause, le réactiver depuis son tableau de bord
+   (« Restore project ») : les données restent récupérables quatre-vingt-dix
+   jours.
+2. Dans `.env.local` : `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` (Settings ›
+   API), `DATABASE_URL` (Neon) et `BLOB_READ_WRITE_TOKEN`.
+3. `npm run db:migrate`, puis `npm run import:supabase -- --dry-run` pour voir
+   ce qui sera repris, puis `npm run import:supabase`.
+4. Recréer les comptes avec `npm run admin:create` : Supabase ne livre pas les
+   empreintes de mot de passe par son API.
+5. Cliquer sur « Actualiser le site » dans le tableau de bord, puis retirer les
+   deux variables Supabase.
+
+L'import se fait en une transaction : la base est reprise en entier ou pas du
+tout. Il refuse de s'exécuter sur une base qui contient déjà des collections,
+sauf avec `--replace` (qui conserve comptes, demandes et abonnés).
+
+---
+
+## Tests
+
+`npm test` lance la suite Vitest. Les tests qui touchent la base utilisent
+**PGlite**, un vrai Postgres compilé en WebAssembly, avec les migrations du
+dépôt : contraintes, index uniques et valeurs par défaut sont éprouvés pour de
+bon, sans réseau ni Docker. Ils couvrent les mots de passe, les sessions, la
+limitation de débit (y compris sous requêtes simultanées), la conservation des
+demandes, le réordonnancement, l'amorçage, la lecture publique et ses replis,
+la validation, le stockage des images et l'import Supabase.
 
 ---
 
@@ -491,9 +617,13 @@ statiques et rapides, tout en reflétant les modifications sans délai.
   natif du navigateur. Les liens d'ancrage lui sont désormais confiés
   (`components/providers/hash-scroll.tsx`), avec un décalage égal à la hauteur
   de la barre fixe.
-- **Les pièces de la page Collections restent codées** dans
-  `constants/collections.ts`. Un module « pièces » ne figurait pas dans les
-  tables demandées, et le faire piloter par les collections aurait changé
-  l'affichage (poids et cours du jour disparaissent) — ce que la consigne
-  « ne pas modifier le design public » interdit. Les filtres de cette page, eux,
-  suivent bien les univers du tableau de bord.
+- **Les pièces de la page Collections se gèrent désormais en base** (rubrique
+  Pièces), avec le même affichage qu'avant : photo, matière, poids réel, univers
+  et pastille. Le nombre de pièces annoncé en boutique se règle au même endroit.
+- **La grande photo du bandeau** se change dans Visuels. Le champ image de la
+  rubrique Accueil n'était jamais affiché ; une photo déposée là est reprise
+  automatiquement dans l'emplacement du hero.
+- **Les coordonnées suivent le tableau de bord partout** : cartes de pièces,
+  services, questions, coffret de dot, pages Rachat d'or et Alliances, 404, pages
+  légales et données structurées lisaient encore les valeurs figées de la
+  maquette.

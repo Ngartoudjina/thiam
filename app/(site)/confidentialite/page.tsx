@@ -1,6 +1,8 @@
 import { LegalPage, type LegalBlock } from '@/features/legal/legal-page';
 import { ROUTES } from '@/constants/navigation';
-import { CONTACT, SITE } from '@/constants/site';
+import { SITE } from '@/constants/site';
+import { getSiteSettings } from '@/services/content';
+import type { ContactSettings } from '@/lib/schemas/content';
 import { createMetadata } from '@/lib/seo';
 
 export const metadata = createMetadata({
@@ -9,7 +11,7 @@ export const metadata = createMetadata({
   path: ROUTES.privacy,
 });
 
-const BLOCKS: readonly LegalBlock[] = [
+const blocks = (contact: ContactSettings): readonly LegalBlock[] => [
   {
     heading: 'Ce que nous collectons',
     paragraphs: [
@@ -27,7 +29,14 @@ const BLOCKS: readonly LegalBlock[] = [
   {
     heading: 'Combien de temps',
     paragraphs: [
-      'Les demandes sans suite sont effacées au bout de douze mois. Les données liées à une commande, une réparation ou une garantie sont conservées le temps de la garantie, puis archivées conformément aux obligations comptables.',
+      'Les demandes envoyées par le formulaire sont effacées automatiquement au bout de douze mois. Les données liées à une commande, une réparation ou une garantie sont conservées le temps de la garantie, puis archivées conformément aux obligations comptables.',
+    ],
+  },
+  {
+    heading: 'Où elles sont conservées',
+    paragraphs: [
+      'Les demandes et les inscriptions à la lettre sont enregistrées dans la base de données du site, hébergée par Neon. Seule l’équipe de la maison y accède, depuis un espace protégé par mot de passe.',
+      'Les adresses IP ne sont jamais conservées : seule une empreinte irréversible sert, quelques minutes, à freiner les envois automatisés.',
     ],
   },
   {
@@ -40,7 +49,7 @@ const BLOCKS: readonly LegalBlock[] = [
     heading: 'Vos droits',
     paragraphs: [
       'Vous pouvez demander à consulter, corriger ou supprimer les informations vous concernant, à tout moment et sans justification.',
-      `Il suffit de nous écrire à ${CONTACT.email} ou de nous appeler au ${CONTACT.phoneDisplay}. Nous traitons la demande sous huit jours.`,
+      `Il suffit de nous écrire à ${contact.email} ou de nous appeler au ${contact.phoneDisplay}. Nous traitons la demande sous huit jours.`,
     ],
   },
   {
@@ -52,14 +61,16 @@ const BLOCKS: readonly LegalBlock[] = [
   },
 ];
 
-export default function ConfidentialitePage() {
+export default async function ConfidentialitePage() {
+  const { contact } = await getSiteSettings();
+
   return (
     <LegalPage
       eyebrow="Vos données"
       titleLines={['Ce que nous', 'faisons de vos données']}
       intro="Nous demandons le strict nécessaire pour vous répondre, et nous nous y tenons. Cette page explique quoi, pourquoi, et pour combien de temps."
-      blocks={BLOCKS}
-      updatedAt="30 juillet 2026"
+      blocks={blocks(contact)}
+      updatedAt="7 novembre 2026"
     />
   );
 }

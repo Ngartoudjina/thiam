@@ -201,7 +201,9 @@ export function buildWebPageSchema({
   };
 }
 
-export function buildFaqSchema(entries: readonly FaqEntry[] = FAQ_ENTRIES): Record<string, unknown> {
+export function buildFaqSchema(
+  entries: readonly FaqEntry[] = FAQ_ENTRIES,
+): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -248,7 +250,9 @@ export function buildCollectionPageSchema(
  * (« rachat d'or Cotonou », « vendre son or ») : elle mérite son propre nœud
  * `Service`, distinct de la simple offre listée sur la boutique.
  */
-export function buildBuybackServiceSchema(): Record<string, unknown> {
+export function buildBuybackServiceSchema(
+  contact: ContactSettings = DEFAULT_CONTACT,
+): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -265,7 +269,7 @@ export function buildBuybackServiceSchema(): Record<string, unknown> {
     availableChannel: {
       '@type': 'ServiceChannel',
       serviceLocation: { '@id': SCHEMA_ID.store },
-      servicePhone: DEFAULT_CONTACT.phoneE164,
+      servicePhone: contact.phoneE164,
       serviceUrl: absoluteUrl(ROUTES.buyback),
     },
     termsOfService: BUYBACK.steps.map((step) => `${step.title} — ${step.description}`).join(' '),
@@ -279,7 +283,9 @@ export function buildBuybackServiceSchema(): Record<string, unknown> {
 }
 
 /** Prestation « alliances et bijoux de mariage », même logique que le rachat. */
-export function buildWeddingServiceSchema(): Record<string, unknown> {
+export function buildWeddingServiceSchema(
+  contact: ContactSettings = DEFAULT_CONTACT,
+): Record<string, unknown> {
   return {
     '@context': 'https://schema.org',
     '@type': 'Service',
@@ -297,7 +303,7 @@ export function buildWeddingServiceSchema(): Record<string, unknown> {
     availableChannel: {
       '@type': 'ServiceChannel',
       serviceLocation: { '@id': SCHEMA_ID.store },
-      servicePhone: DEFAULT_CONTACT.phoneE164,
+      servicePhone: contact.phoneE164,
       serviceUrl: absoluteUrl(ROUTES.wedding),
     },
     offers: {

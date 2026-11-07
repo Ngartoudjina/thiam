@@ -12,7 +12,7 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import { CONTACT } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 import type { MediaAsset } from '@/types';
 import type { FaqEntry } from '@/types';
 
@@ -34,7 +34,7 @@ interface LandingHeroProps {
   readonly ctaLabel: string;
 }
 
-export function LandingHero({
+export async function LandingHero({
   trail,
   eyebrow,
   titleId,
@@ -44,6 +44,9 @@ export function LandingHero({
   whatsappIntent,
   ctaLabel,
 }: LandingHeroProps) {
+  const { contact } = await getSiteSettings();
+  const links = contactLinks(contact);
+
   return (
     // Compense la hauteur de la barre fixe, comme les autres pages intérieures.
     <section
@@ -72,7 +75,7 @@ export function LandingHero({
           <Reveal variant="up-sm" className="flex flex-wrap items-center gap-4">
             <Button asChild variant="gold" size="lg">
               <a
-                href={CONTACT.whatsappWithMessage(whatsappIntent)}
+                href={links.whatsappWithMessage(whatsappIntent)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -81,7 +84,7 @@ export function LandingHero({
               </a>
             </Button>
             <Button asChild variant="outlineDark" size="lg">
-              <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a>
+              <a href={links.phoneHref}>{contact.phoneDisplay}</a>
             </Button>
           </Reveal>
         </div>

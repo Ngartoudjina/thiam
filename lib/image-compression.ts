@@ -8,10 +8,15 @@ export interface CompressedImage {
 }
 
 export const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+/** Fichier choisi : une photo de téléphone récent tient dans 15 Mo. */
+export const MAX_SOURCE_BYTES = 15 * 1024 * 1024;
+
+/** Fichier envoyé, après compression — sous la limite de la route d'envoi (4 Mo). */
+const MAX_COMPRESSED_BYTES = 3.8 * 1024 * 1024;
 
 const MAX_EDGE = 2000;
-const QUALITY = 0.86;
+const QUALITIES = [0.86, 0.75, 0.62] as const;
 
 const supportsWebp = (): boolean => {
   const canvas = document.createElement('canvas');
@@ -24,8 +29,9 @@ const supportsWebp = (): boolean => {
  *
  * Les photos de bijoux sortent souvent d'un téléphone à 4 000 px et 6 Mo : on
  * les ramène à 2 000 px sur le grand côté et en WebP. Le fichier envoyé pèse
- * alors quelques centaines de kilo-octets, sans dépendance externe et sans
- * jamais transiter par le serveur Next.
+ * alors quelques centaines de kilo-octets, sans dépendance externe. Si le
+ * résultat dépasse encore le plafond d'envoi, la qualité est abaissée par
+ * paliers.
  */
 export async function compressImage(file: File): Promise<CompressedImage> {
   const bitmap = await createImageBitmap(file);
@@ -52,13 +58,20 @@ export async function compressImage(file: File): Promise<CompressedImage> {
   const useWebp = supportsWebp();
   const mimeType = useWebp ? 'image/webp' : 'image/jpeg';
 
-  const blob = await new Promise<Blob | null>((resolve) => {
-    canvas.toBlob(resolve, mimeType, QUALITY);
-  });
+  for (const quality of QUALITIES) {
+    const blob = await new Promise<Blob | null>((resolve) => {
+      canvas.toBlob(resolve, mimeType, quality);
+    });
 
-  if (!blob) throw new Error('La compression de l’image a échoué.');
+    if (!blob) throw new Error('La compression de l’image a échoué.');
+    if (blob.size <= MAX_COMPRESSED_BYTES) {
+      return { blob, width, height, extension: useWebp ? 'webp' : 'jpg' };
+    }
+  }
 
-  return { blob, width, height, extension: useWebp ? 'webp' : 'jpg' };
+  throw new Error(
+    'Cette photo reste trop lourde, même compressée. Essayez une version plus petite.',
+  );
 }
 
 /** Contrôle de recevabilité avant toute manipulation coûteuse. */
@@ -67,8 +80,8 @@ export function validateImageFile(file: File): string | null {
     return 'Formats acceptés : JPG, PNG ou WEBP.';
   }
 
-  if (file.size > MAX_UPLOAD_BYTES) {
-    return 'Ce fichier dépasse 10 Mo.';
+  if (file.size > MAX_SOURCE_BYTES) {
+    return 'Ce fichier dépasse 15 Mo.';
   }
 
   return null;

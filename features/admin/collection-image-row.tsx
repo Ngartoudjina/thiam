@@ -9,7 +9,6 @@ import { ImageUploader, type UploadedImage } from '@/components/admin/image-uplo
 import { ConfirmDialog } from '@/components/admin/ui/confirm-dialog';
 import { AdminButton } from '@/components/admin/ui/primitives';
 import { TextInput } from '@/components/admin/ui/form-fields';
-import { publicStorageUrl } from '@/lib/supabase/env';
 import {
   deleteCollectionImageAction,
   replaceCollectionImageAction,
@@ -98,13 +97,7 @@ export function CollectionImageRow({
     <div className="flex items-center justify-between gap-3">
       <div className="flex min-w-0 items-center gap-3">
         <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-panel-sunken dark:bg-panel-dark-sunken">
-          <Image
-            src={publicStorageUrl(image.storage_path)}
-            alt=""
-            fill
-            sizes="48px"
-            className="object-cover"
-          />
+          <Image src={image.storage_path} alt="" fill sizes="48px" className="object-cover" />
         </span>
 
         {mode === 'alt' ? (

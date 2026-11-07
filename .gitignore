@@ -22,6 +22,9 @@ next-env.d.ts
 .env
 .env*.local
 
+# Données locales : images téléversées en développement (STORAGE_DRIVER=local)
+/.data
+
 # Déploiement
 .vercel
 
@@ -41,3 +44,5 @@ yarn-error.log*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+# Contexte local de la CLI Neon (branche sélectionnée)
+.neon

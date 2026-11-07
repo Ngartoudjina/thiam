@@ -1,13 +1,19 @@
 import type { LucideIcon } from 'lucide-react';
 import {
+  BookOpen,
   Gem,
   HelpCircle,
   Home,
-  Images,
   Image as ImageIcon,
+  Images,
+  Inbox,
   LayoutDashboard,
+  Mail,
   MapPin,
   MessageSquareQuote,
+  Tag,
+  UserCog,
+  Users,
   Wrench,
 } from 'lucide-react';
 
@@ -16,6 +22,10 @@ export interface AdminNavItem {
   readonly href: string;
   readonly icon: LucideIcon;
   readonly description: string;
+  /** Réservé au rôle administrateur. */
+  readonly adminOnly?: boolean;
+  /** Affiche le nombre de demandes en attente. */
+  readonly showsPendingRequests?: boolean;
 }
 
 export interface AdminNavGroup {
@@ -26,7 +36,10 @@ export interface AdminNavGroup {
 export const ADMIN_ROUTES = {
   dashboard: '/admin',
   login: '/admin/connexion',
+  requests: '/admin/demandes',
+  subscribers: '/admin/abonnes',
   collections: '/admin/collections',
+  pieces: '/admin/pieces',
   gallery: '/admin/galerie',
   visuals: '/admin/visuels',
   services: '/admin/services',
@@ -35,6 +48,8 @@ export const ADMIN_ROUTES = {
   hero: '/admin/accueil',
   about: '/admin/histoire',
   contact: '/admin/coordonnees',
+  accounts: '/admin/comptes',
+  account: '/admin/mon-compte',
 } as const;
 
 export const ADMIN_NAV: readonly AdminNavGroup[] = [
@@ -47,6 +62,19 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
         icon: LayoutDashboard,
         description: 'État du contenu publié',
       },
+      {
+        label: 'Demandes',
+        href: ADMIN_ROUTES.requests,
+        icon: Inbox,
+        description: 'Messages reçus par le formulaire de contact',
+        showsPendingRequests: true,
+      },
+      {
+        label: 'Abonnés',
+        href: ADMIN_ROUTES.subscribers,
+        icon: Mail,
+        description: 'Inscrits à la lettre de la maison',
+      },
     ],
   },
   {
@@ -57,6 +85,12 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
         href: ADMIN_ROUTES.collections,
         icon: Gem,
         description: 'Univers, photos et ordre d’affichage',
+      },
+      {
+        label: 'Pièces',
+        href: ADMIN_ROUTES.pieces,
+        icon: Tag,
+        description: 'Bijoux en vitrine sur la page Collections',
       },
       {
         label: 'Galerie',
@@ -107,7 +141,7 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
       {
         label: 'Histoire',
         href: ADMIN_ROUTES.about,
-        icon: LayoutDashboard,
+        icon: BookOpen,
         description: 'Récit de la maison et chronologie',
       },
       {
@@ -115,6 +149,24 @@ export const ADMIN_NAV: readonly AdminNavGroup[] = [
         href: ADMIN_ROUTES.contact,
         icon: MapPin,
         description: 'Téléphone, WhatsApp, adresse, horaires',
+      },
+    ],
+  },
+  {
+    title: 'Réglages',
+    items: [
+      {
+        label: 'Comptes',
+        href: ADMIN_ROUTES.accounts,
+        icon: Users,
+        description: 'Personnes autorisées à modifier le site',
+        adminOnly: true,
+      },
+      {
+        label: 'Mon compte',
+        href: ADMIN_ROUTES.account,
+        icon: UserCog,
+        description: 'Nom, mot de passe et sessions',
       },
     ],
   },

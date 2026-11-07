@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { CONTACT } from '@/constants/site';
+import { useSiteContent } from '@/components/providers/site-content-provider';
 
 /**
  * Écran d'erreur applicatif.
@@ -16,6 +16,8 @@ export default function GlobalError({
   readonly error: Error & { digest?: string };
   readonly reset: () => void;
 }) {
+  const { contact, links } = useSiteContent();
+
   useEffect(() => {
     console.error('[thiam] erreur de rendu', error);
   }, [error]);
@@ -41,7 +43,7 @@ export default function GlobalError({
           Réessayer
         </Button>
         <Button asChild variant="outlineLight" size="lg">
-          <a href={CONTACT.phoneHref}>{CONTACT.phoneDisplay}</a>
+          <a href={links.phoneHref}>{contact.phoneDisplay}</a>
         </Button>
       </div>
     </section>

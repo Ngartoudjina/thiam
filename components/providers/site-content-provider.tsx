@@ -42,7 +42,7 @@ function buildLinks(contact: ContactSettings): SiteContentValue['links'] {
  *
  * La barre de navigation, le menu plein écran, la barre d'action mobile et la
  * pastille d'ouverture en ont besoin sans que la page ait à les leur passer de
- * main en main. Les valeurs viennent de Supabase via la mise en page racine.
+ * main en main. Les valeurs viennent de la base via la mise en page racine.
  */
 export function SiteContentProvider({
   contact,

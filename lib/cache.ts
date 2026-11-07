@@ -7,6 +7,7 @@
  */
 export const CACHE_TAGS = {
   collections: 'contenu:collections',
+  pieces: 'contenu:pieces',
   gallery: 'contenu:galerie',
   services: 'contenu:services',
   testimonials: 'contenu:temoignages',
@@ -19,9 +20,11 @@ export type CacheTag = (typeof CACHE_TAGS)[keyof typeof CACHE_TAGS];
 /**
  * Durée de vie maximale d'une entrée.
  *
- * Ce n'est qu'un filet de sécurité : la fraîcheur est assurée par
- * l'invalidation par étiquette, déclenchée à chaque écriture du tableau de
- * bord. Une heure évite de réinterroger Supabase pour rien sur un contenu qui
- * change quelques fois par mois.
+ * La fraîcheur est assurée par l'invalidation par étiquette, déclenchée à
+ * chaque écriture du tableau de bord. Ce délai ne couvre que les écritures
+ * faites hors de l'application (import en ligne de commande, console Neon) :
+ * elles apparaissent au plus tard dans l'heure — ou aussitôt avec le bouton
+ * « Actualiser le site » du tableau de bord. Une lecture par heure au plus
+ * laisse la base en veille l'essentiel du temps.
  */
 export const CONTENT_REVALIDATE_SECONDS = 3600;

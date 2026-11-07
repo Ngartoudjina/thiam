@@ -36,7 +36,7 @@ export const metadata = createMetadata({
  * planche : hero, preuve sociale, collections, savoir-faire, respiration,
  * galerie, histoire, services, témoignages, questions, visite.
  *
- * Le contenu vient de Supabase ; à défaut, des valeurs de la maquette.
+ * Le contenu vient de la base Neon ; à défaut, des valeurs de la maquette.
  */
 export default async function HomePage() {
   const { settings, collections, services, testimonials, faq, gallery } = await getHomeContent();
@@ -45,7 +45,7 @@ export default async function HomePage() {
     <>
       <JsonLd id="schema-faq" data={buildFaqSchema(faq)} />
 
-      <HeroSection hero={settings.hero} visuals={settings.visuals} />
+      <HeroSection hero={settings.hero} visuals={settings.visuals} contact={settings.contact} />
       <ProofSection stats={settings.stats.items} testimonial={testimonials.hero} />
       <CollectionsSection collections={collections} />
       <BuybackSection contact={settings.contact} visuals={settings.visuals} />
@@ -54,7 +54,11 @@ export default async function HomePage() {
       <GallerySection gallery={gallery} />
       <StorySection about={settings.about} />
       <ServicesSection services={services} />
-      <TestimonialsSection featured={testimonials.featured} cards={testimonials.cards} visuals={settings.visuals} />
+      <TestimonialsSection
+        featured={testimonials.featured}
+        cards={testimonials.cards}
+        visuals={settings.visuals}
+      />
       <FaqSection entries={faq} />
       <VisitSection contact={settings.contact} hours={settings.hours} visuals={settings.visuals} />
       <SiteFooter contact={settings.contact} collections={collections} />

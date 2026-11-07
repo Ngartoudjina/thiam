@@ -1,20 +1,41 @@
 import 'server-only';
 
-import { adminClient } from '@/services/admin/repository';
+import { asc, count, desc, eq } from 'drizzle-orm';
+import { requireAdmin } from '@/lib/auth';
+import { purgeExpiredContactRequests } from '@/lib/retention';
+import {
+  collectionImages,
+  collections,
+  contactRequests,
+  faq,
+  galleryImages,
+  newsletterSubscribers,
+  pieces,
+  services,
+  testimonials,
+  users,
+} from '@/lib/db/schema';
+import { staffDb } from '@/services/admin/repository';
 import type {
   CollectionImageRow,
   CollectionRow,
+  ContactRequestRow,
   FaqRow,
   GalleryImageRow,
+  NewsletterSubscriberRow,
+  PieceRow,
+  RequestStatus,
   ServiceRow,
   TestimonialRow,
+  UserRow,
 } from '@/types/database';
 
 /**
  * Lectures du tableau de bord.
  *
  * Contrairement à la couche publique, elles retournent aussi les éléments
- * masqués : l'administrateur doit voir ce qui n'est pas publié.
+ * masqués : l'administrateur doit voir ce qui n'est pas publié. Elles ne sont
+ * jamais mises en cache.
  */
 
 export interface CollectionWithImages extends CollectionRow {
@@ -22,98 +43,167 @@ export interface CollectionWithImages extends CollectionRow {
 }
 
 export async function listCollections(): Promise<readonly CollectionWithImages[]> {
-  const supabase = await adminClient();
+  const db = await staffDb();
 
-  const { data: collections } = await supabase
-    .from('collections')
-    .select('*')
-    .order('position', { ascending: true });
+  const [rows, images] = await Promise.all([
+    db.select().from(collections).orderBy(asc(collections.position)),
+    db.select().from(collectionImages).orderBy(asc(collectionImages.position)),
+  ]);
 
-  if (!collections || collections.length === 0) return [];
-
-  const { data: images } = await supabase
-    .from('collection_images')
-    .select('*')
-    .in(
-      'collection_id',
-      collections.map((collection) => collection.id),
-    )
-    .order('position', { ascending: true });
-
-  const byCollection = new Map<string, CollectionImageRow[]>();
-  for (const image of images ?? []) {
-    const bucket = byCollection.get(image.collection_id) ?? [];
-    bucket.push(image);
-    byCollection.set(image.collection_id, bucket);
-  }
-
-  return collections.map((collection) => ({
+  return rows.map((collection) => ({
     ...collection,
-    images: byCollection.get(collection.id) ?? [],
+    images: images.filter((image) => image.collection_id === collection.id),
   }));
 }
 
 export async function getCollection(id: string): Promise<CollectionWithImages | null> {
-  const supabase = await adminClient();
+  if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
 
-  const { data: collection } = await supabase
-    .from('collections')
-    .select('*')
-    .eq('id', id)
-    .maybeSingle();
+  const db = await staffDb();
 
-  if (!collection) return null;
+  const [[collection], images] = await Promise.all([
+    db.select().from(collections).where(eq(collections.id, id)).limit(1),
+    db
+      .select()
+      .from(collectionImages)
+      .where(eq(collectionImages.collection_id, id))
+      .orderBy(asc(collectionImages.position)),
+  ]);
 
-  const { data: images } = await supabase
-    .from('collection_images')
-    .select('*')
-    .eq('collection_id', id)
-    .order('position', { ascending: true });
+  return collection ? { ...collection, images } : null;
+}
 
-  return { ...collection, images: images ?? [] };
+/** Univers proposés dans le formulaire d'une pièce. */
+export async function listCollectionOptions(): Promise<
+  readonly Pick<CollectionRow, 'id' | 'name' | 'slug'>[]
+> {
+  const db = await staffDb();
+
+  return db
+    .select({ id: collections.id, name: collections.name, slug: collections.slug })
+    .from(collections)
+    .orderBy(asc(collections.position));
+}
+
+export async function listPieces(): Promise<readonly PieceRow[]> {
+  const db = await staffDb();
+  return db.select().from(pieces).orderBy(asc(pieces.position));
 }
 
 export async function listServices(): Promise<readonly ServiceRow[]> {
-  const supabase = await adminClient();
-  const { data } = await supabase.from('services').select('*').order('position');
-  return data ?? [];
+  const db = await staffDb();
+  return db.select().from(services).orderBy(asc(services.position));
 }
 
 export async function listTestimonials(): Promise<readonly TestimonialRow[]> {
-  const supabase = await adminClient();
-  const { data } = await supabase.from('testimonials').select('*').order('position');
-  return data ?? [];
+  const db = await staffDb();
+  return db.select().from(testimonials).orderBy(asc(testimonials.position));
 }
 
 export async function listFaq(): Promise<readonly FaqRow[]> {
-  const supabase = await adminClient();
-  const { data } = await supabase.from('faq').select('*').order('position');
-  return data ?? [];
+  const db = await staffDb();
+  return db.select().from(faq).orderBy(asc(faq.position));
 }
 
 export async function listGalleryImages(): Promise<readonly GalleryImageRow[]> {
-  const supabase = await adminClient();
-  const { data } = await supabase.from('gallery_images').select('*').order('position');
-  return data ?? [];
+  const db = await staffDb();
+  return db.select().from(galleryImages).orderBy(asc(galleryImages.position));
 }
 
-/** Compteurs de la page d'accueil du tableau de bord. */
-export async function getContentSummary() {
-  const supabase = await adminClient();
+/* -------------------------------------------------------------------------- */
+/*  Relation client                                                            */
+/* -------------------------------------------------------------------------- */
 
-  const counts = await Promise.all(
-    (['collections', 'gallery_images', 'services', 'testimonials', 'faq'] as const).map(
-      async (table) => {
-        const { count } = await supabase.from(table).select('id', { count: 'exact', head: true });
-        const { count: visible } = await supabase
-          .from(table)
-          .select('id', { count: 'exact', head: true })
-          .eq('status', 'visible');
+export async function listContactRequests(
+  filter: RequestStatus | 'all',
+): Promise<readonly ContactRequestRow[]> {
+  const db = await staffDb();
+  await purgeExpiredContactRequests(db);
 
-        return { table, total: count ?? 0, visible: visible ?? 0 };
-      },
-    ),
+  return db
+    .select()
+    .from(contactRequests)
+    .where(filter === 'all' ? undefined : eq(contactRequests.status, filter))
+    .orderBy(desc(contactRequests.created_at))
+    .limit(500);
+}
+
+export async function countNewContactRequests(): Promise<number> {
+  const db = await staffDb();
+
+  const [row] = await db
+    .select({ total: count() })
+    .from(contactRequests)
+    .where(eq(contactRequests.status, 'new'));
+
+  return row?.total ?? 0;
+}
+
+export async function listSubscribers(): Promise<readonly NewsletterSubscriberRow[]> {
+  const db = await staffDb();
+  return db.select().from(newsletterSubscribers).orderBy(desc(newsletterSubscribers.created_at));
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Comptes                                                                    */
+/* -------------------------------------------------------------------------- */
+
+const userColumns = {
+  id: users.id,
+  email: users.email,
+  full_name: users.full_name,
+  role: users.role,
+  last_login_at: users.last_login_at,
+  created_at: users.created_at,
+  updated_at: users.updated_at,
+};
+
+/** Comptes du tableau de bord, sans jamais l'empreinte du mot de passe. */
+export async function listUsers(): Promise<readonly UserRow[]> {
+  await requireAdmin();
+  const db = await staffDb();
+
+  return db.select(userColumns).from(users).orderBy(asc(users.created_at));
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Vue d'ensemble                                                             */
+/* -------------------------------------------------------------------------- */
+
+const SUMMARY_TABLES = {
+  collections,
+  pieces,
+  gallery_images: galleryImages,
+  services,
+  testimonials,
+  faq,
+} as const;
+
+export type SummaryTable = keyof typeof SUMMARY_TABLES;
+
+export interface ContentSummaryEntry {
+  readonly table: SummaryTable;
+  readonly total: number;
+  readonly visible: number;
+}
+
+/** Compteurs de la page d'accueil du tableau de bord, en une requête par table. */
+export async function getContentSummary(): Promise<readonly ContentSummaryEntry[]> {
+  const db = await staffDb();
+
+  return Promise.all(
+    (Object.keys(SUMMARY_TABLES) as SummaryTable[]).map(async (name) => {
+      const table = SUMMARY_TABLES[name];
+
+      const rows = await db
+        .select({ status: table.status, total: count() })
+        .from(table)
+        .groupBy(table.status);
+
+      const total = rows.reduce((sum, row) => sum + row.total, 0);
+      const visible = rows.find((row) => row.status === 'visible')?.total ?? 0;
+
+      return { table: name, total, visible };
+    }),
   );
-
-  return counts;
 }

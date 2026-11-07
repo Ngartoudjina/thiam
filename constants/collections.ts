@@ -4,7 +4,7 @@ import type { Collection, CollectionFilter, Piece } from '@/types';
 /**
  * Contenu de repli.
  *
- * Ces valeurs alimentent le site tant que Supabase n'est pas configuré ou que
+ * Ces valeurs alimentent le site tant que la base n'est pas configurée ou que
  * la table correspondante est vide. Elles servent aussi de source au script
  * d'amorçage (`npm run db:seed`) : le tableau de bord démarre donc avec le
  * contenu exact de la maquette.

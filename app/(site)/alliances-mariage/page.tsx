@@ -56,7 +56,7 @@ export default async function WeddingPage() {
           trail: TRAIL,
         })}
       />
-      <JsonLd id="schema-service-mariage" data={buildWeddingServiceSchema()} />
+      <JsonLd id="schema-service-mariage" data={buildWeddingServiceSchema(settings.contact)} />
       <JsonLd id="schema-faq-mariage" data={buildFaqSchema(WEDDING_PAGE.faq)} />
 
       <LandingHero

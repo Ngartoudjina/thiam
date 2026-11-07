@@ -1,6 +1,7 @@
 'use client';
 
 import { Plus, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { ImageUploader, type UploadedImage } from '@/components/admin/image-uploader';
@@ -13,6 +14,7 @@ import {
   saveHoursAction,
   saveStatsAction,
 } from '@/services/admin/settings-actions';
+import { ADMIN_ROUTES } from '@/constants/admin-navigation';
 import type { ActionResult } from '@/services/admin/action-result';
 import type {
   AboutContent,
@@ -54,9 +56,6 @@ function SubmitRow({ pending, label = 'Enregistrer' }: { pending: boolean; label
 
 export function HeroForm({ hero }: { readonly hero: HeroContent }) {
   const { formAction, pending, errors } = useSettingsForm(saveHeroAction);
-  const [image, setImage] = useState<UploadedImage | null>(
-    hero.imagePath ? { storagePath: hero.imagePath, width: 1200, height: 1600 } : null,
-  );
 
   return (
     <Panel>
@@ -66,9 +65,6 @@ export function HeroForm({ hero }: { readonly hero: HeroContent }) {
       />
 
       <form action={formAction} className="flex flex-col gap-5 p-5" noValidate>
-        <input type="hidden" name="previousImagePath" value={hero.imagePath} />
-        <input type="hidden" name="imagePath" value={image?.storagePath ?? ''} />
-
         <TextInput
           id="eyebrow"
           name="eyebrow"
@@ -133,7 +129,7 @@ export function HeroForm({ hero }: { readonly hero: HeroContent }) {
             name="primaryHref"
             label="Bouton principal — destination"
             required
-            hint="Lien WhatsApp, numéro de téléphone ou page du site."
+            hint="« whatsapp » ou « telephone » pour les numéros des Coordonnées, sinon une page du site (/collections) ou un lien."
             defaultValue={hero.primaryCta.href}
             error={errors?.['primaryCta.href']?.[0]}
           />
@@ -155,24 +151,13 @@ export function HeroForm({ hero }: { readonly hero: HeroContent }) {
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-[16rem_1fr] sm:items-start">
-          <ImageUploader
-            folder="content"
-            scope="hero"
-            value={image}
-            onChange={setImage}
-            label="Grande image"
-            aspect="portrait"
-            hint="Format vertical recommandé. Laissez vide pour conserver la photo livrée avec la maquette."
-          />
-          <TextInput
-            id="imageAlt"
-            name="imageAlt"
-            label="Texte alternatif de l’image"
-            defaultValue={hero.imageAlt}
-            error={errors?.imageAlt?.[0]}
-          />
-        </div>
+        <p className="rounded-lg bg-panel-muted px-4 py-3 text-[0.8125rem] text-panel-soft dark:bg-panel-dark-sunken dark:text-panel-dark-soft">
+          La grande photo du bandeau se change dans la rubrique{' '}
+          <Link href={ADMIN_ROUTES.visuals} className="text-accent underline underline-offset-4">
+            Visuels
+          </Link>
+          , emplacement « Grande photo du hero ».
+        </p>
 
         <SubmitRow pending={pending} />
       </form>
@@ -271,7 +256,6 @@ export function AboutForm({ about }: { readonly about: AboutContent }) {
       />
 
       <form action={formAction} className="flex flex-col gap-5 p-5" noValidate>
-        <input type="hidden" name="previousPortraitPath" value={about.portraitPath} />
         <input type="hidden" name="portraitPath" value={portrait?.storagePath ?? ''} />
         <input type="hidden" name="milestones" value={JSON.stringify(milestones)} />
 

@@ -68,7 +68,7 @@ export function StaticMap({
             height={TILE_SIZE}
             sizes="256px"
             unoptimized={false}
-            className="absolute max-w-none saturate-[0.75] contrast-[1.02]"
+            className="absolute max-w-none contrast-[1.02] saturate-[0.75]"
             style={{ left: tile.left, top: tile.top }}
           />
         ))}

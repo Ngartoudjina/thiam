@@ -6,6 +6,16 @@ import { SiteHeader } from '@/components/layout/site-header';
 import { SkipLink } from '@/components/layout/skip-link';
 
 /**
+ * Régénération horaire, en filet de sécurité.
+ *
+ * Le contenu est invalidé à chaque enregistrement du tableau de bord ; ce
+ * délai ne sert que si une lecture a échoué (base momentanément injoignable) :
+ * la page servie avec le contenu de repli se reconstruit alors d'elle-même
+ * dans l'heure, sans attendre une modification.
+ */
+export const revalidate = 3600;
+
+/**
  * Chrome du site vitrine.
  *
  * Regroupée ici plutôt que dans la mise en page racine : le tableau de bord

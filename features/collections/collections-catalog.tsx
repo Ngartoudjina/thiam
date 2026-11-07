@@ -4,8 +4,8 @@ import { m } from 'framer-motion';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import { PieceCard } from '@/features/collections/piece-card';
-import { PIECES, TOTAL_PIECES } from '@/constants/collections';
-import type { CollectionFilter } from '@/types';
+import { parseWeight } from '@/lib/format';
+import type { CollectionFilter, Piece } from '@/types';
 import { STAGGER, staggerContainer } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
@@ -17,8 +17,18 @@ const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
   { value: 'poids-decroissant', label: 'Poids décroissant' },
 ];
 
-const parseWeight = (weight: string): number =>
-  Number(weight.replace(/[^\d,]/g, '').replace(',', '.'));
+/** Les pièces sans poids se rangent en fin de liste, quel que soit le sens du tri. */
+const weightOf = (piece: Piece): number | null => piece.weightGrams ?? parseWeight(piece.weight);
+
+const byWeight =
+  (direction: 1 | -1) =>
+  (a: Piece, b: Piece): number => {
+    const left = weightOf(a);
+    const right = weightOf(b);
+    if (left === null) return right === null ? 0 : 1;
+    if (right === null) return -1;
+    return (left - right) * direction;
+  };
 
 const isKnownFilter = (
   value: string | null,
@@ -32,7 +42,15 @@ const isKnownFilter = (
  * ou du pied de page ouvre directement la bonne sélection, et le filtre reste
  * partageable et indexable.
  */
-export function CollectionsCatalog({ filters }: { readonly filters: readonly CollectionFilter[] }) {
+export function CollectionsCatalog({
+  filters,
+  pieces: allPieces,
+  totalInStore,
+}: {
+  readonly filters: readonly CollectionFilter[];
+  readonly pieces: readonly Piece[];
+  readonly totalInStore: number;
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -62,18 +80,18 @@ export function CollectionsCatalog({ filters }: { readonly filters: readonly Col
   const pieces = useMemo(() => {
     const filtered =
       activeFilter === 'tout'
-        ? [...PIECES]
-        : PIECES.filter((piece) => piece.collection === activeFilter);
+        ? [...allPieces]
+        : allPieces.filter((piece) => piece.collection === activeFilter);
 
     switch (sort) {
       case 'poids-croissant':
-        return filtered.sort((a, b) => parseWeight(a.weight) - parseWeight(b.weight));
+        return filtered.sort(byWeight(1));
       case 'poids-decroissant':
-        return filtered.sort((a, b) => parseWeight(b.weight) - parseWeight(a.weight));
+        return filtered.sort(byWeight(-1));
       default:
         return filtered;
     }
-  }, [activeFilter, sort]);
+  }, [activeFilter, allPieces, sort]);
 
   return (
     <>
@@ -150,7 +168,8 @@ export function CollectionsCatalog({ filters }: { readonly filters: readonly Col
 
       <p className="mt-10 text-center text-caption-lg font-normal text-clay lg:text-left">
         {pieces.length} pièce{pieces.length > 1 ? 's' : ''} affichée
-        {pieces.length > 1 ? 's' : ''} sur {TOTAL_PIECES} disponibles en boutique.
+        {pieces.length > 1 ? 's' : ''}
+        {totalInStore > 0 ? ` sur ${totalInStore} disponibles en boutique.` : '.'}
       </p>
     </>
   );

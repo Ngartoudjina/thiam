@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { getCollections } from '@/services/content/collections';
+import { getCollections, getPieces } from '@/services/content/collections';
 import {
   getFaqEntries,
   getGallery,
@@ -9,7 +9,7 @@ import {
 } from '@/services/content/catalog';
 import { getSiteSettings } from '@/services/content/settings';
 
-export { getCollections } from '@/services/content/collections';
+export { getCollections, getPieces } from '@/services/content/collections';
 export {
   getFaqEntries,
   getGallery,
@@ -35,6 +35,17 @@ export async function getHomeContent() {
   ]);
 
   return { settings, collections, services, testimonials, faq, gallery } as const;
+}
+
+/** Page Collections : univers, pièces et réglages. */
+export async function getCatalogContent() {
+  const [settings, collections, pieces] = await Promise.all([
+    getSiteSettings(),
+    getCollections(),
+    getPieces(),
+  ]);
+
+  return { settings, collections, pieces } as const;
 }
 
 export type HomeContent = Awaited<ReturnType<typeof getHomeContent>>;

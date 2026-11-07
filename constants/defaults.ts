@@ -16,7 +16,7 @@ import type {
  * Valeurs de repli des blocs singuliers.
  *
  * Elles reprennent mot pour mot la maquette et alimentent deux usages :
- * l'affichage tant que Supabase n'a rien à dire, et l'amorçage de la base
+ * l'affichage tant que la base n'a rien à dire, et l'amorçage de la base
  * (`npm run db:seed`) pour que le tableau de bord démarre plein.
  */
 
@@ -27,7 +27,8 @@ export const DEFAULT_HERO: HeroContent = {
   description:
     'Or, argent et diamant. Alliances gravées à la main et parures de dot, façonnées dans notre atelier de Cotonou — et rachat d’or au cours du jour.',
   descriptionMobile: 'Or, argent et diamant. Alliances, parures de dot et rachat d’or.',
-  primaryCta: { label: 'Prendre rendez-vous', href: CONTACT.whatsappHref },
+  // Mot-clé résolu à l'affichage avec le numéro des Coordonnées (voir lib/cta.ts).
+  primaryCta: { label: 'Prendre rendez-vous', href: 'whatsapp' },
   secondaryCta: { label: 'Découvrir les collections', href: ROUTES.collections },
   imagePath: '',
   imageAlt: MEDIA.heroParure.alt,
@@ -91,13 +92,16 @@ export const DEFAULT_STATS: StatsContent = {
  * photographie livrée avec la maquette, jusqu'à ce que la maison en téléverse
  * une depuis le tableau de bord.
  */
+/** Emplacement vide : la photographie de la maquette tient la place. */
+const unsetVisual = (alt: string) => ({ path: '', alt, width: 0, height: 0 });
+
 export const DEFAULT_VISUALS: VisualsContent = {
-  heroMain: { path: '', alt: MEDIA.heroParure.alt },
-  heroCard: { path: '', alt: MEDIA.bouclesPerle.alt },
-  buyback: { path: '', alt: MEDIA.rachatPieces.alt },
-  quoteBand: { path: '', alt: MEDIA.presentationParures.alt },
-  visitBand: { path: '', alt: MEDIA.ecrinParure.alt },
-  testimonialPortrait: { path: '', alt: MEDIA.bouclesFleurPerle.alt },
-  dowry: { path: '', alt: MEDIA.presentationParures.alt },
-  contactPhoto: { path: '', alt: MEDIA.parureCristaux.alt },
+  heroMain: unsetVisual(MEDIA.heroParure.alt),
+  heroCard: unsetVisual(MEDIA.bouclesPerle.alt),
+  buyback: unsetVisual(MEDIA.rachatPieces.alt),
+  quoteBand: unsetVisual(MEDIA.presentationParures.alt),
+  visitBand: unsetVisual(MEDIA.ecrinParure.alt),
+  testimonialPortrait: unsetVisual(MEDIA.bouclesFleurPerle.alt),
+  dowry: unsetVisual(MEDIA.presentationParures.alt),
+  contactPhoto: unsetVisual(MEDIA.parureCristaux.alt),
 };

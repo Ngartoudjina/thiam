@@ -2,17 +2,17 @@ import Link from 'next/link';
 import { ROUTES } from '@/constants/navigation';
 
 const STEPS = [
-  'Créer un projet sur supabase.com, puis relever dans Settings → API son URL, sa clé publique et sa clé de service.',
-  'Copier « .env.example » en « .env.local », y renseigner ces trois valeurs, puis relancer le serveur.',
-  'Ouvrir l’éditeur SQL du projet et exécuter les deux fichiers de « supabase/migrations/ », dans l’ordre.',
-  'Créer le compte de la maison depuis Supabase : Authentication → Users → Add user. Le premier compte créé devient administrateur.',
+  'Créer une base sur neon.com (ou lancer « neon init » puis « neon deploy »), et relever son adresse de connexion.',
+  'La renseigner dans « .env.local » sous le nom DATABASE_URL, puis relancer le serveur.',
+  'Créer les tables : « npm run db:migrate ».',
+  'Créer le compte de la maison : « npm run admin:create -- --email=vous@exemple.com ». Le premier compte devient administrateur.',
   'Se connecter ici, puis importer le contenu de la maquette d’un clic depuis le tableau de bord.',
 ] as const;
 
 /**
  * Page d'installation.
  *
- * Tant que Supabase n'est pas configuré, le site vitrine fonctionne sur ses
+ * Tant que la base n'est pas configurée, le site vitrine fonctionne sur ses
  * valeurs de repli : on ne bloque donc rien, on explique simplement la suite.
  */
 export function SetupNotice() {
@@ -26,7 +26,7 @@ export function SetupNotice() {
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-panel-soft dark:text-panel-dark-soft">
         Le site public fonctionne déjà : il affiche le contenu livré avec la maquette. Pour pouvoir
-        le modifier depuis cette interface, connectez le projet à Supabase.
+        le modifier depuis cette interface, connectez le projet à une base Neon.
       </p>
 
       <ol className="mt-8 flex flex-col gap-4">

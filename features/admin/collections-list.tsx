@@ -9,7 +9,6 @@ import { SortableList } from '@/components/admin/sortable-list';
 import { ConfirmDialog } from '@/components/admin/ui/confirm-dialog';
 import { AdminButton, EmptyState, StatusPill } from '@/components/admin/ui/primitives';
 import { ADMIN_ROUTES } from '@/constants/admin-navigation';
-import { publicStorageUrl } from '@/lib/supabase/env';
 import {
   deleteCollectionAction,
   reorderCollectionsAction,
@@ -83,7 +82,7 @@ export function CollectionsList({
               <span className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-panel-sunken dark:bg-panel-dark-sunken">
                 {primary ? (
                   <Image
-                    src={publicStorageUrl(primary.storage_path)}
+                    src={primary.storage_path}
                     alt=""
                     fill
                     sizes="48px"

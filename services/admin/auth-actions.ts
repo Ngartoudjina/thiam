@@ -1,69 +1,48 @@
 'use server';
 
+import { eq } from 'drizzle-orm';
+import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { ADMIN_ROUTES } from '@/constants/admin-navigation';
-import { SUPABASE } from '@/lib/supabase/env';
-import { createServerSupabase } from '@/lib/supabase/server';
+import { getCurrentStaff } from '@/lib/auth';
+import { SESSION_COOKIE, sessionCookieOptions } from '@/lib/auth/cookie';
+import { hashPassword, needsRehash, verifyAgainstDecoy, verifyPassword } from '@/lib/auth/password';
+import { createSession, invalidateSession, purgeExpiredSessions } from '@/lib/auth/session';
+import { getDb } from '@/lib/db';
+import { users } from '@/lib/db/schema';
+import {
+  RATE_LIMITS,
+  clientAddress,
+  consumeRateLimit,
+  fingerprint,
+  formatRetryDelay,
+  purgeRateLimits,
+  resetRateLimit,
+} from '@/lib/rate-limit';
 import { failure, runAction, success, type ActionResult } from '@/services/admin/action-result';
 
-
-/**
- * Distingue une panne de service d'un identifiant erroné.
- *
- * Les deux renvoyaient le même message : un projet Supabase en pause ou
- * supprimé se lisait donc « mot de passe incorrect », et l'on cherchait le
- * défaut du mauvais côté. Le message reste générique sur les identifiants —
- * pour ne pas permettre d'énumérer les comptes — mais une indisponibilité du
- * serveur doit se nommer.
- */
-function isBackendUnreachable(error: unknown): boolean {
-  if (!error || typeof error !== 'object') return false;
-
-  const { name, message, status } = error as {
-    name?: string;
-    message?: string;
-    status?: number;
-  };
-
-  if (name === 'AuthRetryableFetchError' || name === 'TimeoutError' || name === 'AbortError') {
-    return true;
-  }
-
-  // Une erreur réseau ne porte pas de statut HTTP exploitable.
-  if (status === 0 || status === undefined) {
-    const text = (message ?? '').toLowerCase();
-    return (
-      text.includes('fetch failed') ||
-      text.includes('failed to fetch') ||
-      text.includes('network') ||
-      text.includes('enotfound') ||
-      text.includes('timeout')
-    );
-  }
-
-  return false;
-}
-
 const credentialsSchema = z.object({
-  email: z.email('Cette adresse e-mail ne semble pas valide.'),
-  password: z.string().min(8, 'Le mot de passe compte au moins huit caractères.'),
+  email: z.email('Cette adresse e-mail ne semble pas valide.').max(200),
+  // Aucune règle de longueur minimale ici : elle s'applique à la création du
+  // mot de passe, pas à sa saisie. Le plafond évite de hacher un roman.
+  password: z.string().min(1, 'Saisissez votre mot de passe.').max(200),
 });
 
 /**
  * Connexion par e-mail et mot de passe.
  *
- * Le message d'échec reste volontairement générique : il ne révèle pas si
- * l'adresse existe, ce qui empêche d'énumérer les comptes.
+ * Le message d'échec reste volontairement générique, et une adresse inconnue
+ * coûte autant de calcul qu'une adresse existante : rien ne permet d'énumérer
+ * les comptes. Les essais sont limités par compte et par adresse IP.
  */
 export async function signInAction(
   _previous: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
   return runAction(async () => {
-    if (!SUPABASE.isConfigured) {
-      return failure('Supabase n’est pas configuré. Voir le README, § Installation.');
-    }
+    const db = getDb();
+    if (!db) return failure('La base de données n’est pas configurée. Voir le README.');
 
     const parsed = credentialsSchema.safeParse({
       email: formData.get('email'),
@@ -71,46 +50,68 @@ export async function signInAction(
     });
 
     if (!parsed.success) {
-      return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+      return failure('Vérifiez les champs.', z.flattenError(parsed.error).fieldErrors);
     }
 
-    const supabase = await createServerSupabase();
-    if (!supabase) return failure('Supabase n’est pas configuré.');
+    const email = parsed.data.email.trim().toLowerCase();
+    const requestHeaders = await headers();
+    const ip = fingerprint(clientAddress(requestHeaders));
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: parsed.data.email,
-      password: parsed.data.password,
-    });
+    const [byIp, byAccount] = await Promise.all([
+      consumeRateLimit(db, `connexion:ip:${ip}`, RATE_LIMITS.loginIp),
+      consumeRateLimit(db, `connexion:compte:${fingerprint(email)}`, RATE_LIMITS.loginAccount),
+    ]);
 
-    if (error && isBackendUnreachable(error)) {
-      return failure(
-        'Le service d’authentification est injoignable. Vérifiez que le projet Supabase est actif, puis réessayez.',
-      );
+    if (!byIp.allowed || !byAccount.allowed) {
+      const wait = Math.max(byIp.retryAfterMs, byAccount.retryAfterMs);
+      return failure(`Trop de tentatives. Réessayez dans ${formatRetryDelay(wait)}.`);
     }
 
-    if (error || !data.user) {
-      return failure('Adresse e-mail ou mot de passe incorrect.');
-    }
+    const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
-    // Le compte doit disposer d'un profil : c'est lui qui confère les droits.
-    const { data: profile } = await supabase
-      .from('users')
-      .select('id')
-      .eq('id', data.user.id)
-      .maybeSingle();
+    const valid = user
+      ? await verifyPassword(parsed.data.password, user.password_hash)
+      : await verifyAgainstDecoy(parsed.data.password);
 
-    if (!profile) {
-      await supabase.auth.signOut();
-      return failure('Ce compte n’a pas accès à l’administration.');
-    }
+    if (!user || !valid) return failure('Adresse e-mail ou mot de passe incorrect.');
+
+    const session = await createSession(db, user.id, requestHeaders.get('user-agent') ?? '');
+    (await cookies()).set(SESSION_COOKIE, session.token, sessionCookieOptions(session.expiresAt));
+
+    // Après coup, et sans bloquer la connexion : horodatage, empreinte
+    // renforcée si les paramètres ont évolué, ménage des données échues.
+    await Promise.allSettled([
+      resetRateLimit(db, `connexion:compte:${fingerprint(email)}`),
+      db
+        .update(users)
+        .set({
+          last_login_at: new Date(),
+          ...(needsRehash(user.password_hash)
+            ? { password_hash: await hashPassword(parsed.data.password) }
+            : {}),
+        })
+        .where(eq(users.id, user.id)),
+      purgeExpiredSessions(db),
+      purgeRateLimits(db),
+    ]);
 
     return success('Connexion réussie.');
   });
 }
 
-/** Déconnexion : la session est révoquée côté Supabase, pas seulement oubliée. */
+/** Déconnexion : la session est supprimée en base, pas seulement oubliée. */
 export async function signOutAction(): Promise<void> {
-  const supabase = await createServerSupabase();
-  await supabase?.auth.signOut();
+  const staff = await getCurrentStaff();
+  const db = getDb();
+
+  if (staff && db) {
+    await invalidateSession(db, staff.sessionId).catch((error: unknown) => {
+      console.error('[auth] session non supprimée', error);
+    });
+  }
+
+  // Effacement avec les mêmes attributs que la pose : un cookie `__Host-`
+  // effacé sans `Secure` ni `Path=/` serait ignoré par le navigateur.
+  (await cookies()).set(SESSION_COOKIE, '', sessionCookieOptions(new Date(0)));
   redirect(ADMIN_ROUTES.login);
 }

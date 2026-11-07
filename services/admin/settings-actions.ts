@@ -1,15 +1,25 @@
 'use server';
 
+import { eq, sql } from 'drizzle-orm';
+import { z } from 'zod';
+import { DEFAULT_VISUALS } from '@/constants/defaults';
 import { CACHE_TAGS } from '@/lib/cache';
+import type { Database } from '@/lib/db';
+import { settings } from '@/lib/db/schema';
+import { isAllowedImageSource } from '@/lib/media-source';
 import {
+  SETTING_KEYS,
   aboutSchema,
+  catalogSchema,
   contactSettingsSchema,
   heroSchema,
   hoursSchema,
   statsSchema,
   visualsSchema,
-  SETTING_KEYS,
+  type SettingKey,
+  type VisualsContent,
 } from '@/lib/schemas/content';
+import { deleteImages } from '@/lib/storage';
 import {
   failure,
   publishChanges,
@@ -17,30 +27,44 @@ import {
   success,
   type ActionResult,
 } from '@/services/admin/action-result';
-import { adminClient } from '@/services/admin/repository';
-import { removeStorageObjects } from '@/services/admin/storage';
+import { staffDb } from '@/services/admin/repository';
 
 /** Écrit une clé de `settings` après validation, et publie le changement. */
-async function writeSetting(key: string, value: unknown, message: string): Promise<ActionResult> {
-  const supabase = await adminClient();
-
-  const { error } = await supabase.from('settings').upsert({ key, value }, { onConflict: 'key' });
-  if (error) return failure('Enregistrement impossible.');
+async function writeSetting(
+  db: Database,
+  key: SettingKey,
+  value: unknown,
+  message: string,
+): Promise<ActionResult> {
+  await db
+    .insert(settings)
+    .values({ key, value })
+    .onConflictDoUpdate({ target: settings.key, set: { value, updated_at: sql`now()` } });
 
   publishChanges(CACHE_TAGS.settings);
   return success(message);
 }
 
-const readJson = <T>(formData: FormData, field: string): T | null => {
+async function readSetting(db: Database, key: SettingKey): Promise<unknown> {
+  const [row] = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
+  return row?.value;
+}
+
+const readJson = (formData: FormData, field: string): unknown => {
   const raw = formData.get(field);
-  if (typeof raw !== 'string' || raw.length === 0) return null;
+  if (typeof raw !== 'string' || raw.length === 0 || raw.length > 100_000) return null;
 
   try {
-    return JSON.parse(raw) as T;
+    return JSON.parse(raw) as unknown;
   } catch {
     return null;
   }
 };
+
+const fieldErrors = (error: z.ZodError) => z.flattenError(error).fieldErrors;
+
+/** Une image enregistrée doit venir du stockage du site, ou être vide. */
+const isStorablePath = (path: string): boolean => path === '' || isAllowedImageSource(path);
 
 /* -------------------------------------------------------------------------- */
 /*  Bandeau d'accueil                                                          */
@@ -57,28 +81,41 @@ export async function saveHeroAction(
       titleLine2: formData.get('titleLine2'),
       description: formData.get('description'),
       descriptionMobile: formData.get('descriptionMobile') ?? '',
-      primaryCta: {
-        label: formData.get('primaryLabel'),
-        href: formData.get('primaryHref'),
-      },
-      secondaryCta: {
-        label: formData.get('secondaryLabel'),
-        href: formData.get('secondaryHref'),
-      },
-      imagePath: formData.get('imagePath') ?? '',
-      imageAlt: formData.get('imageAlt') ?? '',
+      primaryCta: { label: formData.get('primaryLabel'), href: formData.get('primaryHref') },
+      secondaryCta: { label: formData.get('secondaryLabel'), href: formData.get('secondaryHref') },
+      // La grande photo se gère désormais dans « Visuels » (emplacement heroMain).
+      imagePath: '',
+      imageAlt: '',
     });
 
-    if (!parsed.success) return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+    if (!parsed.success) return failure('Vérifiez les champs.', fieldErrors(parsed.error));
 
-    const previousPath = String(formData.get('previousImagePath') ?? '');
-    const result = await writeSetting(SETTING_KEYS.hero, parsed.data, 'Bandeau mis à jour.');
+    const db = await staffDb();
 
-    if (result.ok && previousPath && previousPath !== parsed.data.imagePath) {
-      await removeStorageObjects([previousPath]);
+    /*
+     * Reprise d'une ancienne saisie : la photo déposée jadis dans ce
+     * formulaire n'était jamais affichée. Si l'emplacement « heroMain » est
+     * vide, elle y est reportée avant d'être retirée d'ici.
+     */
+    const current = heroSchema.safeParse(await readSetting(db, SETTING_KEYS.hero));
+    const legacyPath = current.success ? current.data.imagePath : '';
+
+    if (legacyPath && isAllowedImageSource(legacyPath)) {
+      const visuals = visualsSchema.safeParse(await readSetting(db, SETTING_KEYS.visuals));
+      const base: VisualsContent = visuals.success ? visuals.data : DEFAULT_VISUALS;
+
+      if (!base.heroMain.path) {
+        const alt = (current.success && current.data.imageAlt) || base.heroMain.alt;
+        await writeSetting(
+          db,
+          SETTING_KEYS.visuals,
+          { ...base, heroMain: { ...base.heroMain, path: legacyPath, alt } },
+          'Visuels repris.',
+        );
+      }
     }
 
-    return result;
+    return writeSetting(db, SETTING_KEYS.hero, parsed.data, 'Bandeau mis à jour.');
   });
 }
 
@@ -91,14 +128,11 @@ export async function saveStatsAction(
   formData: FormData,
 ): Promise<ActionResult> {
   return runAction(async () => {
-    const items = readJson<unknown>(formData, 'items');
-    const parsed = statsSchema.safeParse({ items });
+    const parsed = statsSchema.safeParse({ items: readJson(formData, 'items') });
+    if (!parsed.success) return failure('Vérifiez les chiffres saisis.', fieldErrors(parsed.error));
 
-    if (!parsed.success) {
-      return failure('Vérifiez les chiffres saisis.', parsed.error.flatten().fieldErrors);
-    }
-
-    return writeSetting(SETTING_KEYS.stats, parsed.data, 'Chiffres mis à jour.');
+    const db = await staffDb();
+    return writeSetting(db, SETTING_KEYS.stats, parsed.data, 'Chiffres mis à jour.');
   });
 }
 
@@ -120,16 +154,22 @@ export async function saveAboutAction(
       quoteAuthor: formData.get('quoteAuthor'),
       portraitPath: formData.get('portraitPath') ?? '',
       portraitAlt: formData.get('portraitAlt') ?? '',
-      milestones: readJson<unknown>(formData, 'milestones') ?? [],
+      milestones: readJson(formData, 'milestones') ?? [],
     });
 
-    if (!parsed.success) return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+    if (!parsed.success) return failure('Vérifiez les champs.', fieldErrors(parsed.error));
+    if (!isStorablePath(parsed.data.portraitPath)) {
+      return failure('Le portrait doit être déposé depuis ce formulaire.');
+    }
 
-    const previousPath = String(formData.get('previousPortraitPath') ?? '');
-    const result = await writeSetting(SETTING_KEYS.about, parsed.data, 'Histoire mise à jour.');
+    const db = await staffDb();
+    const current = aboutSchema.safeParse(await readSetting(db, SETTING_KEYS.about));
+    const previousPath = current.success ? current.data.portraitPath : '';
+
+    const result = await writeSetting(db, SETTING_KEYS.about, parsed.data, 'Histoire mise à jour.');
 
     if (result.ok && previousPath && previousPath !== parsed.data.portraitPath) {
-      await removeStorageObjects([previousPath]);
+      await deleteImages([previousPath]);
     }
 
     return result;
@@ -159,9 +199,10 @@ export async function saveContactAction(
       facebook: formData.get('facebook') ?? '',
     });
 
-    if (!parsed.success) return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+    if (!parsed.success) return failure('Vérifiez les champs.', fieldErrors(parsed.error));
 
-    return writeSetting(SETTING_KEYS.contact, parsed.data, 'Coordonnées mises à jour.');
+    const db = await staffDb();
+    return writeSetting(db, SETTING_KEYS.contact, parsed.data, 'Coordonnées mises à jour.');
   });
 }
 
@@ -172,14 +213,30 @@ export async function saveHoursAction(
   return runAction(async () => {
     const parsed = hoursSchema.safeParse({
       summary: formData.get('summary'),
-      days: readJson<unknown>(formData, 'days') ?? [],
+      days: readJson(formData, 'days') ?? [],
     });
 
-    if (!parsed.success) {
-      return failure('Vérifiez les horaires saisis.', parsed.error.flatten().fieldErrors);
-    }
+    if (!parsed.success) return failure('Vérifiez les horaires saisis.', fieldErrors(parsed.error));
 
-    return writeSetting(SETTING_KEYS.hours, parsed.data, 'Horaires mis à jour.');
+    const db = await staffDb();
+    return writeSetting(db, SETTING_KEYS.hours, parsed.data, 'Horaires mis à jour.');
+  });
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Catalogue                                                                  */
+/* -------------------------------------------------------------------------- */
+
+export async function saveCatalogAction(
+  _previous: ActionResult | null,
+  formData: FormData,
+): Promise<ActionResult> {
+  return runAction(async () => {
+    const parsed = catalogSchema.safeParse({ totalInStore: formData.get('totalInStore') });
+    if (!parsed.success) return failure('Vérifiez le nombre saisi.', fieldErrors(parsed.error));
+
+    const db = await staffDb();
+    return writeSetting(db, SETTING_KEYS.catalog, parsed.data, 'Catalogue mis à jour.');
   });
 }
 
@@ -188,46 +245,42 @@ export async function saveHoursAction(
 /* -------------------------------------------------------------------------- */
 
 /**
- * Remplace la photographie d'un emplacement de composition.
+ * Remplace les photographies des emplacements de composition.
  *
- * L'ancienne image est supprimée du stockage une fois la nouvelle enregistrée :
- * remplacer une photo dix fois ne laisse pas neuf fichiers orphelins derrière.
+ * Les anciennes images sont supprimées du stockage une fois les nouvelles
+ * enregistrées : remplacer une photo dix fois ne laisse pas neuf fichiers
+ * orphelins derrière.
  */
 export async function saveVisualsAction(
   _previous: ActionResult | null,
   formData: FormData,
 ): Promise<ActionResult> {
   return runAction(async () => {
-    const submitted = readJson<unknown>(formData, 'visuals');
-    if (submitted === null) return failure('Données illisibles.');
+    const parsed = visualsSchema.safeParse(readJson(formData, 'visuals'));
+    if (!parsed.success) return failure('Vérifiez les champs.', fieldErrors(parsed.error));
 
-    const parsed = visualsSchema.safeParse(submitted);
-    if (!parsed.success) {
-      return failure('Vérifiez les champs.', parsed.error.flatten().fieldErrors);
+    if (!Object.values(parsed.data).every((visual) => isStorablePath(visual.path))) {
+      return failure('Une des images ne provient pas du stockage du site.');
     }
 
-    const previousPaths = readJson<Record<string, string>>(formData, 'previousPaths') ?? {};
+    const db = await staffDb();
+    const current = visualsSchema.safeParse(await readSetting(db, SETTING_KEYS.visuals));
 
     const result = await writeSetting(
+      db,
       SETTING_KEYS.visuals,
       parsed.data,
       'Visuels enregistrés. Le site est à jour.',
     );
-    if (!result.ok) return result;
+    if (!result.ok || !current.success) return result;
 
-    // Nettoyage : uniquement les fichiers qu'aucun emplacement ne référence plus.
-    const stillUsed = new Set(
-      Object.values(parsed.data)
-        .map((visual) => visual.path)
-        .filter(Boolean),
-    );
+    // Ménage : uniquement les fichiers qu'aucun emplacement ne référence plus.
+    const stillUsed = new Set(Object.values(parsed.data).map((visual) => visual.path));
+    const orphans = Object.values(current.data)
+      .map((visual) => visual.path)
+      .filter((path) => path && !stillUsed.has(path));
 
-    const orphans = Object.values(previousPaths).filter(
-      (path) => Boolean(path) && !stillUsed.has(path),
-    );
-
-    if (orphans.length > 0) await removeStorageObjects(orphans);
-
+    await deleteImages(orphans);
     return result;
   });
 }

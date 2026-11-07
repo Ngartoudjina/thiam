@@ -1,0 +1,54 @@
+# Vérification de chaque modification : types, lint, tests, build.
+#
+# Le build tourne sans base de données : le site se construit alors sur le
+# contenu de la maquette, ce qui prouve qu'il reste publiable même si la base
+# est injoignable. Les tests utilisent une base Postgres embarquée (PGlite) :
+# aucun secret n'est nécessaire.
+name: Vérification
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verifier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Types
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Tests
+        run: npm test
+
+      - name: Migrations à jour avec le schéma
+        run: |
+          npx drizzle-kit generate --name verification
+          if [ -n "$(git status --porcelain drizzle)" ]; then
+            echo "Le schéma a changé sans migration : lancez « npm run db:generate »."
+            git status --porcelain drizzle
+            exit 1
+          fi
+
+      - name: Build
+        run: npm run build

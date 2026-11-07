@@ -2,8 +2,15 @@ import 'server-only';
 
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { AuthorizationError } from '@/lib/auth';
-import { ROUTES } from '@/constants/navigation';
+import { DatabaseNotConfiguredError } from '@/lib/db';
+import {
+  isConnectionFailure,
+  isForeignKeyViolation,
+  isInvalidInput,
+  isUniqueViolation,
+} from '@/lib/db/errors';
 import type { CacheTag } from '@/lib/cache';
+import { StorageNotConfiguredError } from '@/lib/storage';
 
 export interface ActionSuccess<T> {
   readonly ok: true;
@@ -45,8 +52,24 @@ export async function runAction<T>(
   try {
     return await handler();
   } catch (error) {
-    if (error instanceof AuthorizationError) {
-      return failure(error.message);
+    if (error instanceof AuthorizationError) return failure(error.message);
+
+    if (error instanceof DatabaseNotConfiguredError) {
+      return failure('La base de données n’est pas configurée (DATABASE_URL).');
+    }
+
+    if (error instanceof StorageNotConfiguredError) return failure(error.message);
+
+    if (isUniqueViolation(error)) {
+      return failure('Un élément portant cet identifiant existe déjà.');
+    }
+
+    if (isInvalidInput(error) || isForeignKeyViolation(error)) {
+      return failure('Élément introuvable : la page n’est peut-être plus à jour. Rechargez-la.');
+    }
+
+    if (isConnectionFailure(error)) {
+      return failure('La base de données ne répond pas. Réessayez dans un instant.');
     }
 
     console.error('[admin] action en échec', error);
@@ -55,13 +78,13 @@ export async function runAction<T>(
 }
 
 /**
- * Invalide le cache de contenu puis les pages qui l'affichent.
- * C'est ce qui rend une modification visible sur le site sans redéploiement.
+ * Invalide le cache de contenu puis toutes les pages du site.
+ * C'est ce qui rend une modification visible sans redéploiement.
  */
 export function publishChanges(...tags: readonly CacheTag[]): void {
   for (const tag of tags) revalidateTag(tag);
 
-  revalidatePath(ROUTES.home);
-  revalidatePath(ROUTES.collections);
-  revalidatePath(ROUTES.contact);
+  // La mise en page racine lit les coordonnées et les collections (données
+  // structurées, pied de page) : on invalide donc depuis la racine.
+  revalidatePath('/', 'layout');
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { FORM_TOPIC_LABELS } from '@/constants/services';
 
 /**
  * Schémas de validation partagés entre le client et la route API.
@@ -21,7 +22,13 @@ export const contactSchema = z.object({
     .min(8, 'Un numéro joignable nous permet de vous rappeler.')
     .max(20, 'Ce numéro comporte trop de caractères.')
     .regex(PHONE_PATTERN, 'Ce numéro ne semble pas valide.'),
-  topic: z.string().min(1, 'Choisissez un sujet.'),
+  topic: z
+    .string()
+    .min(1, 'Choisissez un sujet.')
+    .refine(
+      (value) => Object.hasOwn(FORM_TOPIC_LABELS, value),
+      'Choisissez un sujet dans la liste.',
+    ),
   message: z
     .string()
     .trim()
@@ -35,7 +42,7 @@ export const contactSchema = z.object({
 export type ContactInput = z.infer<typeof contactSchema>;
 
 export const newsletterSchema = z.object({
-  email: z.email('Cette adresse e-mail ne semble pas valide.'),
+  email: z.email('Cette adresse e-mail ne semble pas valide.').max(200, 'Adresse trop longue.'),
 });
 
 export type NewsletterInput = z.infer<typeof newsletterSchema>;

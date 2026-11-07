@@ -1,6 +1,8 @@
 import 'server-only';
 
 import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
+import { TOTAL_PIECES } from '@/constants/collections';
 import {
   DEFAULT_ABOUT,
   DEFAULT_CONTACT,
@@ -10,22 +12,25 @@ import {
   DEFAULT_VISUALS,
 } from '@/constants/defaults';
 import { CACHE_TAGS, CONTENT_REVALIDATE_SECONDS } from '@/lib/cache';
+import { settings } from '@/lib/db/schema';
 import {
+  SETTING_KEYS,
   aboutSchema,
+  catalogSchema,
   contactSettingsSchema,
   heroSchema,
   hoursSchema,
   statsSchema,
   visualsSchema,
-  SETTING_KEYS,
   type AboutContent,
+  type CatalogSettings,
   type ContactSettings,
   type HeroContent,
   type HoursContent,
   type StatsContent,
   type VisualsContent,
 } from '@/lib/schemas/content';
-import { createPublicSupabase } from '@/lib/supabase/server';
+import { publicDb, readOrFallback } from '@/services/content/read';
 
 export interface SiteSettings {
   readonly hero: HeroContent;
@@ -34,55 +39,81 @@ export interface SiteSettings {
   readonly hours: HoursContent;
   readonly stats: StatsContent;
   readonly visuals: VisualsContent;
+  readonly catalog: CatalogSettings;
 }
 
-const FALLBACK: SiteSettings = {
+export const DEFAULT_SETTINGS: SiteSettings = {
   hero: DEFAULT_HERO,
   about: DEFAULT_ABOUT,
   contact: DEFAULT_CONTACT,
   hours: DEFAULT_HOURS,
   stats: DEFAULT_STATS,
   visuals: DEFAULT_VISUALS,
+  catalog: { totalInStore: TOTAL_PIECES },
 };
 
+interface Parser<T> {
+  safeParse: (value: unknown) => { success: true; data: T } | { success: false };
+}
+
 /**
- * Blocs singuliers du site.
- *
- * Chaque valeur est repassée par son schéma : un JSON incomplet ou modifié à
- * la main en base ne casse jamais le rendu, la valeur de repli prend le relais
+ * Lit chaque bloc à travers son schéma : un JSON incomplet ou modifié à la
+ * main en base ne casse jamais le rendu, la valeur de repli prend le relais
  * pour la seule clé fautive.
  */
-export const getSiteSettings = unstable_cache(
-  async (): Promise<SiteSettings> => {
-    const supabase = createPublicSupabase();
-    if (!supabase) return FALLBACK;
+export function parseSettings(rows: readonly { key: string; value: unknown }[]): SiteSettings {
+  const byKey = new Map(rows.map((row) => [row.key, row.value]));
 
-    const { data, error } = await supabase.from('settings').select('key, value');
-    if (error || !data) return FALLBACK;
+  const parse = <T>(key: string, schema: Parser<T>, fallback: T): T => {
+    if (!byKey.has(key)) return fallback;
+    const result = schema.safeParse(byKey.get(key));
+    return result.success ? result.data : fallback;
+  };
 
-    const byKey = new Map(data.map((row) => [row.key, row.value]));
+  const hero = parse(SETTING_KEYS.hero, heroSchema, DEFAULT_SETTINGS.hero);
+  const visuals = parse(SETTING_KEYS.visuals, visualsSchema, DEFAULT_SETTINGS.visuals);
 
-    const parse = <T>(
-      key: string,
-      schema: { safeParse: (value: unknown) => { success: boolean; data?: T } },
-      fallback: T,
-    ): T => {
-      if (!byKey.has(key)) return fallback;
-      const result = schema.safeParse(byKey.get(key));
-      return result.success && result.data !== undefined ? result.data : fallback;
-    };
+  return {
+    hero,
+    about: parse(SETTING_KEYS.about, aboutSchema, DEFAULT_SETTINGS.about),
+    contact: parse(SETTING_KEYS.contact, contactSettingsSchema, DEFAULT_SETTINGS.contact),
+    hours: parse(SETTING_KEYS.hours, hoursSchema, DEFAULT_SETTINGS.hours),
+    stats: parse(SETTING_KEYS.stats, statsSchema, DEFAULT_SETTINGS.stats),
+    catalog: parse(SETTING_KEYS.catalog, catalogSchema, DEFAULT_SETTINGS.catalog),
+    /*
+     * Ancienne saisie : la photo déposée dans le formulaire « Accueil »
+     * n'était jamais affichée. Tant que l'emplacement « heroMain » est vide,
+     * elle y est reprise.
+     */
+    visuals:
+      hero.imagePath && !visuals.heroMain.path
+        ? {
+            ...visuals,
+            heroMain: {
+              ...visuals.heroMain,
+              path: hero.imagePath,
+              alt: hero.imageAlt || visuals.heroMain.alt,
+            },
+          }
+        : visuals,
+  };
+}
 
-    return {
-      hero: parse(SETTING_KEYS.hero, heroSchema, FALLBACK.hero),
-      about: parse(SETTING_KEYS.about, aboutSchema, FALLBACK.about),
-      contact: parse(SETTING_KEYS.contact, contactSettingsSchema, FALLBACK.contact),
-      hours: parse(SETTING_KEYS.hours, hoursSchema, FALLBACK.hours),
-      stats: parse(SETTING_KEYS.stats, statsSchema, FALLBACK.stats),
-      visuals: parse(SETTING_KEYS.visuals, visualsSchema, FALLBACK.visuals),
-    };
+const cachedSettings = unstable_cache(
+  async (): Promise<SiteSettings | null> => {
+    const db = publicDb();
+    if (!db) return null;
+
+    const rows = await db.select({ key: settings.key, value: settings.value }).from(settings);
+    return parseSettings(rows);
   },
   ['reglages-publics'],
   { tags: [CACHE_TAGS.settings], revalidate: CONTENT_REVALIDATE_SECONDS },
+);
+
+/** Blocs singuliers du site : bandeau, histoire, coordonnées, horaires, visuels… */
+export const getSiteSettings = cache((): Promise<SiteSettings> =>
+  readOrFallback('réglages', cachedSettings, DEFAULT_SETTINGS),
 );
 
 /** Liens de contact dérivés des réglages, prêts à poser dans un `href`. */

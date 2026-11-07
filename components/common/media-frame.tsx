@@ -33,7 +33,7 @@ const HOVER_ZOOM: Record<'none' | 'soft' | 'firm', string> = {
  * livré. Aucun composant n'appelle `next/image` directement.
  *
  * Le visuel est reçu déjà résolu : le composant ignore s'il provient des
- * fichiers du dépôt ou de Supabase Storage.
+ * fichiers du dépôt ou du stockage des images téléversées.
  */
 export function MediaFrame({
   asset,

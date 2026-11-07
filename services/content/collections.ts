@@ -1,12 +1,16 @@
 import 'server-only';
 
+import { asc, eq } from 'drizzle-orm';
 import { unstable_cache } from 'next/cache';
-import { COLLECTIONS } from '@/constants/collections';
+import { cache } from 'react';
+import { COLLECTIONS, PIECES } from '@/constants/collections';
 import { CACHE_TAGS, CONTENT_REVALIDATE_SECONDS } from '@/lib/cache';
-import { createPublicSupabase } from '@/lib/supabase/server';
+import { collectionImages, collections, pieces } from '@/lib/db/schema';
+import { formatWeight } from '@/lib/format';
 import { toMediaAsset } from '@/services/content/media';
+import { publicDb, readOrFallback } from '@/services/content/read';
 import type { CollectionImageRow, CollectionRow } from '@/types/database';
-import type { Collection } from '@/types';
+import type { Collection, Piece } from '@/types';
 
 function toCollection(
   row: CollectionRow,
@@ -33,44 +37,83 @@ function toCollection(
   };
 }
 
-/**
- * Univers affichés sur le site.
- *
- * Retombe sur le contenu de la maquette si Supabase n'est pas configuré, si la
- * requête échoue, ou si la table est vide : le site vitrine reste toujours
- * complet, y compris pendant l'installation.
- */
-export const getCollections = unstable_cache(
-  async (): Promise<readonly Collection[]> => {
-    const supabase = createPublicSupabase();
-    if (!supabase) return COLLECTIONS;
+const cachedCollections = unstable_cache(
+  async (): Promise<readonly Collection[] | null> => {
+    const db = publicDb();
+    if (!db) return null;
 
-    const { data: rows, error } = await supabase
-      .from('collections')
-      .select('*')
-      .eq('status', 'visible')
-      .order('position', { ascending: true });
+    const [rows, images] = await Promise.all([
+      db
+        .select()
+        .from(collections)
+        .where(eq(collections.status, 'visible'))
+        .orderBy(asc(collections.position)),
+      db.select().from(collectionImages).orderBy(asc(collectionImages.position)),
+    ]);
 
-    if (error || !rows || rows.length === 0) return COLLECTIONS;
+    if (rows.length === 0) return null;
 
-    const { data: images } = await supabase
-      .from('collection_images')
-      .select('*')
-      .in(
-        'collection_id',
-        rows.map((row) => row.id),
-      )
-      .order('position', { ascending: true });
-
-    const byCollection = new Map<string, CollectionImageRow[]>();
-    for (const image of images ?? []) {
-      const bucket = byCollection.get(image.collection_id) ?? [];
-      bucket.push(image);
-      byCollection.set(image.collection_id, bucket);
-    }
-
-    return rows.map((row, index) => toCollection(row, byCollection.get(row.id) ?? [], index));
+    return rows.map((row, index) =>
+      toCollection(
+        row,
+        images.filter((image) => image.collection_id === row.id),
+        index,
+      ),
+    );
   },
   ['collections-publiques'],
   { tags: [CACHE_TAGS.collections], revalidate: CONTENT_REVALIDATE_SECONDS },
+);
+
+/**
+ * Univers affichés sur le site.
+ *
+ * Retombe sur le contenu de la maquette si la base n'est pas configurée, si
+ * la requête échoue, ou si aucune collection n'est publiée : le site vitrine
+ * reste toujours complet, y compris pendant l'installation.
+ */
+export const getCollections = cache((): Promise<readonly Collection[]> =>
+  readOrFallback('collections', cachedCollections, COLLECTIONS),
+);
+
+const cachedPieces = unstable_cache(
+  async (): Promise<readonly Piece[] | null> => {
+    const db = publicDb();
+    if (!db) return null;
+
+    const rows = await db
+      .select({ piece: pieces, collectionSlug: collections.slug })
+      .from(pieces)
+      .leftJoin(collections, eq(collections.id, pieces.collection_id))
+      .where(eq(pieces.status, 'visible'))
+      .orderBy(asc(pieces.position));
+
+    if (rows.length === 0) return null;
+
+    return rows.map(({ piece, collectionSlug }) => ({
+      id: piece.id,
+      name: piece.name,
+      detail: piece.detail,
+      detailShort: piece.detail_short || piece.detail,
+      weight: formatWeight(piece.weight_grams),
+      weightGrams: piece.weight_grams,
+      collection: collectionSlug ?? '',
+      image: toMediaAsset({
+        storage_path: piece.storage_path,
+        alt: piece.image_alt || piece.name,
+        width: piece.image_width,
+        height: piece.image_height,
+      }),
+      ...(piece.badge_label
+        ? { badge: { label: piece.badge_label, tone: piece.badge_tone ?? 'gold' } }
+        : {}),
+    }));
+  },
+  ['pieces-publiques'],
+  { tags: [CACHE_TAGS.pieces, CACHE_TAGS.collections], revalidate: CONTENT_REVALIDATE_SECONDS },
+);
+
+/** Pièces en vitrine, dans l'ordre choisi depuis le tableau de bord. */
+export const getPieces = cache((): Promise<readonly Piece[]> =>
+  readOrFallback('pièces', cachedPieces, PIECES),
 );

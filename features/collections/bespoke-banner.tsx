@@ -3,10 +3,13 @@ import { WhatsAppIcon } from '@/components/common/icons';
 import { Reveal } from '@/components/motion/reveal';
 import { TextLines } from '@/components/motion/text-lines';
 import { Button } from '@/components/ui/button';
-import { CONTACT, WHATSAPP_INTENTS } from '@/constants/site';
+import { WHATSAPP_INTENTS } from '@/constants/site';
+import { contactLinks, getSiteSettings } from '@/services/content';
 
 /** « Vous ne trouvez pas ? Nous le fabriquons. » */
-export function BespokeBanner() {
+export async function BespokeBanner() {
+  const links = contactLinks((await getSiteSettings()).contact);
+
   return (
     <section
       aria-labelledby="sur-mesure-titre"
@@ -39,7 +42,7 @@ export function BespokeBanner() {
       <Reveal variant="up-sm" className="flex shrink-0 flex-col gap-3.5">
         <Button asChild variant="gold" size="xl" block>
           <a
-            href={CONTACT.whatsappWithMessage(WHATSAPP_INTENTS.bespoke)}
+            href={links.whatsappWithMessage(WHATSAPP_INTENTS.bespoke)}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -48,7 +51,7 @@ export function BespokeBanner() {
           </a>
         </Button>
         <Button asChild variant="outlineLight" size="xl" block>
-          <a href={CONTACT.phoneHref}>Appeler l’atelier</a>
+          <a href={links.phoneHref}>Appeler l’atelier</a>
         </Button>
       </Reveal>
     </section>
